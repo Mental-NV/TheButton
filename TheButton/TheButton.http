@@ -1,6 +1,6 @@
 @TheButton_HostAddress = http://localhost:5285
 
-GET {{TheButton_HostAddress}}/weatherforecast/
+POST {{TheButton_HostAddress}}/api/button/click
 Accept: application/json
 
 ###
