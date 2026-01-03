@@ -5,10 +5,10 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using TheButton.Api.Models;
 
-namespace TheButton.Api.IntegrationTests.Controllers;
+namespace TheButton.Api.IntegrationTests;
 
 [TestClass]
-public class ButtonControllerTests
+public class ButtonApiTests
 {
     private static WebApplicationFactory<Program> _factory = null!;
 
