@@ -1,6 +1,6 @@
 namespace TheButton.Services;
 
-public class CounterService
+public class CounterService : ICounterService
 {
     private int _count = 0;
     private readonly object _lock = new();

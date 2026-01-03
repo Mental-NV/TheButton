@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TheButton.Services;
+using TheButton.Api.Models;
 
 namespace TheButton.Controllers;
 
@@ -7,17 +8,19 @@ namespace TheButton.Controllers;
 [Route("api/button")]
 public class ButtonController : ControllerBase
 {
-    private readonly CounterService _counterService;
+    private readonly ICounterService _counterService;
 
-    public ButtonController(CounterService counterService)
+    public ButtonController(ICounterService counterService)
     {
         _counterService = counterService;
     }
+
+
 
     [HttpPost("click")]
     public IActionResult Click()
     {
         var newValue = _counterService.Increment();
-        return Ok(new { value = newValue });
+        return Ok(new CounterResponse(newValue));
     }
 }
