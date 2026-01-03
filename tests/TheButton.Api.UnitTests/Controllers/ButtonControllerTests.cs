@@ -10,8 +10,8 @@ namespace TheButton.Api.UnitTests.Controllers;
 [TestClass]
 public class ButtonControllerTests
 {
-    private Mock<ICounterService> _mockCounterService;
-    private ButtonController _controller;
+    private Mock<ICounterService> _mockCounterService = null!;
+    private ButtonController _controller = null!;
 
     [TestInitialize]
     public void Setup()

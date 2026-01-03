@@ -10,7 +10,7 @@ namespace TheButton.Api.IntegrationTests;
 [TestClass]
 public class ButtonApiTests
 {
-    private static WebApplicationFactory<Program> _factory;
+    private static WebApplicationFactory<Program> _factory = null!;
 
     [ClassInitialize]
     public static void ClassInit(TestContext context)
