@@ -1,0 +1,66 @@
+name: Build and Deploy to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build with dotnet
+        run: dotnet build TheButton.sln --configuration Release
+
+      - name: Test with dotnet
+        run: dotnet test TheButton.sln --configuration Release --no-build
+
+      - name: Build React App
+        working-directory: ./src/TheButton.Web
+        run: |
+          npm install
+          npm run build
+
+      - name: Dotnet Publish API
+        run: dotnet publish src/TheButton.Api/TheButton.Api.csproj -c Release -o ./publish-api
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ./publish-api
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+      
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'thebutton-api' # Replace with your app name
+          slot-name: 'Production'
+          package: .
