@@ -23,6 +23,10 @@ jobs:
         with:
           node-version: '20'
 
+
+      - name: Install MAUI Workload
+        run: dotnet workload install maui
+
       - name: Build with dotnet
         run: dotnet build TheButton.sln --configuration Release
 
