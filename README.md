@@ -1,52 +1,116 @@
 # TheButton Project
 
+This repository contains a small sample system with three primary apps:
+
+- `src/TheButton.Api` — ASP.NET Core Web API (POST `/api/button/click`).
+- `src/TheButton.Web` — React + Vite frontend (reads `VITE_API_URL`).
+- `src/TheButton.Mobile` — .NET MAUI single-project mobile app (Android, iOS, MacCatalyst, Windows).
+
 ## Production URLs
 - Frontend: https://lively-water-053753610.2.azurestaticapps.net
 - Backend API: https://clickthebutton.azurewebsites.net
 
 ## Prerequisites
-- **.NET 10 SDK**
-- **Node.js** (v18 or higher)
 
-## Project Structure
-- `src/TheButton.Api` - ASP.NET Core Backend API
-- `src/TheButton.Web` - ReactJS Frontend (Vite)
-- `src/TheButton.Mobile` - .NET MAUI Mobile App
-- `src/TheButton.Core` - Shared Class Library
+- .NET 10 SDK
+- MAUI workload (for mobile): `dotnet workload install maui`
+- Node.js 18+ and npm (for the frontend)
+- Platform SDKs as needed (Xcode on macOS for iOS, Android SDK/emulator for Android, Visual Studio on Windows for MAUI/Windows builds)
 
-## Running the Application
+## Build
 
-### 1. Backend (API)
-The backend runs on `http://localhost:5285`.
+Build the full solution from the repository root:
 
-**Using CLI:**
 ```bash
-# Navigate to the API project
-cd src/TheButton.Api
-
-# Run the project
-dotnet run
+dotnet build TheButton.sln --configuration Debug
 ```
-You can access the API documentation (Scalar UI) at `http://localhost:5285/scalar/v1`.
 
-### 2. Frontend (React)
-The frontend runs on `http://localhost:5173` (by default).
+## Run
 
-**Using CLI:**
+### API (backend)
+
+Runs on `http://localhost:5285` by default (see `src/TheButton.Api/Properties/launchSettings.json`).
+
+From repo root:
+
 ```bash
-# Navigate to the Web project
+dotnet run --project src/TheButton.Api
+```
+
+Open the Scalar/OpenAPI UI in development at `http://localhost:5285/scalar/v1`.
+
+
+### Web (frontend)
+
+Dev server:
+
+```bash
 cd src/TheButton.Web
-
-# Install dependencies (first time only)
-npm install
-
-# Run the development server
+npm install   # first time only
 npm run dev
 ```
 
-## Running Tests
-To run all unit and integration tests for the solution:
+Default dev URL: `http://localhost:5173`
+
+### Mobile (.NET MAUI)
+
+The project targets multiple TFMs: `net10.0-android`, `net10.0-ios`, `net10.0-maccatalyst`, and (on Windows) `net10.0-windows10.0.19041.0`. Use the appropriate TFM below.
+
+Install MAUI workload once if needed:
+
 ```bash
-dotnet test
+dotnet workload install maui
 ```
+
+Android (emulator or device)
+
+```bash
+# Ensure an emulator is running or a device is connected
+dotnet build src/TheButton.Mobile -f net10.0-android
+dotnet run --project src/TheButton.Mobile -f net10.0-android
+```
+
+iOS (macOS only — simulator or device)
+
+```bash
+# On macOS with Xcode installed
+dotnet build src/TheButton.Mobile -f net10.0-ios
+dotnet run --project src/TheButton.Mobile -f net10.0-ios
+```
+
+MacCatalyst (macOS desktop)
+
+```bash
+dotnet run --project src/TheButton.Mobile -f net10.0-maccatalyst
+```
+
+Windows (when on Windows)
+
+Prerequisites:
+
+- Visual Studio 2022/2023 with the MAUI workload (recommended) or Windows SDK + developer mode enabled.
+
+CLI (from repo root):
+
+```bash
+dotnet build src/TheButton.Mobile -f net10.0-windows10.0.19041.0
+dotnet run --project src\TheButton.Mobile -f net10.0-windows10.0.19041.0
+```
+
+For debugging and packaging on Windows, open the solution in Visual Studio and run (F5).
+
+## Tests
+
+Run unit and integration tests for the solution:
+
+```bash
+dotnet test TheButton.sln
+```
+
+## CI / CD
+
+See `.github/workflows/deploy.yml` — the workflow uses .NET 10, installs the MAUI workload, builds and tests the solution, publishes the backend artifact and deploys the frontend to Azure Static Web Apps.
+
+
+
 
