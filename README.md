@@ -45,3 +45,8 @@ To run all unit and integration tests for the solution:
 ```bash
 dotnet test
 ```
+
+## Production URLs
+- Frontend: https://lively-water-053753610.2.azurestaticapps.net
+- Backend API: https://clickthebutton.azurewebsites.net
+
