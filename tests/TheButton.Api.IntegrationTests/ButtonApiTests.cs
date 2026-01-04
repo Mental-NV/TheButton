@@ -56,7 +56,7 @@ public class ButtonApiTests
         // Assert
         Assert.IsNotNull(result1);
         Assert.IsNotNull(result2);
-        Assert.IsTrue(result2.Value > result1.Value, $"Expected {result2.Value} to be greater than {result1.Value}");
+        Assert.IsGreaterThan(result1.Value, result2.Value);
         // Note: Since this is an integration test running against a shared singleton service in memory,
         // we can't assert exact values easily unless we reset the state or have isolation.
         // For now, asserting it increases is sufficient.
