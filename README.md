@@ -1,7 +1,7 @@
 # TheButton Project
 
 ## Prerequisites
-- **.NET 9.0 SDK** (or higher)
+- **.NET 10 SDK**
 - **Node.js** (v18 or higher)
 
 ## Project Structure
