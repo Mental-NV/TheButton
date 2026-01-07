@@ -67,6 +67,7 @@ jobs:
 
     - name: Run Android Emulator and Maestro
       uses: reactivecircus/android-emulator-runner@v2
+
       with:
         api-level: 33
         target: default
@@ -75,8 +76,18 @@ jobs:
         script: |
           # 1. Start Mock API in background
           dotnet run --project tools/TheButton.MockApi/TheButton.MockApi.csproj --urls "http://localhost:5001" &
-          echo "Mock API started"
+          MOCK_API_PID=$!
+          echo "Mock API started with PID $MOCK_API_PID"
+
+          # Function to cleanup background process
+          cleanup() {
+            echo "Stopping Mock API..."
+            kill $MOCK_API_PID || true
+          }
           
+          # Trap exit signals to ensure cleanup
+          trap cleanup EXIT
+
           # 2. Configure App to use 10.0.2.2:5001 (Emulator loopback to host)
           # Overwrite appsettings.Development.json
           echo '{"BaseApiUrl": "http://10.0.2.2:5001/"}' > src/TheButton.Mobile/appsettings.Development.json
