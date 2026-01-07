@@ -69,8 +69,9 @@ jobs:
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 33
-        target: google_apis
+        target: default
         arch: x86_64
+        emulator-boot-timeout: 1200
         script: |
           # 1. Start Mock API in background
           dotnet run --project tools/TheButton.MockApi/TheButton.MockApi.csproj --urls "http://localhost:5001" &
