@@ -70,7 +70,7 @@ jobs:
       with:
         api-level: 33
         target: google_apis
-        arch: x86_64
+        arch: arm64-v8a
         script: |
           # 1. Start Mock API in background
           dotnet run --project tools/TheButton.MockApi/TheButton.MockApi.csproj --urls "http://localhost:5001" &
