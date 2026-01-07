@@ -41,7 +41,7 @@ jobs:
         path: '**/*.trx'
 
   android-e2e:
-    runs-on: macos-13
+    runs-on: macos-15-intel
     needs: build-and-test
     steps:
     - uses: actions/checkout@v4
