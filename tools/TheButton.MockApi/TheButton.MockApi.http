@@ -1,0 +1,6 @@
+@TheButton.MockApi_HostAddress = http://localhost:5044
+
+GET {{TheButton.MockApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

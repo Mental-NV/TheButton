@@ -1,66 +1,40 @@
-# TheButton Project
-
-This repository contains a small sample system with three primary apps:
-
-- `src/TheButton.Api` — ASP.NET Core Web API (POST `/api/button/click`).
-- `src/TheButton.Web` — React + Vite frontend (reads `VITE_API_URL`).
-
-## Production URLs
-- Frontend: https://lively-water-053753610.2.azurestaticapps.net
-- Backend API: https://clickthebutton.azurewebsites.net
+# TheButton.Mobile Runbook
 
 ## Prerequisites
+- .NET SDK 10.0.100+
+- MAUI Workload (`dotnet workload install maui`)
+- Android Emulator (for Android) / Xcode (for iOS)
 
-- .NET 10 SDK
-- Node.js 18+ and npm (for the frontend)
+## Running Locally (Windows)
+1. **Mock API**:
+   ```powershell
+   dotnet run --project tools/TheButton.MockApi/TheButton.MockApi.csproj
+   ```
+   (Runs on http://localhost:5001)
 
-## Build
+2. **Mobile App**:
+   ```powershell
+   dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-windows10.0.19041.0 -t:Run
+   ```
+   The app will use `appsettings.Development.json` pointing to `http://localhost:5285`.
+   To use the Mock API, update `appsettings.Development.json` to `http://localhost:5001` or set environment variable `BaseApiUrl=http://localhost:5001`.
 
-Build the full solution from the repository root:
-
-```bash
-dotnet build TheButton.sln --configuration Debug
+## Running Tests
+### Unit Tests
+```powershell
+dotnet test tests/TheButton.Mobile.UnitTests/TheButton.Mobile.UnitTests.csproj
 ```
 
-## Run
-
-### API (backend)
-
-Runs on `http://localhost:5285` by default (see `src/TheButton.Api/Properties/launchSettings.json`).
-
-From repo root:
-
-```bash
-dotnet run --project src/TheButton.Api
+### Integration Tests
+```powershell
+dotnet test tests/TheButton.Mobile.IntegrationTests/TheButton.Mobile.IntegrationTests.csproj
 ```
 
-Open the Scalar/OpenAPI UI in development at `http://localhost:5285/scalar/v1`.
+## CI/CD
+- **CI**: Runs on every push to main/PR. Validates build, unit tests, integration tests, and runs Maestro E2E on Android Emulator.
+- **Release**: Runs on tags `v*`. Builds signed Android AAB and iOS IPA, and runs Maestro E2E on both platforms.
 
-
-### Web (frontend)
-
-Dev server:
-
-```bash
-cd src/TheButton.Web
-npm install   # first time only
-npm run dev
-```
-
-Default dev URL: `http://localhost:5173`
-
-## Tests
-
-Run unit and integration tests for the solution:
-
-```bash
-dotnet test TheButton.sln
-```
-
-## CI / CD
-
-See `.github/workflows/deploy.yml` — the workflow uses .NET 10, installs the MAUI workload, builds and tests the solution, publishes the backend artifact and deploys the frontend to Azure Static Web Apps.
-
-
-
-
+## Secrets Required (for Release)
+- `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, `ANDROID_KEYSTORE_PASSWORD`
+- `IOS_P12_BASE64`, `IOS_P12_PASSWORD`, `IOS_PROVISIONING_PROFILE_BASE64`, `IOS_CODESIGN_KEY`, `IOS_PROVISIONING_PROFILE_NAME`
+- `KEYCHAIN_PASSWORD` (Arbitrary password for temp keychain in CI)

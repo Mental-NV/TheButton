@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
+    - name: Install MAUI Workload
+      run: dotnet workload install maui --ignore-failed-sources
+
+    - name: Restore dependencies
+      run: dotnet restore TheButton.sln
+
+    - name: Build
+      run: dotnet build TheButton.sln --no-restore
+
+    - name: Test
+      run: dotnet test TheButton.sln --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/*.trx'
+
+  android-e2e:
+    runs-on: macos-latest
+    needs: build-and-test
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
+    - name: Install Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install MAUI Workload
+      run: dotnet workload install maui-android --ignore-failed-sources
+
+    - name: Install Maestro
+      run: |
+        curl -Ls "https://get.maestro.mobile.dev" | bash
+        echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+    - name: Run Android Emulator and Maestro
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 33
+        target: google_apis
+        arch: x86_64
+        script: |
+          # 1. Start Mock API in background
+          dotnet run --project tools/TheButton.MockApi/TheButton.MockApi.csproj --urls "http://localhost:5001" &
+          echo "Mock API started"
+          
+          # 2. Configure App to use 10.0.2.2:5001 (Emulator loopback to host)
+          # Overwrite appsettings.Development.json
+          echo '{"BaseApiUrl": "http://10.0.2.2:5001/"}' > src/TheButton.Mobile/appsettings.Development.json
+          
+          # 3. Build & Sign APK (Debug)
+          dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android -c Debug -t:Run -p:AndroidPackageFormat=apk
+          # Note: -t:Run might fail if no device found yet (emulator starting). 
+          # Better to build then install.
+          # dotnet build ... => produces apk in bin/Debug/net10.0-android/com.companyname.thebutton.mobile-Signed.apk
+          
+          # Let's just build first
+          dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android -c Debug -p:AndroidPackageFormat=apk
+          
+          # 4. Install APK
+          adb install src/TheButton.Mobile/bin/Debug/net10.0-android/com.companyname.thebutton.mobile-Signed.apk
+          
+          # 5. Run Maestro
+          $HOME/.maestro/bin/maestro test .maestro/android-flow.yaml
+
+    - name: Upload Maestro Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: maestro-report-android
+        path: ~/.maestro/tests/**/*
