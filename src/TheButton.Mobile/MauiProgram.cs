@@ -40,6 +40,12 @@ public static class MauiProgram
         {
             configBuilder.AddJsonStream(e2eStream);
         }
+#elif E2E_IOS_TEST
+        using var e2eStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.E2eiOS.json");
+        if (e2eStream != null)
+        {
+            configBuilder.AddJsonStream(e2eStream);
+        }
 #elif DEBUG
         using var devStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.Development.json");
         if (devStream != null)

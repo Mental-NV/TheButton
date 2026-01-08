@@ -63,6 +63,7 @@
 	  <EmbeddedResource Include="appsettings.json" />
 	  <EmbeddedResource Include="appsettings.Development.json" />
 	  <EmbeddedResource Include="appsettings.E2eAndroid.json" />
+	  <EmbeddedResource Include="appsettings.E2eiOS.json" />
 	</ItemGroup>
 
 	<ItemGroup>
