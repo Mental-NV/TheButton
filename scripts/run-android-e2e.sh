@@ -36,7 +36,7 @@ dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android -r 
 
 # 4. Install APK
 echo "Installing APK..."
-adb install src/TheButton.Mobile/bin/Debug/net10.0-android/com.companyname.thebutton.mobile-Signed.apk
+adb install src/TheButton.Mobile/bin/Debug/net10.0-android/android-x64/com.companyname.thebutton.mobile-Signed.apk
 
 # Wait for app readiness (simple sleep as app launch is handled by Maestro)
 sleep 5
