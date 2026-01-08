@@ -34,7 +34,13 @@ public static class MauiProgram
             configBuilder.AddJsonStream(stream);
         }
 
-#if DEBUG
+#if E2E_ANDROID_TEST
+        using var e2eStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.E2eAndroid.json");
+        if (e2eStream != null)
+        {
+            configBuilder.AddJsonStream(e2eStream);
+        }
+#elif DEBUG
         using var devStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.Development.json");
         if (devStream != null)
         {
