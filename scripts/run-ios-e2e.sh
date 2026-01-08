@@ -53,32 +53,35 @@ cleanup() {
 trap cleanup EXIT
 
 # ============================================================================
-# 2. Create and boot iOS Simulator (robust runtime/device selection)
+# 2. Create and boot iOS Simulator
 # ============================================================================
+# You can override these from the workflow/job/step env.
+# - IOS_RUNTIME_MAJOR: preferred iOS major version (e.g., "18", "26")
+# - IOS_DEVICE_TYPE_NAME: preferred device name (e.g., "iPhone 16")
+# - IOS_SIM_NAME: simulator name (default: E2E-iPhone-CI)
 SIM_NAME="${IOS_SIM_NAME:-E2E-iPhone-CI}"
-IOS_DEVICE_TYPE_NAME="${IOS_DEVICE_TYPE_NAME:-iPhone 16}"
 IOS_RUNTIME_MAJOR="${IOS_RUNTIME_MAJOR:-18}"
+IOS_DEVICE_TYPE_NAME="${IOS_DEVICE_TYPE_NAME:-iPhone 16}"
 
 echo "Setting up iOS Simulator..."
 echo "  Preferred device name: $IOS_DEVICE_TYPE_NAME"
 echo "  Preferred iOS major:   $IOS_RUNTIME_MAJOR"
 
-# List available runtimes/devicetypes for debugging
+# List available runtimes/devicetypes for debugging (human-readable)
 echo "Available runtimes:"
-xcrun simctl list runtimes
+xcrun simctl list runtimes || true
 echo "Available device types:"
-xcrun simctl list devicetypes
+xcrun simctl list devicetypes || true
 
-# Resolve runtime identifier (prefer latest available in the desired major; else latest overall)
-RUNTIME_LINE="$(xcrun simctl list runtimes -j | python3 - "$IOS_RUNTIME_MAJOR" <<'PY'
-import json, sys
+resolve_ios_runtime_id() {
+  python3 - "$IOS_RUNTIME_MAJOR" <<'PY'
+import json, subprocess, sys, re
 
-desired_major = int(sys.argv[1])
-data = json.load(sys.stdin)
+major = int(sys.argv[1])
 
 def parse_ver(v: str):
     parts = []
-    for p in (v or "").split("."):
+    for p in (v or "0").split("."):
         try:
             parts.append(int(p))
         except ValueError:
@@ -87,42 +90,47 @@ def parse_ver(v: str):
         parts.append(0)
     return tuple(parts[:3])
 
+def load_simctl_json(args):
+    out = subprocess.check_output(args, text=True, stderr=subprocess.STDOUT)
+    # Some toolchains occasionally emit warnings before JSON. Keep JSON from first '{'.
+    i = out.find("{")
+    if i > 0:
+        out = out[i:]
+    try:
+        return json.loads(out)
+    except json.JSONDecodeError:
+        snippet = out[:400].replace("\n", "\\n")
+        print(f"SIMCTL_JSON_PARSE_ERROR: {snippet}", file=sys.stderr)
+        raise
+
+data = load_simctl_json(["xcrun","simctl","list","runtimes","-j"])
 rts = [
     r for r in data.get("runtimes", [])
     if r.get("isAvailable")
-    and (r.get("identifier","").startswith("com.apple.CoreSimulator.SimRuntime.iOS-"))
+    and r.get("identifier","").startswith("com.apple.CoreSimulator.SimRuntime.iOS-")
 ]
-
 if not rts:
-    print("")
-    sys.exit(0)
+    sys.exit(2)
 
-# Prefer desired major if present (e.g., 18.x)
-preferred = [r for r in rts if parse_ver(r.get("version","0"))[0] == desired_major]
+preferred = [r for r in rts if parse_ver(r.get("version","0"))[0] == major]
 pool = preferred if preferred else rts
-
 pool.sort(key=lambda r: parse_ver(r.get("version","0")))
-best = pool[-1]
-print(f'{best["identifier"]}|{best.get("name","")}|{best.get("version","")}')
+print(pool[-1]["identifier"])
 PY
-)"
+}
 
-if [[ -z "$RUNTIME_LINE" || "$RUNTIME_LINE" != *"|"* ]]; then
-  echo "ERROR: Could not resolve an iOS runtime."
-  exit 1
-fi
-
-RUNTIME_ID="${RUNTIME_LINE%%|*}"
-REST="${RUNTIME_LINE#*|}"
-RUNTIME_NAME="${REST%%|*}"
-RUNTIME_VERSION="${REST#*|}"
-
-# Resolve device type identifier (prefer requested name; else newest iPhone)
-DEVICE_TYPE_ID="$(xcrun simctl list devicetypes -j | python3 - "$IOS_DEVICE_TYPE_NAME" <<'PY'
-import json, sys, re
+resolve_iphone_devicetype_id() {
+  python3 - "$IOS_DEVICE_TYPE_NAME" <<'PY'
+import json, subprocess, sys, re
 
 preferred_name = sys.argv[1]
-data = json.load(sys.stdin)
+
+out = subprocess.check_output(["xcrun","simctl","list","devicetypes","-j"], text=True, stderr=subprocess.STDOUT)
+i = out.find("{")
+if i > 0:
+    out = out[i:]
+data = json.loads(out)
+
 dts = data.get("devicetypes", [])
 
 # Exact match first
@@ -131,27 +139,39 @@ for d in dts:
         print(d.get("identifier",""))
         sys.exit(0)
 
-# Fallback: newest iPhone by number
+# Fallback: newest iPhone by number (best-effort)
 iphones = [d for d in dts if (d.get("name") or "").startswith("iPhone")]
-def iphone_rank(name: str):
+def rank(name: str):
     m = re.search(r"iPhone\s+(\d+)", name or "")
     return int(m.group(1)) if m else -1
 
-iphones.sort(key=lambda d: iphone_rank(d.get("name","")))
-print((iphones[-1].get("identifier","")) if iphones else (dts[0].get("identifier","") if dts else ""))
+iphones.sort(key=lambda d: rank(d.get("name","")))
+if iphones:
+    print(iphones[-1].get("identifier",""))
+    sys.exit(0)
+
+sys.exit(3)
 PY
-)"
+}
 
-if [ -z "$DEVICE_TYPE_ID" ]; then
-  echo "ERROR: Could not resolve an iPhone device type."
+RUNTIME_ID="$(resolve_ios_runtime_id)" || {
+  echo "ERROR: Failed to resolve iOS runtime (major=$IOS_RUNTIME_MAJOR)."
+  echo "Diagnostics:"
+  xcrun simctl list runtimes || true
   exit 1
-fi
+}
 
-echo "Resolved runtime: $RUNTIME_NAME ($RUNTIME_VERSION)"
-echo "  Runtime ID:     $RUNTIME_ID"
-echo "Resolved device type ID: $DEVICE_TYPE_ID"
+DEVICE_TYPE_ID="$(resolve_iphone_devicetype_id)" || {
+  echo "ERROR: Failed to resolve device type ($IOS_DEVICE_TYPE_NAME)."
+  echo "Diagnostics:"
+  xcrun simctl list devicetypes || true
+  exit 1
+}
 
-# Clean existing simulator if present
+echo "Resolved Runtime ID:     $RUNTIME_ID"
+echo "Resolved Device Type ID: $DEVICE_TYPE_ID"
+
+# Clean existing E2E simulator if present
 xcrun simctl delete "$SIM_NAME" 2>/dev/null || true
 
 # Create fresh simulator using identifiers (most reliable)
@@ -159,6 +179,7 @@ echo "Creating simulator '$SIM_NAME'..."
 SIM_UDID="$(xcrun simctl create "$SIM_NAME" "$DEVICE_TYPE_ID" "$RUNTIME_ID")"
 echo "Created simulator with UDID: $SIM_UDID"
 
+# Boot simulator and wait for ready
 echo "Booting simulator..."
 xcrun simctl boot "$SIM_UDID"
 xcrun simctl bootstatus "$SIM_UDID" -b
@@ -167,6 +188,7 @@ echo "Simulator booted and ready"
 # ============================================================================
 # 3. Build iOS Simulator App
 # ============================================================================
+
 echo ""
 echo "=== Building iOS Simulator App ==="
 dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj \
