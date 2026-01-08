@@ -32,7 +32,7 @@ echo '{"BaseApiUrl": "http://10.0.2.2:5001/"}' > src/TheButton.Mobile/appsetting
 
 # 3. Build & Sign APK (Debug)
 echo "Building APK..."
-dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android -r android-x64 -c Debug -p:AndroidPackageFormat=apk
+dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android -r android-x64 -c Debug -p:AndroidPackageFormat=apk -p:EmbedAssembliesIntoApk=true -p:AndroidUseSharedRuntime=false
 
 # 4. Install APK
 echo "Installing APK..."
