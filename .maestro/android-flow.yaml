@@ -2,7 +2,7 @@ appId: com.companyname.thebutton.mobile
 ---
 - launchApp
 - assertVisible: "Value: 0"
-- tapOn: "MainButton"
+- tapOn: "Click"
 - assertVisible: "Value: 1"
-- tapOn: "MainButton"
+- tapOn: "Click"
 - assertVisible: "Value: 2"
