@@ -1,0 +1,79 @@
+name: iOS E2E
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # Increase Maestro driver startup timeout for CI cold starts (default 15s -> 60s)
+  MAESTRO_DRIVER_STARTUP_TIMEOUT: 60000
+
+jobs:
+  ios-e2e:
+    # Pin macOS version - macos-14 is Apple Silicon (M1, ARM64)
+    # Do NOT use macos-latest as it may change unexpectedly
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pin Xcode version explicitly
+      # Avoid Xcode 16.2 on macOS 15 due to known Maestro hang issue
+      # See: https://github.com/mobile-dev-inc/maestro/issues/2906
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.1'
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      # Java 17+ required for Maestro 2.x
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install MAUI Workload
+        run: dotnet workload install maui-ios --ignore-failed-sources
+
+      # Install Maestro CLI
+      # TODO: Pin specific version for reproducibility if flakiness observed
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+          echo "Maestro version:"
+          ~/.maestro/bin/maestro --version
+
+      - name: Run iOS E2E Tests
+        run: |
+          chmod +x scripts/run-ios-e2e.sh
+          ./scripts/run-ios-e2e.sh
+
+      # Always upload Maestro test artifacts for debugging
+      - name: Upload Maestro Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-report-ios
+          path: ~/.maestro/tests/**/*
+          if-no-files-found: ignore
+
+      # Upload additional diagnostics on failure
+      - name: Upload Failure Diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-e2e-diagnostics
+          path: |
+            mock_api.log
+            ~/Library/Logs/CoreSimulator/**/*
+          if-no-files-found: ignore
