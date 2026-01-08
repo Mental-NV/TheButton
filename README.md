@@ -1,66 +1,115 @@
-# TheButton Project
+# TheButton
 
-This repository contains a small sample system with three primary apps:
+TheButton is a multi-platform application designed to... click a button!
 
-- `src/TheButton.Api` — ASP.NET Core Web API (POST `/api/button/click`).
-- `src/TheButton.Web` — React + Vite frontend (reads `VITE_API_URL`).
+## Project Overview
 
-## Production URLs
-- Frontend: https://lively-water-053753610.2.azurestaticapps.net
-- Backend API: https://clickthebutton.azurewebsites.net
+-   `src/TheButton.Api`: ASP.NET Core Web API (Backend)
+-   `src/TheButton.Web`: React application built with Vite (Frontend)
+-   `src/TheButton.Mobile`: .NET MAUI application (Mobile)
+
+## Production Deployments
+
+-   **Web (Frontend)**: https://lively-water-053753610.2.azurestaticapps.net
+-   **API (Backend)**: https://clickthebutton.azurewebsites.net
 
 ## Prerequisites
 
-- .NET 10 SDK
-- Node.js 18+ and npm (for the frontend)
+-   **.NET SDK**: 10.0.100+
+-   **Node.js**: LTS version (for Web)
+-   **MAUI Workload**: `dotnet workload install maui`
+-   **Mobile Emulators**:
+    -   Android Emulator (via Android Studio)
+    -   Xcode (for iOS, macOS only)
 
-## Build
+---
 
-Build the full solution from the repository root:
+## 🔌 API (Backend)
 
-```bash
-dotnet build TheButton.sln --configuration Debug
-```
+The backend is an ASP.NET Core Web API located in `src/TheButton.Api`.
 
-## Run
-
-### API (backend)
-
-Runs on `http://localhost:5285` by default (see `src/TheButton.Api/Properties/launchSettings.json`).
-
-From repo root:
+### Run Locally
 
 ```bash
-dotnet run --project src/TheButton.Api
+dotnet run --project src/TheButton.Api/TheButton.Api.csproj
 ```
 
-Open the Scalar/OpenAPI UI in development at `http://localhost:5285/scalar/v1`.
+-   **API URL**: `http://localhost:5285` (Configured in `launchSettings.json`)
+-   **Scalar/OpenAPI UI**: `http://localhost:5285/scalar/v1`
 
+### Test
 
-### Web (frontend)
+Run all unit and integration tests:
 
-Dev server:
+```bash
+dotnet test
+```
+
+---
+
+## 🚀 Web (Frontend)
+
+The frontend is a React application built with Vite, located in `src/TheButton.Web`.
+
+### Setup
 
 ```bash
 cd src/TheButton.Web
-npm install   # first time only
+npm install
+```
+
+### Run Locally
+
+```bash
 npm run dev
 ```
 
-Default dev URL: `http://localhost:5173`
+Access the app at `http://localhost:5173`.
 
-## Tests
-
-Run unit and integration tests for the solution:
+### Test
 
 ```bash
-dotnet test TheButton.sln
+npx vitest run
 ```
 
-## CI / CD
+---
 
-See `.github/workflows/deploy.yml` — the workflow uses .NET 10, installs the MAUI workload, builds and tests the solution, publishes the backend artifact and deploys the frontend to Azure Static Web Apps.
+## 📱 Mobile
 
+The mobile app is built with .NET MAUI, located in `src/TheButton.Mobile`.
 
+### Running Locally (Windows)
 
+The mobile app is configured to connect to the local API by default.
 
+1.  **Start the Backend**:
+    Run `TheButton.Api` (it runs on `http://localhost:5285` which the mobile app expects).
+
+2.  **Run the Mobile App**:
+    ```powershell
+    dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-windows10.0.19041.0 -t:Run
+    ```
+    *Note: The app uses `appsettings.Development.json` which is configured to point to `http://localhost:5285`.*
+
+### Tests
+
+**Unit Tests**:
+
+```powershell
+dotnet test tests/TheButton.Mobile.UnitTests/TheButton.Mobile.UnitTests.csproj
+```
+
+**Integration Tests**:
+
+```powershell
+dotnet test tests/TheButton.Mobile.IntegrationTests/TheButton.Mobile.IntegrationTests.csproj
+```
+
+---
+
+## ⚙️ CI/CD
+
+Hosted on GitHub Actions.
+
+-   **Build & Test**: Triggers on push to `main` and PRs. Validates .NET (API/Mobile) and runs tests.
+-   **Release**: Triggers on tags starting with `v*`. Builds and signs Android/iOS apps and verifies with Maestro E2E tests.
