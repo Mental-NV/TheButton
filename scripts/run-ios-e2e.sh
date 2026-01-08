@@ -55,128 +55,24 @@ trap cleanup EXIT
 # ============================================================================
 # 2. Create and boot iOS Simulator
 # ============================================================================
-# You can override these from the workflow/job/step env.
-# - IOS_RUNTIME_MAJOR: preferred iOS major version (e.g., "18", "26")
-# - IOS_DEVICE_TYPE_NAME: preferred device name (e.g., "iPhone 16")
-# - IOS_SIM_NAME: simulator name (default: E2E-iPhone-CI)
-SIM_NAME="${IOS_SIM_NAME:-E2E-iPhone-CI}"
-IOS_RUNTIME_MAJOR="${IOS_RUNTIME_MAJOR:-18}"
-IOS_DEVICE_TYPE_NAME="${IOS_DEVICE_TYPE_NAME:-iPhone 16}"
+DEVICE_TYPE="iPhone 16"
+RUNTIME="iOS18.6"
+SIM_NAME="E2E-iPhone-CI"
 
 echo "Setting up iOS Simulator..."
-echo "  Preferred device name: $IOS_DEVICE_TYPE_NAME"
-echo "  Preferred iOS major:   $IOS_RUNTIME_MAJOR"
+echo "  Device Type: $DEVICE_TYPE"
+echo "  Runtime: $RUNTIME"
 
-# List available runtimes/devicetypes for debugging (human-readable)
+# List available runtimes for debugging
 echo "Available runtimes:"
-xcrun simctl list runtimes || true
-echo "Available device types:"
-xcrun simctl list devicetypes || true
-
-resolve_ios_runtime_id() {
-  python3 - "$IOS_RUNTIME_MAJOR" <<'PY'
-import json, subprocess, sys, re
-
-major = int(sys.argv[1])
-
-def parse_ver(v: str):
-    parts = []
-    for p in (v or "0").split("."):
-        try:
-            parts.append(int(p))
-        except ValueError:
-            parts.append(0)
-    while len(parts) < 3:
-        parts.append(0)
-    return tuple(parts[:3])
-
-def load_simctl_json(args):
-    out = subprocess.check_output(args, text=True, stderr=subprocess.STDOUT)
-    # Some toolchains occasionally emit warnings before JSON. Keep JSON from first '{'.
-    i = out.find("{")
-    if i > 0:
-        out = out[i:]
-    try:
-        return json.loads(out)
-    except json.JSONDecodeError:
-        snippet = out[:400].replace("\n", "\\n")
-        print(f"SIMCTL_JSON_PARSE_ERROR: {snippet}", file=sys.stderr)
-        raise
-
-data = load_simctl_json(["xcrun","simctl","list","runtimes","-j"])
-rts = [
-    r for r in data.get("runtimes", [])
-    if r.get("isAvailable")
-    and r.get("identifier","").startswith("com.apple.CoreSimulator.SimRuntime.iOS-")
-]
-if not rts:
-    sys.exit(2)
-
-preferred = [r for r in rts if parse_ver(r.get("version","0"))[0] == major]
-pool = preferred if preferred else rts
-pool.sort(key=lambda r: parse_ver(r.get("version","0")))
-print(pool[-1]["identifier"])
-PY
-}
-
-resolve_iphone_devicetype_id() {
-  python3 - "$IOS_DEVICE_TYPE_NAME" <<'PY'
-import json, subprocess, sys, re
-
-preferred_name = sys.argv[1]
-
-out = subprocess.check_output(["xcrun","simctl","list","devicetypes","-j"], text=True, stderr=subprocess.STDOUT)
-i = out.find("{")
-if i > 0:
-    out = out[i:]
-data = json.loads(out)
-
-dts = data.get("devicetypes", [])
-
-# Exact match first
-for d in dts:
-    if d.get("name") == preferred_name:
-        print(d.get("identifier",""))
-        sys.exit(0)
-
-# Fallback: newest iPhone by number (best-effort)
-iphones = [d for d in dts if (d.get("name") or "").startswith("iPhone")]
-def rank(name: str):
-    m = re.search(r"iPhone\s+(\d+)", name or "")
-    return int(m.group(1)) if m else -1
-
-iphones.sort(key=lambda d: rank(d.get("name","")))
-if iphones:
-    print(iphones[-1].get("identifier",""))
-    sys.exit(0)
-
-sys.exit(3)
-PY
-}
-
-RUNTIME_ID="$(resolve_ios_runtime_id)" || {
-  echo "ERROR: Failed to resolve iOS runtime (major=$IOS_RUNTIME_MAJOR)."
-  echo "Diagnostics:"
-  xcrun simctl list runtimes || true
-  exit 1
-}
-
-DEVICE_TYPE_ID="$(resolve_iphone_devicetype_id)" || {
-  echo "ERROR: Failed to resolve device type ($IOS_DEVICE_TYPE_NAME)."
-  echo "Diagnostics:"
-  xcrun simctl list devicetypes || true
-  exit 1
-}
-
-echo "Resolved Runtime ID:     $RUNTIME_ID"
-echo "Resolved Device Type ID: $DEVICE_TYPE_ID"
+xcrun simctl list runtimes
 
 # Clean existing E2E simulator if present
 xcrun simctl delete "$SIM_NAME" 2>/dev/null || true
 
-# Create fresh simulator using identifiers (most reliable)
+# Create fresh simulator
 echo "Creating simulator '$SIM_NAME'..."
-SIM_UDID="$(xcrun simctl create "$SIM_NAME" "$DEVICE_TYPE_ID" "$RUNTIME_ID")"
+SIM_UDID=$(xcrun simctl create "$SIM_NAME" "$DEVICE_TYPE" "$RUNTIME")
 echo "Created simulator with UDID: $SIM_UDID"
 
 # Boot simulator and wait for ready
@@ -188,7 +84,6 @@ echo "Simulator booted and ready"
 # ============================================================================
 # 3. Build iOS Simulator App
 # ============================================================================
-
 echo ""
 echo "=== Building iOS Simulator App ==="
 dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj \
