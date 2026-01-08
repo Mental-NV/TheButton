@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Moq" />
     <PackageReference Include="MSTest" />
+    <PackageReference Include="Moq" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TheButton.Api\TheButton.Api.csproj" />
+    <ProjectReference Include="..\..\src\TheButton.Mobile.Infrastructure\TheButton.Mobile.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

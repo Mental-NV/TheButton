@@ -1,0 +1,8 @@
+appId: com.companyname.thebutton.mobile
+---
+- launchApp
+- assertVisible: "Value: 0"
+- tapOn: "Click"
+- assertVisible: "Value: 1"
+- tapOn: "Click"
+- assertVisible: "Value: 2"
