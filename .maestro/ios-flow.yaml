@@ -1,9 +1,21 @@
 appId: com.companyname.thebutton.mobile
 ---
 - launchApp
-- assertVisible: "CounterLabel"
-- assertVisible: "Value: 0"
-- tapOn: "MainButton"
-- assertVisible: "Value: 1"
-- tapOn: "MainButton"
-- assertVisible: "Value: 2"
+
+- assertVisible:
+    id: CounterLabel
+    text: "Value: 0"
+
+- tapOn:
+    id: MainButton
+
+- assertVisible:
+    id: CounterLabel
+    text: "Value: 1"
+
+- tapOn:
+    id: MainButton
+
+- assertVisible:
+    id: CounterLabel
+    text: "Value: 2"
