@@ -91,14 +91,9 @@ jobs:
         name: maestro-report-android
         path: ~/.maestro/tests/**/*
 
-    - name: Save Logcat
-      if: failure()
-      run: |
-        adb logcat -d > logcat.txt
-
     - name: Upload Logcat
       if: failure()
       uses: actions/upload-artifact@v4
       with:
         name: logcat-android
-        path: logcat.txt
+        path: android-logcat.txt

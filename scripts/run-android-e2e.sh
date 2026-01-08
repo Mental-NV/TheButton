@@ -13,9 +13,12 @@ cleanup() {
   echo "--- End Mock API Logs ---"
 
   echo "--- Logcat Crash Dump ---"
-  adb logcat -d | grep -C 20 "FATAL EXCEPTION" || true
+  adb logcat -d | grep -E "AndroidRuntime|FATAL|com.companyname.thebutton.mobile|dotnet" || true
   adb logcat -d | tail -n 100
   echo "--- End Logcat Crash Dump ---"
+
+  echo "Saving full logcat to android-logcat.txt..."
+  adb logcat -d > android-logcat.txt
 
   echo "Stopping Mock API (PID: $MOCK_API_PID)..."
   kill $MOCK_API_PID || true
@@ -29,7 +32,7 @@ echo '{"BaseApiUrl": "http://10.0.2.2:5001/"}' > src/TheButton.Mobile/appsetting
 
 # 3. Build & Sign APK (Debug)
 echo "Building APK..."
-dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android -c Debug -p:AndroidPackageFormat=apk
+dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android -r android-x64 -c Debug -p:AndroidPackageFormat=apk
 
 # 4. Install APK
 echo "Installing APK..."
