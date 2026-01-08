@@ -27,12 +27,9 @@ cleanup() {
 # Trap exit signals to ensure cleanup
 trap cleanup EXIT
 
-# 2. Configure App to use 10.0.2.2:5001 (Emulator loopback to host)
-echo '{"BaseApiUrl": "http://10.0.2.2:5001/"}' > src/TheButton.Mobile/appsettings.Development.json
-
-# 3. Build & Sign APK (Debug)
+# 2. Build & Sign APK (Debug) - E2E Config enabled via E2E_ANDROID_TEST constant
 echo "Building APK..."
-dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android -r android-x64 -c Debug -p:AndroidPackageFormat=apk -p:EmbedAssembliesIntoApk=true -p:AndroidUseSharedRuntime=false
+dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android -r android-x64 -c Debug -p:AndroidPackageFormat=apk -p:EmbedAssembliesIntoApk=true -p:AndroidUseSharedRuntime=false -p:DefineConstants=E2E_ANDROID_TEST
 
 # 4. Install APK
 echo "Installing APK..."
