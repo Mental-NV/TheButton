@@ -69,7 +69,9 @@ Access the app at `http://localhost:5173`.
 ### Test
 
 ```bash
-npx vitest run
+npm test            # Run all tests once
+npm run test:watch  # Run in watch mode
+npm run test:coverage # Run with coverage report
 ```
 
 ---

@@ -1,33 +1,18 @@
-import { useState } from 'react'
 import './App.css'
+import { useButtonCounter } from './hooks/useButtonCounter'
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  const handleClick = async () => {
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${apiUrl}/api/button/click`, {
-        method: 'POST'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setCount(data.value);
-      } else {
-        console.error('Failed to increment counter');
-      }
-    } catch (error) {
-      console.error('Error clicking button:', error);
-    }
-  }
+  const { count, isLoading, error, handleClick } = useButtonCounter()
 
   return (
     <div className="card">
-      <button onClick={handleClick}>
-        count is {count}
+      <button onClick={handleClick} disabled={isLoading}>
+        {isLoading ? 'Loading...' : `count is ${count}`}
       </button>
+      {error && <p className="error" role="alert">{error}</p>}
     </div>
   )
 }
 
 export default App
+
