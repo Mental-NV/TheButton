@@ -121,9 +121,10 @@ echo "MAESTRO_DRIVER_STARTUP_TIMEOUT=${MAESTRO_DRIVER_STARTUP_TIMEOUT:-not set}"
 mkdir -p ~/.maestro/tests
 
 # Run Maestro with explicit UDID and output
-~/.maestro/bin/maestro test .maestro/ios-flow.yaml \
-  --udid "$SIM_UDID" \
-  --output ~/.maestro/tests
+~/.maestro/bin/maestro --device "$SIM_UDID" test .maestro/ios-flow.yaml \
+  --test-output-dir ~/.maestro/tests \
+  --format JUNIT \
+  --output ~/.maestro/tests/junit.xml
 
 echo ""
 echo "=== iOS E2E Tests Complete ==="
