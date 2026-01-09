@@ -19,7 +19,7 @@ on:
     paths: *mobile_paths
 
   workflow_dispatch:
-
+    
 concurrency:
   group: e2e-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -89,8 +89,13 @@ jobs:
       - name: Install Maestro (latest)
         shell: bash
         run: |
+          set -euo pipefail
           curl -fsSL "https://get.maestro.mobile.dev" | bash
-          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+          # Make Maestro available in THIS step and all subsequent steps
+          export PATH="$HOME/.maestro/bin:$PATH"
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
           maestro --version
 
       - name: Ensure Maestro output directory exists
@@ -189,8 +194,13 @@ jobs:
       - name: Install Maestro (latest)
         shell: bash
         run: |
+          set -euo pipefail
           curl -fsSL "https://get.maestro.mobile.dev" | bash
-          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+          # Make Maestro available in THIS step and all subsequent steps
+          export PATH="$HOME/.maestro/bin:$PATH"
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
           maestro --version
 
       - name: Ensure Maestro output directory exists
