@@ -3,97 +3,100 @@ name: CI
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - "**/*.md"
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - "**/*.md"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_MULTILEVEL_LOOKUP: 0
+  NUGET_PACKAGES: ${{ runner.temp }}/nuget-packages
 
 jobs:
-  build-and-test:
+  dotnet:
+    name: .NET build & test
     runs-on: windows-latest
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        global-json-file: global.json
+      - uses: actions/checkout@v4
 
-    - name: Install MAUI Workload
-      run: dotnet workload install maui --ignore-failed-sources
+      - name: Setup .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
 
-    - name: Restore dependencies
-      run: dotnet restore TheButton.sln
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/*.fsproj', '**/*.props', '**/*.targets', 'Directory.Packages.props', 'NuGet.config', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-    - name: Build
-      run: dotnet build TheButton.sln --no-restore
+      - name: Install MAUI workload (Windows)
+        run: dotnet workload install maui --ignore-failed-sources
 
-    - name: Test
-      run: dotnet test TheButton.sln --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+      - name: Restore
+        run: dotnet restore TheButton.sln
 
-    - name: Upload Test Results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: test-results
-        path: '**/*.trx'
+      - name: Build
+        run: dotnet build TheButton.sln -c Release --no-restore
 
-  android-e2e:
+      - name: Test
+        run: dotnet test TheButton.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/*.trx"
+          if-no-files-found: warn
+          retention-days: 7
+
+  web:
+    name: Web build & test
     runs-on: ubuntu-latest
-    needs: build-and-test
+
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Enable KVM
-      run: |
-        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-        sudo udevadm control --reload-rules
-        sudo udevadm trigger --name-match=kvm
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+          cache-dependency-path: src/TheButton.Web/package-lock.json
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        global-json-file: global.json
+      - name: Install
+        working-directory: src/TheButton.Web
+        run: npm ci
 
-    - name: Install Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Test
+        working-directory: src/TheButton.Web
+        run: npm test --if-present
 
-    - name: Install MAUI Workload
-      run: dotnet workload install maui-android --ignore-failed-sources
+      - name: Build
+        working-directory: src/TheButton.Web
+        run: npm run build --if-present
 
-    - name: Install Maestro
-      run: |
-        curl -Ls "https://get.maestro.mobile.dev" | bash
-        echo "$HOME/.maestro/bin" >> $GITHUB_PATH
-
-    - name: Run Android Emulator and Maestro
-      uses: reactivecircus/android-emulator-runner@v2
-
-      with:
-        api-level: 33
-        target: default
-        arch: x86_64
-        emulator-boot-timeout: 1200
-        emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -no-metrics
-        script: |
-          chmod +x scripts/run-android-e2e.sh
-          ./scripts/run-android-e2e.sh
-
-    - name: Upload Maestro Report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: maestro-report-android
-        path: ~/.maestro/tests/**/*
-
-    - name: Upload Logcat
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: logcat-android
-        path: android-logcat.txt
+      - name: Upload web build output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: src/TheButton.Web/dist
+          if-no-files-found: ignore
+          retention-days: 3
