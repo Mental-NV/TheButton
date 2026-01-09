@@ -9,6 +9,9 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+## NuGet ##
+nuget-packages/
+
 ## Windows ##
 Thumbs.db
 ehthumbs.db

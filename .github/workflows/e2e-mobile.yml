@@ -3,10 +3,10 @@ name: Mobile E2E
 on:
   pull_request:
     branches: [ main ]
-    paths:
+    paths: &mobile_paths
       - "src/TheButton.Mobile/**"
-      - "src/TheButton.Mobile.Infrastructure/**"
       - "src/TheButton.Mobile.Core/**"
+      - "src/TheButton.Mobile.Infrastructure/**"
       - "maestro/**"
       - ".maestro/**"
       - "scripts/run-android-e2e.sh"
@@ -16,31 +16,9 @@ on:
 
   push:
     branches: [ main ]
-    paths:
-      - "src/TheButton.Mobile/**"
-      - "src/TheButton.Mobile.Infrastructure/**"
-      - "src/TheButton.Mobile.Core/**"
-      - "maestro/**"
-      - ".maestro/**"
-      - "scripts/run-android-e2e.sh"
-      - "scripts/run-ios-e2e.sh"
-      - "tools/TheButton.MockApi/**"
-      - ".github/workflows/e2e-mobile.yml"
+    paths: *mobile_paths
 
   workflow_dispatch:
-    inputs:
-      platform:
-        description: Which platform(s) to run
-        required: true
-        default: both
-        type: choice
-        options:
-          - both
-          - android
-          - ios
-
-  schedule:
-    - cron: "0 2 * * *"
 
 concurrency:
   group: e2e-${{ github.workflow }}-${{ github.ref }}
@@ -53,15 +31,15 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_MULTILEVEL_LOOKUP: 0
+  NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
   MAESTRO_CLI_NO_ANALYTICS: "1"
   MAESTRO_DRIVER_STARTUP_TIMEOUT: 240000
-  NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
 
 jobs:
   android-e2e:
     name: Android E2E (Maestro)
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.platform == 'both' || github.event.inputs.platform == 'android' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
@@ -102,22 +80,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-dotnetpacks-
 
-      - name: Restore MAUI workloads (pinned)
+      - name: Restore MAUI workloads (pinned by SDK)
         run: |
           dotnet --info
           dotnet workload restore src/TheButton.Mobile/TheButton.Mobile.csproj --skip-manifest-update --ignore-failed-sources
           dotnet workload --info
 
-      - name: Install Maestro
+      - name: Install Maestro (latest)
+        shell: bash
         run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
           maestro --version
 
       - name: Ensure Maestro output directory exists
         run: mkdir -p ~/.maestro/tests
 
-      - name: Run Android Emulator and Maestro
+      - name: Run Android emulator and Maestro
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33
@@ -159,8 +138,8 @@ jobs:
 
   ios-e2e:
     name: iOS E2E (Maestro)
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.platform == 'both' || github.event.inputs.platform == 'ios' }}
     runs-on: macos-15
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -200,16 +179,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-dotnetpacks-
 
-      - name: Restore MAUI workloads (pinned)
+      - name: Restore MAUI workloads (pinned by SDK)
         run: |
           dotnet --info
           xcodebuild -version
           dotnet workload restore src/TheButton.Mobile/TheButton.Mobile.csproj --skip-manifest-update --ignore-failed-sources
           dotnet workload --info
 
-      - name: Install Maestro
+      - name: Install Maestro (latest)
+        shell: bash
         run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
           maestro --version
 

@@ -45,8 +45,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Install MAUI workload (Windows)
-        run: dotnet workload install maui --ignore-failed-sources
+      - name: Cache .NET workload packs (Windows)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.dotnet/packs
+            ~/.dotnet/sdk-manifests
+            ~/.dotnet/workloads
+          key: ${{ runner.os }}-dotnetpacks-${{ hashFiles('global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-dotnetpacks-
+
+      - name: Restore MAUI workloads (pinned by SDK)
+        run: |
+          dotnet --info
+          dotnet workload restore TheButton.sln --skip-manifest-update --ignore-failed-sources
+          dotnet workload --info
 
       - name: Restore
         run: dotnet restore TheButton.sln
