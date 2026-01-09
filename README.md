@@ -2,16 +2,22 @@
 
 TheButton is a multi-platform application designed to... click a button!
 
+## Deployments
+
+![Azure Deploy](https://github.com/Mental-NV/TheButton/actions/workflows/deploy.yml/badge.svg)
+![iOS E2E](https://github.com/Mental-NV/TheButton/actions/workflows/ios-e2e.yml/badge.svg)
+![Android E2E](https://github.com/Mental-NV/TheButton/actions/workflows/ci.yml/badge.svg)
+
+-   **Web (Frontend)**: https://lively-water-053753610.2.azurestaticapps.net
+-   **API (Backend)**: https://clickthebutton.azurewebsites.net
+
 ## Project Overview
 
 -   `src/TheButton.Api`: ASP.NET Core Web API (Backend)
 -   `src/TheButton.Web`: React application built with Vite (Frontend)
 -   `src/TheButton.Mobile`: .NET MAUI application (Mobile)
 
-## Production Deployments
 
--   **Web (Frontend)**: https://lively-water-053753610.2.azurestaticapps.net
--   **API (Backend)**: https://clickthebutton.azurewebsites.net
 
 ## Prerequisites
 
