@@ -10,7 +10,10 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_MULTILEVEL_LOOKUP: 0
-  MAESTRO_DRIVER_STARTUP_TIMEOUT: 60000
+  # Maestro driver timeout is in milliseconds. CI can need 2–4 minutes.
+  MAESTRO_DRIVER_STARTUP_TIMEOUT: 240000
+  # Optional: reduce noise / unexpected network waits
+  MAESTRO_CLI_NO_ANALYTICS: "1"
 
 jobs:
   ios-e2e:
