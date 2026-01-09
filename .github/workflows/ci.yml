@@ -22,7 +22,7 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_MULTILEVEL_LOOKUP: 0
-  NUGET_PACKAGES: ${{ runner.temp }}/nuget-packages
+  NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
 
 jobs:
   dotnet:

@@ -55,7 +55,7 @@ env:
   DOTNET_MULTILEVEL_LOOKUP: 0
   MAESTRO_CLI_NO_ANALYTICS: "1"
   MAESTRO_DRIVER_STARTUP_TIMEOUT: 240000
-  NUGET_PACKAGES: ${{ runner.temp }}/nuget-packages
+  NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
 
 jobs:
   android-e2e:
