@@ -1,6 +1,6 @@
 # TheButton
 
-TheButton is a multi-platform application designed to... click a button!
+TheButton is a demonstration project showcasing modern, industrial-grade software development practices for building, testing, and deploying cross-platform applications (Web, iOS, and Android) using a unified architectural approach.
 
 ## Deployments
 
@@ -16,7 +16,7 @@ TheButton is a multi-platform application designed to... click a button!
 -   `src/TheButton.Api`: ASP.NET Core Web API (Backend)
 -   `src/TheButton.Web`: React application built with Vite (Frontend)
 -   `src/TheButton.Mobile`: .NET MAUI application (Mobile)
-
+-   `tests/*`: Comprehensive testing suits for all major components
 
 
 ## Prerequisites
