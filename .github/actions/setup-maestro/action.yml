@@ -1,0 +1,17 @@
+name: 'Setup Maestro'
+description: 'Installs Maestro CLI and Java dependency'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install Maestro
+      shell: bash
+      run: |
+        curl -Ls "https://get.maestro.mobile.dev" | bash
+        echo "$HOME/.maestro/bin" >> $GITHUB_PATH

@@ -7,36 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_test:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-
-      - name: Install MAUI Workload
-        run: dotnet workload install maui
-
-      - name: Build with dotnet
-        run: dotnet build TheButton.sln --configuration Release
-
-      - name: Test with dotnet
-        run: dotnet test TheButton.sln --configuration Release --no-build
-
-      - name: Publish Backend
-        run: dotnet publish src/TheButton.Api/TheButton.Api.csproj --configuration Release --output ./publish
-
-      - name: Upload Backend Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-app
-          path: ./publish
+  build_backend:
+    uses: ./.github/workflows/reusable-build-dotnet.yml
+    with:
+      configuration: Release
+      workloads: 'maui'
+      publish-project: 'src/TheButton.Api/TheButton.Api.csproj'
+      upload-artifact-name: 'backend-app'
 
   deploy_backend:
-    needs: build_and_test
+    needs: build_backend
     runs-on: windows-latest
     steps:
       - name: Download Artifact
@@ -48,18 +28,16 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "clickthebutton" # Optional if part of publish profile, but good practice
+          app-name: "clickthebutton"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ./publish
 
   deploy_frontend:
-    needs: build_and_test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-          lfs: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

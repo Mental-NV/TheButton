@@ -1,0 +1,22 @@
+name: 'Setup .NET & MAUI'
+description: 'Sets up .NET SDK and installs required MAUI workloads'
+inputs:
+  workloads:
+    description: 'Space-separated list of MAUI workloads to install (e.g., maui-android maui-ios)'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
+    - name: Restore MAUI workloads
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.workloads }}" ]; then
+          dotnet workload install ${{ inputs.workloads }} --ignore-failed-sources
+        fi

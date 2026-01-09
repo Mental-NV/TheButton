@@ -1,0 +1,59 @@
+name: Build and Test .NET
+
+on:
+  workflow_call:
+    inputs:
+      configuration:
+        required: false
+        type: string
+        default: 'Release'
+      workloads:
+        required: false
+        type: string
+        default: ''
+      upload-artifact-name:
+        required: false
+        type: string
+        default: ''
+      publish-project:
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET & MAUI
+        uses: ./.github/actions/setup-dotnet-maui
+        with:
+          workloads: ${{ inputs.workloads }}
+
+      - name: Restore dependencies
+        run: dotnet restore TheButton.sln
+
+      - name: Build
+        run: dotnet build TheButton.sln --configuration ${{ inputs.configuration }} --no-restore
+
+      - name: Test
+        run: dotnet test TheButton.sln --configuration ${{ inputs.configuration }} --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}
+          path: '**/*.trx'
+
+      - name: Publish (Optional)
+        if: inputs.publish-project != ''
+        run: dotnet publish ${{ inputs.publish-project }} --configuration ${{ inputs.configuration }} --output ./publish
+
+      - name: Upload Publish Artifact
+        if: inputs.publish-project != '' && inputs.upload-artifact-name != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.upload-artifact-name }}
+          path: ./publish
