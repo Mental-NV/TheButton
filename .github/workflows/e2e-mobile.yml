@@ -7,7 +7,6 @@ on:
       - "src/TheButton.Mobile/**"
       - "src/TheButton.Mobile.Core/**"
       - "src/TheButton.Mobile.Infrastructure/**"
-      - "maestro/**"
       - ".maestro/**"
       - "scripts/run-android-e2e.sh"
       - "scripts/run-ios-e2e.sh"
@@ -152,7 +151,7 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "26.0.x"
+          xcode-version: "26.1.x"
 
       - name: Setup Java
         uses: actions/setup-java@v4
