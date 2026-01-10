@@ -4,9 +4,9 @@ TheButton is a demonstration project showcasing modern, industrial-grade softwar
 
 ## Deployments
 
-![Azure Deploy](https://github.com/Mental-NV/TheButton/actions/workflows/deploy.yml/badge.svg)
-![iOS E2E](https://github.com/Mental-NV/TheButton/actions/workflows/ios-e2e.yml/badge.svg)
-![Android E2E](https://github.com/Mental-NV/TheButton/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/Mental-NV/TheButton/actions/workflows/ci.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/ci.yml)
+[![Mobile E2E](https://github.com/Mental-NV/TheButton/actions/workflows/e2e-mobile.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/e2e-mobile.yml)
+[![Azure Deploy](https://github.com/Mental-NV/TheButton/actions/workflows/deploy.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/deploy.yml)
 
 -   **Web (Frontend)**: https://lively-water-053753610.2.azurestaticapps.net
 -   **API (Backend)**: https://clickthebutton.azurewebsites.net
@@ -119,5 +119,6 @@ dotnet test tests/TheButton.Mobile.IntegrationTests/TheButton.Mobile.Integration
 
 Hosted on GitHub Actions.
 
--   **Build & Test**: Triggers on push to `main` and PRs. Validates .NET (API/Mobile) and runs tests.
--   **Release**: Triggers on tags starting with `v*`. Builds and signs Android/iOS apps and verifies with Maestro E2E tests.
+-   **CI**: Triggers on push to `main` and PRs. Validates .NET (API/Mobile) and runs tests.
+-   **Mobile E2E**: Triggers on mobile-related changes. Runs Maestro E2E tests on Android and iOS.
+-   **Deploy**: Triggers after successful `CI` run on `main`. Deploys API and Web components to Azure.
