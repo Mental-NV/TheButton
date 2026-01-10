@@ -5,7 +5,6 @@ on:
     workflows: [ "CI" ]
     branches: [ main ]
     types: [ completed ]
-  workflow_dispatch:
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -23,8 +22,12 @@ env:
 jobs:
   deploy_backend:
     name: Deploy backend (Azure Web App)
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: windows-latest
+
+    # Key fix: Deploy does not require workloads; avoid workload resolver / pinned workloadVersion issues.
+    env:
+      MSBuildEnableWorkloadResolver: "false"
 
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +60,7 @@ jobs:
 
   deploy_frontend:
     name: Deploy frontend (Azure Static Web Apps)
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -78,7 +81,6 @@ jobs:
         working-directory: src/TheButton.Web
         run: npm run build
 
-      # Deploy pre-built assets for determinism and usually better performance
       - name: Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
