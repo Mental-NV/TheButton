@@ -62,16 +62,12 @@ jobs:
           dotnet workload restore TheButton.sln --skip-manifest-update --ignore-failed-sources
           dotnet workload --info
 
-      - name: Restore
-        run: dotnet restore TheButton.sln
-
-      # Critical: ensure RID-specific runtime packs exist before build --no-restore
-      - name: Restore MAUI Windows runtime packs (win-x64)
+      # Critical: restore with RID so the win-x64 runtime pack is downloaded,
+      # without overriding TargetFramework (prevents NETSDK1005).
+      - name: Restore (solution, win-x64 RID)
         shell: pwsh
         run: |
-          dotnet restore src/TheButton.Mobile/TheButton.Mobile.csproj `
-            -r win-x64 `
-            -p:TargetFramework=net10.0-windows10.0.19041.0
+          dotnet restore TheButton.sln -r win-x64
 
       - name: Build
         run: dotnet build TheButton.sln -c Release --no-restore
