@@ -6,7 +6,7 @@ namespace TheButton.Mobile.Core.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    private readonly IButtonApiClient _apiClient;
+    private readonly ICounterApiClient _apiClient;
 
     [ObservableProperty]
     private int _value;
@@ -20,7 +20,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _errorMessage = string.Empty;
 
-    public MainViewModel(IButtonApiClient apiClient)
+    public MainViewModel(ICounterApiClient apiClient)
     {
         _apiClient = apiClient;
     }
@@ -34,7 +34,7 @@ public partial class MainViewModel : ObservableObject
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
-            Value = await _apiClient.ClickButtonAsync();
+            Value = await _apiClient.IncrementAsync();
         }
         catch (Exception)
         {

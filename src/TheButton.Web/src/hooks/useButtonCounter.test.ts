@@ -18,9 +18,14 @@ describe('useButtonCounter', () => {
 
     it('updates count on successful API response', async () => {
         const mockResponse = { value: 42 }
-        vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
-            ok: true,
-            json: () => Promise.resolve(mockResponse),
+        vi.stubGlobal('fetch', vi.fn((url) => {
+            if (url.endsWith('/api/v2/counter')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockResponse),
+                })
+            }
+            return Promise.resolve({ ok: false })
         }))
 
         const { result } = renderHook(() => useButtonCounter())

@@ -18,7 +18,7 @@ export function useButtonCounter(): UseButtonCounterResult {
 
         try {
             const apiUrl = import.meta.env.VITE_API_URL
-            const response = await fetch(`${apiUrl}/api/button/click`, {
+            const response = await fetch(`${apiUrl}/api/v2/counter`, {
                 method: 'POST',
             })
 

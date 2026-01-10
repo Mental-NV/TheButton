@@ -7,17 +7,17 @@ using Moq.Protected;
 namespace TheButton.Mobile.IntegrationTests;
 
 [TestClass]
-public class ButtonApiClientTests
+public class CounterApiClientTests
 {
     [TestMethod]
-    public async Task ClickAsync_PostsToEndpoint_ParsesValue()
+    public async Task IncrementAsync_PostsToV2Endpoint_ParsesValue()
     {
         // Arrange
         var handlerMock = new Mock<HttpMessageHandler>();
         var response = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
-            Content = new StringContent("{\"value\": 10}")
+            Content = new StringContent("{\"value\": 20}")
         };
 
         handlerMock
@@ -37,17 +37,17 @@ public class ButtonApiClientTests
         var client = new CounterApiClient(httpClient);
 
         // Act
-        var result = await client.IncrementAsync("api/button/click");
+        var result = await client.IncrementAsync();
 
         // Assert
-        Assert.AreEqual(10, result);
+        Assert.AreEqual(20, result);
 
         handlerMock.Protected().Verify(
            "SendAsync",
            Times.Exactly(1),
            ItExpr.Is<HttpRequestMessage>(req =>
               req.Method == HttpMethod.Post
-              && req.RequestUri.ToString().EndsWith("api/button/click") // Check URL
+              && req.RequestUri.ToString().EndsWith("api/v2/counter") // V2 Check
            ),
            ItExpr.IsAny<CancellationToken>()
         );
