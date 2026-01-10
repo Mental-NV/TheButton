@@ -6,22 +6,19 @@ using Asp.Versioning;
 namespace TheButton.Controllers;
 
 [ApiController]
-[ApiVersion("1.0", Deprecated = true)]
-[Route("api/button")]
-[Route("api/v{version:apiVersion}/button")]
-public class ButtonController : ControllerBase
+[ApiVersion("2.0")]
+[Route("api/v{version:apiVersion}/counter")]
+public class CounterController : ControllerBase
 {
     private readonly ICounterService _counterService;
 
-    public ButtonController(ICounterService counterService)
+    public CounterController(ICounterService counterService)
     {
         _counterService = counterService;
     }
 
-
-
-    [HttpPost("click")]
-    public IActionResult Click()
+    [HttpPost]
+    public IActionResult Increment()
     {
         var newValue = _counterService.Increment();
         return Ok(new CounterResponse(newValue));
