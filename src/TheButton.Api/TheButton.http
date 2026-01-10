@@ -1,6 +1,6 @@
 @TheButton_HostAddress = http://localhost:5285
 
-POST {{TheButton_HostAddress}}/api/button/click
+POST {{TheButton_HostAddress}}/api/v2/counter
 Accept: application/json
 
 ###

@@ -7,13 +7,13 @@ namespace TheButton.Mobile.UnitTests;
 [TestClass]
 public class MainViewModelTests
 {
-    private Mock<IButtonApiClient> _mockApiClient;
+    private Mock<ICounterApiClient> _mockApiClient;
     private MainViewModel _viewModel;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockApiClient = new Mock<IButtonApiClient>();
+        _mockApiClient = new Mock<ICounterApiClient>();
         _viewModel = new MainViewModel(_mockApiClient.Object);
     }
 
@@ -21,7 +21,7 @@ public class MainViewModelTests
     public async Task Click_Success_UpdatesValue_AndClearsError()
     {
         // Arrange
-        _mockApiClient.Setup(x => x.ClickButtonAsync()).ReturnsAsync(5);
+        _mockApiClient.Setup(x => x.IncrementAsync(It.IsAny<string>())).ReturnsAsync(5);
         _viewModel.ErrorMessage = "Old Error";
 
         // Act
@@ -37,7 +37,7 @@ public class MainViewModelTests
     public async Task Click_Failure_SetsUserFacingError_AndClearsBusy()
     {
         // Arrange
-        _mockApiClient.Setup(x => x.ClickButtonAsync()).ThrowsAsync(new Exception("API Error"));
+        _mockApiClient.Setup(x => x.IncrementAsync(It.IsAny<string>())).ThrowsAsync(new Exception("API Error"));
 
         // Act
         await _viewModel.ClickCommand.ExecuteAsync(null);

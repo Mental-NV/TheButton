@@ -14,10 +14,10 @@ The project follows a clean architecture approach with the **MVVM (Model-View-Vi
   - Configuration (appsettings.json) and Resource management.
 - **TheButton.Mobile.Core**: The Application layer.
   - Contains **ViewModels** (e.g., `MainViewModel.cs`) which handle the presentation logic and state.
-  - Defines **Core Interfaces** (e.g., `IButtonApiClient`).
+  - Defines **Core Interfaces** (e.g., `ICounterApiClient`).
   - Not dependent on any UI-specific implementation details.
 - **TheButton.Mobile.Infrastructure**: The Infrastructure layer.
-  - Implements external concerns such as API Clients (`ButtonApiClient`).
+  - Implements external concerns such as API Clients (`CounterApiClient`).
   - Registered via Dependency Injection in `MauiProgram.cs`.
 
 This structure promotes testability and separation of concerns (`View` -> `ViewModel` -> `Model/Service`).
