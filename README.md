@@ -21,7 +21,7 @@ TheButton is a demonstration project showcasing modern, industrial-grade softwar
 
 ## Prerequisites
 
--   **.NET SDK**: 10.0.100+
+-   **.NET SDK**: 10.0.101+
 -   **Node.js**: LTS version (for Web)
 -   **MAUI Workload**: `dotnet workload install maui`
 -   **Mobile Emulators**:
