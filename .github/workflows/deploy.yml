@@ -1,88 +1,91 @@
-name: Build and Deploy
+name: Deploy
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [ "CI" ]
+    branches: [ main ]
+    types: [ completed ]
   workflow_dispatch:
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_MULTILEVEL_LOOKUP: 0
+  NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
+
 jobs:
-  build_and_test:
+  deploy_backend:
+    name: Deploy backend (Azure Web App)
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: windows-latest
+
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Set up .NET Core
+
+      - name: Setup .NET (global.json)
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
 
-      - name: Install MAUI Workload
-        run: dotnet workload install maui
-
-      - name: Build with dotnet
-        run: dotnet build TheButton.sln --configuration Release
-
-      - name: Test with dotnet
-        run: dotnet test TheButton.sln --configuration Release --no-build
-
-      - name: Publish Backend
-        run: dotnet publish src/TheButton.Api/TheButton.Api.csproj --configuration Release --output ./publish
-
-      - name: Upload Backend Artifact
-        uses: actions/upload-artifact@v4
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
         with:
-          name: backend-app
-          path: ./publish
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/*.fsproj', '**/*.props', '**/*.targets', 'Directory.Packages.props', 'NuGet.config', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-  deploy_backend:
-    needs: build_and_test
-    runs-on: windows-latest
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-app
-          path: ./publish
+      - name: Restore
+        run: dotnet restore src/TheButton.Api/TheButton.Api.csproj
 
-      - name: Deploy to Azure Web App
+      - name: Publish
+        run: dotnet publish src/TheButton.Api/TheButton.Api.csproj -c Release --no-restore -o ./publish
+
+      - name: Deploy
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "clickthebutton" # Optional if part of publish profile, but good practice
+          app-name: clickthebutton
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ./publish
 
   deploy_frontend:
-    needs: build_and_test
+    name: Deploy frontend (Azure Static Web Apps)
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
-          lfs: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
+          node-version: "lts/*"
+          cache: "npm"
           cache-dependency-path: src/TheButton.Web/package-lock.json
 
-      - name: Install Dependencies
+      - name: Install
+        working-directory: src/TheButton.Web
         run: npm ci
-        working-directory: src/TheButton.Web
 
-      - name: Run Frontend Tests
-        run: npm test
+      - name: Build
         working-directory: src/TheButton.Web
+        run: npm run build
 
-      - name: Build and Deploy Frontend
+      # Deploy pre-built assets for determinism and usually better performance
+      - name: Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          app_location: "src/TheButton.Web"
+          action: upload
+          app_location: src/TheButton.Web
           api_location: ""
-          output_location: "dist"
-
+          output_location: dist
+          skip_app_build: true

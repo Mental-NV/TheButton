@@ -1,0 +1,232 @@
+name: Mobile E2E
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths: &mobile_paths
+      - "src/TheButton.Mobile/**"
+      - "src/TheButton.Mobile.Core/**"
+      - "src/TheButton.Mobile.Infrastructure/**"
+      - "maestro/**"
+      - ".maestro/**"
+      - "scripts/run-android-e2e.sh"
+      - "scripts/run-ios-e2e.sh"
+      - "tools/TheButton.MockApi/**"
+      - ".github/workflows/e2e-mobile.yml"
+
+  push:
+    branches: [ main ]
+    paths: *mobile_paths
+
+  workflow_dispatch:
+    
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_MULTILEVEL_LOOKUP: 0
+  NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
+  MAESTRO_CLI_NO_ANALYTICS: "1"
+  MAESTRO_DRIVER_STARTUP_TIMEOUT: 240000
+
+jobs:
+  android-e2e:
+    name: Android E2E (Maestro)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/*.fsproj', '**/*.props', '**/*.targets', 'Directory.Packages.props', 'NuGet.config', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Cache .NET workload packs (Android)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.dotnet/packs
+            ~/.dotnet/sdk-manifests
+            ~/.dotnet/workloads
+          key: ${{ runner.os }}-dotnetpacks-${{ hashFiles('global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-dotnetpacks-
+
+      - name: Restore MAUI workloads (pinned by SDK)
+        run: |
+          dotnet --info
+          dotnet workload restore src/TheButton.Mobile/TheButton.Mobile.csproj --skip-manifest-update --ignore-failed-sources
+          dotnet workload --info
+
+      - name: Install Maestro (latest)
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+
+          # Make Maestro available in THIS step and all subsequent steps
+          export PATH="$HOME/.maestro/bin:$PATH"
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+          maestro --version
+
+      - name: Ensure Maestro output directory exists
+        run: mkdir -p ~/.maestro/tests
+
+      - name: Run Android emulator and Maestro
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: default
+          arch: x86_64
+          emulator-boot-timeout: 1200
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -no-metrics
+          script: |
+            chmod +x scripts/run-android-e2e.sh
+            ./scripts/run-android-e2e.sh
+
+      - name: Upload Maestro report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-report-android
+          path: ~/.maestro/tests/**/*
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload Android logcat
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logcat-android
+          path: android-logcat.txt
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload Mock API logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mock-api-android
+          path: mock_api.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+  ios-e2e:
+    name: iOS E2E (Maestro)
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.0.x"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/*.fsproj', '**/*.props', '**/*.targets', 'Directory.Packages.props', 'NuGet.config', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Cache .NET workload packs (iOS)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.dotnet/packs
+            ~/.dotnet/sdk-manifests
+            ~/.dotnet/workloads
+          key: ${{ runner.os }}-dotnetpacks-${{ hashFiles('global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-dotnetpacks-
+
+      - name: Restore MAUI workloads (pinned by SDK)
+        run: |
+          dotnet --info
+          xcodebuild -version
+          dotnet workload restore src/TheButton.Mobile/TheButton.Mobile.csproj --skip-manifest-update --ignore-failed-sources
+          dotnet workload --info
+
+      - name: Install Maestro (latest)
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+
+          # Make Maestro available in THIS step and all subsequent steps
+          export PATH="$HOME/.maestro/bin:$PATH"
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+          maestro --version
+
+      - name: Ensure Maestro output directory exists
+        run: mkdir -p ~/.maestro/tests
+
+      - name: Run iOS E2E tests
+        run: |
+          chmod +x scripts/run-ios-e2e.sh
+          ./scripts/run-ios-e2e.sh
+
+      - name: Upload Maestro report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-report-ios
+          path: ~/.maestro/tests/**/*
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-e2e-diagnostics
+          path: |
+            mock_api.log
+            ~/Library/Logs/CoreSimulator/**/*
+          if-no-files-found: ignore
+          retention-days: 7
