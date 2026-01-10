@@ -65,6 +65,14 @@ jobs:
       - name: Restore
         run: dotnet restore TheButton.sln
 
+      # Critical: ensure RID-specific runtime packs exist before build --no-restore
+      - name: Restore MAUI Windows runtime packs (win-x64)
+        shell: pwsh
+        run: |
+          dotnet restore src/TheButton.Mobile/TheButton.Mobile.csproj `
+            -r win-x64 `
+            -p:TargetFramework=net10.0-windows10.0.19041.0
+
       - name: Build
         run: dotnet build TheButton.sln -c Release --no-restore
 
