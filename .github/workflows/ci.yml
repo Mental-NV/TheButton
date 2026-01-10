@@ -49,9 +49,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.dotnet/packs
-            ~/.dotnet/sdk-manifests
-            ~/.dotnet/workloads
+            ${{ env.DOTNET_ROOT }}/packs
+            ${{ env.DOTNET_ROOT }}/sdk-manifests
+            ${{ env.DOTNET_ROOT }}/metadata/workloads
           key: ${{ runner.os }}-dotnetpacks-${{ hashFiles('global.json') }}
           restore-keys: |
             ${{ runner.os }}-dotnetpacks-
