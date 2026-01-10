@@ -4,14 +4,14 @@ on:
   pull_request:
     branches: [ main ]
     paths: &mobile_paths
-      - "src/TheButton.Mobile/**"
-      - "src/TheButton.Mobile.Core/**"
-      - "src/TheButton.Mobile.Infrastructure/**"
+      - ".github/workflows/e2e-mobile.yml"
       - ".maestro/**"
       - "scripts/run-android-e2e.sh"
       - "scripts/run-ios-e2e.sh"
+      - "src/TheButton.Mobile.Core/**"
+      - "src/TheButton.Mobile.Infrastructure/**"
+      - "src/TheButton.Mobile/**"
       - "tools/TheButton.MockApi/**"
-      - ".github/workflows/e2e-mobile.yml"
 
   push:
     branches: [ main ]
