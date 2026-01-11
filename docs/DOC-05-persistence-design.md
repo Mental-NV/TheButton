@@ -61,4 +61,4 @@ For `POST /counter/increment`:
 ## Implementation notes
 
 - The projection increment must be concurrency-safe (single-statement upsert where feasible).
-- Bounded retries may be applied for transient or concurrency exceptions (DOC-08).
+- Bounded retries may be applied for transient or concurrency exceptions ([DOC-08](DOC-08-observability-and-reliability.md)).

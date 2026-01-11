@@ -105,14 +105,14 @@ Do not merge unless:
 
 - solution builds
 - tests pass (unit + integration where applicable)
-- endpoint contract matches DOC-04 (when endpoints are touched)
+- endpoint contract matches [DOC-04](./DOC-04-api-contract.md) (when endpoints are touched)
 - docs are updated if contract/architecture changed
 
 ## References
 
-- DOC-02 — Goals, Constraints, Non-Goals
-- DOC-03 — Architecture Overview
-- DOC-04 — API Contract
-- DOC-05 — Persistence Design
-- DOC-07 — Integration Testing Strategy
-- DOC-09 — Definition of Done
+- [DOC-02 — Goals, Constraints, Non-Goals](DOC-02-goals-constraints-non-goals.md)
+- [DOC-03 — Architecture Overview](DOC-03-architecture-overview.md)
+- [DOC-04 — API Contract](DOC-04-api-contract.md)
+- [DOC-05 — Persistence Design](DOC-05-persistence-design.md)
+- [DOC-07 — Integration Testing Strategy](DOC-07-integration-testing.md)
+- [DOC-09 — Definition of Done](DOC-09-definition-of-done.md)

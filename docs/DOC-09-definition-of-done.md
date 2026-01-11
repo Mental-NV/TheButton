@@ -4,8 +4,8 @@ A milestone is complete when:
 
 ## Functional correctness
 
-- Increment endpoint matches DOC-04 and is strongly consistent (Variant A).
-- Read endpoints match DOC-04 and read projections/views.
+- Increment endpoint matches [DOC-04](DOC-04-api-contract.md) and is strongly consistent (Variant A).
+- Read endpoints match [DOC-04](DOC-04-api-contract.md) and read projections/views.
 
 ## Architecture constraints
 
@@ -17,7 +17,7 @@ A milestone is complete when:
 
 ## Persistence
 
-- EF Core migrations define and create schemas/tables/views per DOC-05.
+- EF Core migrations define and create schemas/tables/views per [DOC-05](DOC-05-persistence-design.md).
 - LocalDB works from a clean state (DB created by migrations).
 
 ## Testing

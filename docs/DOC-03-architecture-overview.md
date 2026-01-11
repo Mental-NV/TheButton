@@ -90,5 +90,5 @@ src/
 
 ## References
 
-- DOC-04 — API Contract
-- DOC-05 — Persistence Design
+- [DOC-04 — API Contract](DOC-04-api-contract.md)
+- [DOC-05 — Persistence Design](DOC-05-persistence-design.md)

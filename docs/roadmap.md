@@ -25,9 +25,9 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 - **E0.1** — Introduce Clean Architecture solution structure (Api/Application/Domain/Infrastructure)
 
 **Key outputs**
-- Projects and dependency direction enforced (DOC-03)
-- Minimal API mapping skeleton in place (DOC-03)
-- Baseline build remains green (DOC-09)
+- Projects and dependency direction enforced ([DOC-03](DOC-03-architecture-overview.md))
+- Minimal API mapping skeleton in place ([DOC-03](DOC-03-architecture-overview.md))
+- Baseline build remains green ([DOC-09](DOC-09-definition-of-done.md))
 
 ---
 
@@ -39,9 +39,9 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 - **E1.1** — Add EF Core persistence with write/read schemas and migrations
 
 **Key outputs**
-- EF Core DbContext + entity mapping for event store, idempotency, projections (DOC-05)
-- Initial migration creates schemas/tables + view (DOC-05)
-- LocalDB connectivity and DB creation workflow (DOC-06)
+- EF Core DbContext + entity mapping for event store, idempotency, projections ([DOC-05](DOC-05-persistence-design.md))
+- Initial migration creates schemas/tables + view ([DOC-05](DOC-05-persistence-design.md))
+- LocalDB connectivity and DB creation workflow ([DOC-06](DOC-06-localdev-and-migrations.md))
 
 ---
 
@@ -53,10 +53,10 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 - **E2.1** — Implement /counter/increment (atomic + idempotent)
 
 **Key outputs**
-- Minimal API endpoint matches contract (DOC-04)
-- Single-transaction algorithm implemented (DOC-05)
-- In-memory counter removed/deprecated (DOC-02)
-- Bounded retry strategy may be deferred to M5 (DOC-08)
+- Minimal API endpoint matches contract ([DOC-04](DOC-04-api-contract.md))
+- Single-transaction algorithm implemented ([DOC-05](DOC-05-persistence-design.md))
+- In-memory counter removed/deprecated ([DOC-02](DOC-02-goals-constraints-non-goals.md))
+- Bounded retry strategy may be deferred to M5 ([DOC-08](DOC-08-observability-and-reliability.md))
 
 ---
 
@@ -68,8 +68,8 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 - **E3.1** — Implement read endpoints (global + per-user)
 
 **Key outputs**
-- `GET /counter/global` and `GET /counter/users/{userId}` live (DOC-04)
-- Queries read projections only (DOC-05)
+- `GET /counter/global` and `GET /counter/users/{userId}` live ([DOC-04](DOC-04-api-contract.md))
+- Queries read projections only ([DOC-05](DOC-05-persistence-design.md))
 
 ---
 
@@ -81,9 +81,9 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 - **E4.1** — Integration tests with LocalDB (per-run DB + reset between tests)
 
 **Key outputs**
-- Per-run unique test DB provisioning and migrations (DOC-07)
-- Reset strategy for deterministic tests (DOC-07)
-- Core integration tests: increment, idempotency, concurrency (DOC-07)
+- Per-run unique test DB provisioning and migrations ([DOC-07](DOC-07-integration-testing.md))
+- Reset strategy for deterministic tests ([DOC-07](DOC-07-integration-testing.md))
+- Core integration tests: increment, idempotency, concurrency ([DOC-07](DOC-07-integration-testing.md))
 
 ---
 
@@ -96,9 +96,9 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 - **E5.2** — Bounded retry for concurrency/transient SQL faults
 
 **Key outputs**
-- `/health/live` and `/health/ready` endpoints (DOC-08)
-- Structured log enrichment and correlation fields (DOC-08)
-- Bounded retry for transient/concurrency faults (DOC-08)
+- `/health/live` and `/health/ready` endpoints ([DOC-08](DOC-08-observability-and-reliability.md))
+- Structured log enrichment and correlation fields ([DOC-08](DOC-08-observability-and-reliability.md))
+- Bounded retry for transient/concurrency faults ([DOC-08](DOC-08-observability-and-reliability.md))
 
 ---
 
@@ -110,8 +110,8 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 - **E6.1** — Update README with local run, migrations, API usage
 
 **Key outputs**
-- README reflects LocalDB, migrations, API usage patterns (DOC-04, DOC-06)
-- Docs updated to reflect final state (DOC-09)
+- README reflects LocalDB, migrations, API usage patterns ([DOC-04](DOC-04-api-contract.md), [DOC-06](DOC-06-localdev-and-migrations.md))
+- Docs updated to reflect final state ([DOC-09](DOC-09-definition-of-done.md))
 
 ## Cross-cutting conventions
 
