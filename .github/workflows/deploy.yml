@@ -23,7 +23,7 @@ env:
 jobs:
   deploy_backend:
     name: Deploy backend (Azure Web App)
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: windows-latest
 
     # Key fix: Deploy does not require workloads; avoid workload resolver / pinned workloadVersion issues.
@@ -61,7 +61,7 @@ jobs:
 
   deploy_frontend:
     name: Deploy frontend (Azure Static Web Apps)
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -88,7 +88,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-          app_location: src/TheButton.Web
+          app_location: src/TheButton.Web/dist
           api_location: ""
-          output_location: dist
+          output_location: ""
           skip_app_build: true
