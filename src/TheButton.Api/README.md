@@ -9,8 +9,7 @@ The project follows a modular structure to separate concerns and ensure maintain
 ```text
 src/TheButton.Api/
 ├── Configuration/          # Strongly-typed configuration (Options pattern)
-├── Controllers/            # API Endpoints (Versioned)
-│   ├── ButtonController.cs # Legacy V1 endpoints (Deprecated)
+├── Controllers/            # API Endpoints
 │   └── CounterController.cs# Modern V2 endpoints
 ├── Models/                 # Data Transfer Objects (DTOs)
 │   └── CounterResponse.cs  # Unified response for counter values
@@ -32,11 +31,6 @@ The API uses **versioning** and provides interactive documentation via **Scalar*
 - **Base Route**: `/api/v2/counter`
 - **Endpoints**:
     - `POST /`: Increments the counter and returns the new value.
-
-### Version 1.0 (Deprecated)
-- **Base Route**: `/api/v1/button` or `/api/button`
-- **Endpoints**:
-    - `POST /click`: Increments the counter.
 
 ### Documentation
 - **Scalar UI**: `/scalar/v1` (Available in Development mode)
