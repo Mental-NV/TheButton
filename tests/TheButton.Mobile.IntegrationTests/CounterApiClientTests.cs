@@ -10,14 +10,14 @@ namespace TheButton.Mobile.IntegrationTests;
 public class CounterApiClientTests
 {
     [TestMethod]
-    public async Task IncrementAsync_PostsToV2Endpoint_ParsesValue()
+    public async Task IncrementAsync_PostsToEndpoint_ParsesValue()
     {
         // Arrange
         var handlerMock = new Mock<HttpMessageHandler>();
         var response = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
-            Content = new StringContent("{\"value\": 20}")
+            Content = new StringContent("{\"value\": 10}")
         };
 
         handlerMock
@@ -37,17 +37,17 @@ public class CounterApiClientTests
         var client = new CounterApiClient(httpClient);
 
         // Act
-        var result = await client.IncrementAsync();
+        var result = await client.IncrementAsync("api/v2/counter");
 
         // Assert
-        Assert.AreEqual(20, result);
+        Assert.AreEqual(10, result);
 
         handlerMock.Protected().Verify(
            "SendAsync",
            Times.Exactly(1),
            ItExpr.Is<HttpRequestMessage>(req =>
               req.Method == HttpMethod.Post
-              && req.RequestUri.ToString().EndsWith("api/v2/counter") // V2 Check
+              && req.RequestUri.ToString().EndsWith("api/v2/counter") // Check URL
            ),
            ItExpr.IsAny<CancellationToken>()
         );

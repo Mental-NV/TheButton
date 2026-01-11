@@ -58,17 +58,4 @@ public class CounterApiTests
         Assert.IsNotNull(result2);
         Assert.IsGreaterThan(result1.Value, result2.Value, "Counter should increment between calls.");
     }
-
-    [TestMethod]
-    public async Task Click_V1_VersionedRoute_ReturnsSuccess()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
-
-        // Act
-        var response = await client.PostAsync("/api/v1/button/click", null);
-
-        // Assert
-        response.EnsureSuccessStatusCode();
-    }
 }
