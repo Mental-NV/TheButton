@@ -4,5 +4,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>preview</LangVersion>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <MauiVersion>10.0.20</MauiVersion>
   </PropertyGroup>
 </Project>
