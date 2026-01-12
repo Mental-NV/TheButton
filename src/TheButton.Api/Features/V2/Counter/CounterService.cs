@@ -1,4 +1,10 @@
-namespace TheButton.Services;
+namespace TheButton.Api.Features.V2.Counter;
+
+public interface ICounterService
+{
+    int GetCount();
+    int Increment();
+}
 
 public class CounterService : ICounterService
 {

@@ -4,20 +4,18 @@ The backend for **TheButton** is an ASP.NET Core Web API built with .NET 10. It 
 
 ## 🏗️ Project Structure
 
-The project follows a modular structure to separate concerns and ensure maintainability:
+The project follows a **Vertical Slices** (Feature-Folders) architecture to ensure high cohesion and low coupling:
 
 ```text
 src/TheButton.Api/
-├── Configuration/          # Strongly-typed configuration (Options pattern)
-├── Controllers/            # API Endpoints
-│   └── CounterController.cs# Modern V2 endpoints
-├── Models/                 # Data Transfer Objects (DTOs)
-│   └── CounterResponse.cs  # Unified response for counter values
-├── Services/               # Core Business Logic
-│   ├── ICounterService.cs  # Interface for dependency injection
-│   └── CounterService.cs   # Thread-safe in-memory counter implementation
+├── Abstractions/           # Infrastructure abstractions (e.g., IEndpoint)
+├── Extensions/             # Dependency injection and mapping extensions
+├── Features/               # Vertical Slices (Core Business Logic)
+│   ├── Health/             # Self-contained health check feature
+│   └── V2/
+│       └── Counter/        # Counter management (Endpoints, Models)
 ├── Properties/             # Environmental settings (launchSettings.json)
-├── Program.cs              # Entry point, DI container, and middleware pipeline
+├── Program.cs              # Entry point and automated endpoint registration
 └── TheButton.Api.csproj    # Project manifest and NuGet packages
 ```
 
@@ -27,10 +25,13 @@ src/TheButton.Api/
 
 The API uses **versioning** and provides interactive documentation via **Scalar**.
 
-### Version 2.0 (Current)
-- **Base Route**: `/api/v2/counter`
-- **Endpoints**:
-    - `POST /`: Increments the counter and returns the new value.
+### Standard Endpoints
+- **Health Check**: `/health` - Returns the status of the API.
+
+### Featured Endpoints
+- **Counter (V2)**:
+    - **Base Route**: `/api/v2/counter`
+    - **POST /**: Increments the counter and returns the new value.
 
 ### Documentation
 - **Scalar UI**: `/scalar/v1` (Available in Development mode)

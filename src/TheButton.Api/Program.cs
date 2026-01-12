@@ -1,20 +1,17 @@
 using Scalar.AspNetCore;
-using TheButton.Services;
 using Asp.Versioning;
 using TheButton.Api.Extensions;
 using System.Reflection;
-using TheButton.Api.Features.V2.Counter;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddEndpoints(typeof(Program).Assembly);
-builder.Services.AddSingleton<ICounterService, CounterService>();
+builder.Services.AddSingleton<TheButton.Api.Features.V2.Counter.ICounterService, TheButton.Api.Features.V2.Counter.CounterService>();
 builder.Services.AddOpenApi();
 
 builder.Services.AddApiVersioning(options =>
 {
-    options.DefaultApiVersion = new ApiVersion(3, 0);
+    options.DefaultApiVersion = new ApiVersion(2, 0);
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
@@ -47,17 +44,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
-var versionSet = app.NewApiVersionSet()
-    .HasApiVersion(new ApiVersion(3, 0))
-    .ReportApiVersions()
-    .Build();
-
-app.NewVersionedApi("v3")
-   .MapGroup("/api/v3")
-   .HasApiVersion(new ApiVersion(3, 0))
-   .MapEndpoints();
-
-app.MapCounterEndpoints();
+app.MapEndpoints();
 
 app.Run();
 
