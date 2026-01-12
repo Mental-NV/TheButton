@@ -71,19 +71,16 @@ jobs:
       - name: Restore MAUI workloads (pinned by SDK)
         run: |
           dotnet --info
-          dotnet workload restore TheButton.sln --skip-manifest-update --ignore-failed-sources
+          dotnet workload restore TheButton.Mobile.sln --skip-manifest-update --ignore-failed-sources
           dotnet workload --info
 
-      # Critical: restore with RID so the win-x64 runtime pack is downloaded,
-      # without overriding TargetFramework (prevents NETSDK1005).
-      # Restoring full solution is fine for Mobile since it has MAUI workloads restored.
-      - name: Restore (solution, win-x64 RID)
+      - name: Restore (Mobile Solution, win-x64 RID)
         shell: pwsh
         run: |
-          dotnet restore TheButton.sln -r win-x64
+          dotnet restore TheButton.Mobile.sln -r win-x64
 
       - name: Build Mobile
-        run: dotnet build src/mobile/TheButton.Mobile/TheButton.Mobile.csproj -c Release --no-restore
+        run: dotnet build TheButton.Mobile.sln -c Release --no-restore
 
       - name: Test Mobile Unit
         run: dotnet test tests/mobile/TheButton.Mobile.UnitTests/TheButton.Mobile.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-mobile-unit.trx"

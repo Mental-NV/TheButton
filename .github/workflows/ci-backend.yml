@@ -72,26 +72,19 @@ jobs:
 
       # Skip workload restore for backend only
 
-      - name: Restore (solution)
+      - name: Restore (Backend Solution)
         shell: pwsh
         run: |
-          # Only restore backend projects to avoid MAUI issues?
-          # Actually, 'dotnet restore TheButton.sln' might fail if MAUI workloads are missing.
-          # We should restore specifically the API/Application/Infrastructure/Domain projects?
-          # OR allow 'ignore-failed-sources' and hope SDK can handle it?
-          # Better: dotnet restore src/TheButton.Api/TheButton.Api.csproj etc.
-          # However, to be safe and simple, let's try restoring just the backend solution or projects.
-          # Since we are using standard 'dotnet build' on a specific project, it implicitly restores.
-          dotnet restore src/TheButton.Api/TheButton.Api.csproj
+          dotnet restore TheButton.Backend.sln
 
-      - name: Build Api
-        run: dotnet build src/TheButton.Api/TheButton.Api.csproj -c Release --no-restore
+      - name: Build Backend
+        run: dotnet build TheButton.Backend.sln -c Release --no-restore
 
       - name: Test Api Unit
-        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --logger "trx;LogFileName=test-results-unit.trx"
+        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-unit.trx"
 
       - name: Test Api Integration
-        run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --logger "trx;LogFileName=test-results-integration.trx"
+        run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx"
 
       - name: Upload test results
         if: always()
