@@ -1,13 +1,25 @@
-name: CI
+name: CI Backend
 
 on:
   push:
     branches: [ main ]
     paths-ignore:
+      - "src/mobile/**"
+      - "tests/mobile/**"
+      - ".github/workflows/ci-mobile.yml"
+      - ".github/workflows/e2e-mobile.yml"
+      - ".maestro/**"
+      - "scripts/run-*-e2e.sh"
       - "**/*.md"
   pull_request:
     branches: [ main ]
     paths-ignore:
+      - "src/mobile/**"
+      - "tests/mobile/**"
+      - ".github/workflows/ci-mobile.yml"
+      - ".github/workflows/e2e-mobile.yml"
+      - ".maestro/**"
+      - "scripts/run-*-e2e.sh"
       - "**/*.md"
   workflow_dispatch:
 
@@ -25,14 +37,18 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
 
 jobs:
-  dotnet:
-    name: .NET build & test
+  backend:
+    name: Backend build & test
     runs-on: windows-latest
     env:
       DOTNET_ROOT: "" # Silences the linter
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Use Backend global.json (Unpin workloads)
+        shell: pwsh
+        run: Copy-Item global-backend.json global.json -Force
 
       - name: Setup .NET (global.json)
         uses: actions/setup-dotnet@v4
@@ -43,45 +59,33 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.NUGET_PACKAGES }}
-          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/*.fsproj', '**/*.props', '**/*.targets', 'Directory.Packages.props', 'NuGet.config', '**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-backend-${{ hashFiles('global.json', 'src/TheButton.*/**/*.csproj', 'tests/TheButton.*/**/*.csproj', '**/*.props', '**/*.targets', 'NuGet.config') }}
           restore-keys: |
-            ${{ runner.os }}-nuget-
+            ${{ runner.os }}-nuget-backend-
 
-      - name: Cache .NET workload packs (Windows)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.DOTNET_ROOT }}/packs
-            ${{ env.DOTNET_ROOT }}/sdk-manifests
-            ${{ env.DOTNET_ROOT }}/metadata/workloads
-          key: ${{ runner.os }}-dotnetpacks-${{ hashFiles('global.json') }}
-          restore-keys: |
-            ${{ runner.os }}-dotnetpacks-
 
-      - name: Restore MAUI workloads (pinned by SDK)
-        run: |
-          dotnet --info
-          dotnet workload restore TheButton.sln --skip-manifest-update --ignore-failed-sources
-          dotnet workload --info
 
-      # Critical: restore with RID so the win-x64 runtime pack is downloaded,
-      # without overriding TargetFramework (prevents NETSDK1005).
-      - name: Restore (solution, win-x64 RID)
+      # Skip workload restore for backend only
+
+      - name: Restore (Backend Solution)
         shell: pwsh
         run: |
-          dotnet restore TheButton.sln -r win-x64
+          dotnet restore TheButton.Backend.sln
 
-      - name: Build
-        run: dotnet build TheButton.sln -c Release --no-restore
+      - name: Build Backend
+        run: dotnet build TheButton.Backend.sln -c Release --no-restore
 
-      - name: Test
-        run: dotnet test TheButton.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx"
+      - name: Test Api Unit
+        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-unit.trx"
+
+      - name: Test Api Integration
+        run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx"
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-backend
           path: "**/*.trx"
           if-no-files-found: warn
           retention-days: 7

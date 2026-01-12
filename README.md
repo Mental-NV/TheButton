@@ -4,7 +4,8 @@ TheButton is a demonstration project showcasing modern, industrial-grade softwar
 
 ## Deployments
 
-[![CI](https://github.com/Mental-NV/TheButton/actions/workflows/ci.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/ci.yml)
+[![CI Backend](https://github.com/Mental-NV/TheButton/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/ci-backend.yml)
+[![CI Mobile](https://github.com/Mental-NV/TheButton/actions/workflows/ci-mobile.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/ci-mobile.yml)
 [![Mobile E2E](https://github.com/Mental-NV/TheButton/actions/workflows/e2e-mobile.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/e2e-mobile.yml)
 [![Azure Deploy](https://github.com/Mental-NV/TheButton/actions/workflows/deploy.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/deploy.yml)
 
@@ -15,7 +16,7 @@ TheButton is a demonstration project showcasing modern, industrial-grade softwar
 
 -   `src/TheButton.Api`: ASP.NET Core Web API (Backend)
 -   `src/TheButton.Web`: React application built with Vite (Frontend)
--   `src/TheButton.Mobile`: .NET MAUI application (Mobile)
+-   `src/mobile/TheButton.Mobile`: .NET MAUI application (Mobile)
 -   `tests/*`: Comprehensive testing suits for all major components
 
 
@@ -84,7 +85,7 @@ npm run test:coverage # Run with coverage report
 
 ## 📱 Mobile
 
-The mobile app is built with .NET MAUI, located in `src/TheButton.Mobile`.
+The mobile app is built with .NET MAUI, located in `src/mobile/TheButton.Mobile`.
 
 ### Running Locally (Windows)
 
@@ -95,7 +96,7 @@ The mobile app is configured to connect to the local API by default.
 
 2.  **Run the Mobile App**:
     ```powershell
-    dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-windows10.0.19041.0 -t:Run
+    dotnet build src/mobile/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-windows10.0.19041.0 -t:Run
     ```
     *Note: The app uses `appsettings.Development.json` which is configured to point to `http://localhost:5285`.*
 
@@ -104,13 +105,13 @@ The mobile app is configured to connect to the local API by default.
 **Unit Tests**:
 
 ```powershell
-dotnet test tests/TheButton.Mobile.UnitTests/TheButton.Mobile.UnitTests.csproj
+dotnet test tests/mobile/TheButton.Mobile.UnitTests/TheButton.Mobile.UnitTests.csproj
 ```
 
 **Integration Tests**:
 
 ```powershell
-dotnet test tests/TheButton.Mobile.IntegrationTests/TheButton.Mobile.IntegrationTests.csproj
+dotnet test tests/mobile/TheButton.Mobile.IntegrationTests/TheButton.Mobile.IntegrationTests.csproj
 ```
 
 ---
@@ -119,6 +120,7 @@ dotnet test tests/TheButton.Mobile.IntegrationTests/TheButton.Mobile.Integration
 
 Hosted on GitHub Actions.
 
--   **CI**: Triggers on push to `main` and PRs. Validates .NET (API/Mobile) and runs tests.
+-   **CI Backend**: Triggers on push to `main` and PRs (excluding mobile paths). Validates .NET Backend and Web.
+-   **CI Mobile**: Triggers on push to `main` and PRs (mobile paths only). Validates .NET MAUI Mobile app.
 -   **Mobile E2E**: Triggers on mobile-related changes. Runs Maestro E2E tests on Android and iOS.
 -   **Deploy**: Triggers after successful `CI` run on `main`. Deploys API and Web components to Azure.

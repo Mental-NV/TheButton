@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TheButton.Mobile.Infrastructure\TheButton.Mobile.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\mobile\TheButton.Mobile.Infrastructure\TheButton.Mobile.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

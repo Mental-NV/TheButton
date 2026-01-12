@@ -8,14 +8,16 @@ on:
       - ".maestro/**"
       - "scripts/run-android-e2e.sh"
       - "scripts/run-ios-e2e.sh"
-      - "src/TheButton.Mobile.Core/**"
-      - "src/TheButton.Mobile.Infrastructure/**"
-      - "src/TheButton.Mobile/**"
+      - "src/mobile/TheButton.Mobile.Core/**"
+      - "src/mobile/TheButton.Mobile.Infrastructure/**"
+      - "src/mobile/TheButton.Mobile/**"
       - "tools/TheButton.MockApi/**"
 
   push:
     branches: [ main ]
     paths: *mobile_paths
+    paths-ignore:
+      - "**/*.md"
 
   workflow_dispatch:
     
@@ -82,7 +84,7 @@ jobs:
       - name: Restore MAUI workloads (pinned by SDK)
         run: |
           dotnet --info
-          dotnet workload restore src/TheButton.Mobile/TheButton.Mobile.csproj --skip-manifest-update --ignore-failed-sources
+          dotnet workload restore src/mobile/TheButton.Mobile/TheButton.Mobile.csproj --skip-manifest-update --ignore-failed-sources
           dotnet workload --info
 
       - name: Install Maestro (latest)
@@ -187,7 +189,7 @@ jobs:
         run: |
           dotnet --info
           xcodebuild -version
-          dotnet workload restore src/TheButton.Mobile/TheButton.Mobile.csproj --skip-manifest-update --ignore-failed-sources
+          dotnet workload restore src/mobile/TheButton.Mobile/TheButton.Mobile.csproj --skip-manifest-update --ignore-failed-sources
           dotnet workload --info
 
       - name: Install Maestro (latest)
