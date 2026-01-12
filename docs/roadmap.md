@@ -1,10 +1,19 @@
 # Roadmap
 
-This roadmap serves as a high-level index for the project's milestones, epics, and backlog items.
+This is the authoritative entry point for AI agents and developers. It provides high-level guidance, links to planning documents, and indexes the project backlog.
 
-## References
+## How to use
 
-- [DOC-00 Index](DOC-00-index.md)
+- Start with [DOC-01 Agent Operating Instructions](DOC-01-agent-instructions.md) and [DOC-02 Product Goals, Constraints, Non-Goals](DOC-02-goals-constraints-non-goals.md).
+- Use [DOC-03 Architecture Overview](DOC-03-architecture-overview.md) as the reference for layering, folder structure, CQRS style (no MediatR), and **Asp.Versioning v3 route groups**.
+- Use [DOC-04 API Contract](DOC-04-api-contract.md) and [DOC-05 Persistence Design](DOC-05-persistence-design.md) as the source of truth for API contract + persistence model.
+- Use [DOC-06 Local Development & Migrations](DOC-06-localdev-and-migrations.md)/[DOC-07 Integration Testing Strategy](DOC-07-integration-testing.md) for local dev, migrations, and testing.
+- Use [Manual Steps Checklist](MANUAL-STEPS.md) for actions requiring human confirmation.
+- Use [DOC-08 Observability & Reliability](DOC-08-observability-and-reliability.md) for operational hardening.
+- Use [DOC-09 Definition of Done](DOC-09-definition-of-done.md) for milestone acceptance.
+
+## Authoritative Documents
+
 - [DOC-01 Agent Operating Instructions](DOC-01-agent-instructions.md)
 - [DOC-02 Product Goals, Constraints, Non-Goals](DOC-02-goals-constraints-non-goals.md)
 - [DOC-03 Architecture Overview](DOC-03-architecture-overview.md)
@@ -14,6 +23,13 @@ This roadmap serves as a high-level index for the project's milestones, epics, a
 - [DOC-07 Integration Testing Strategy](DOC-07-integration-testing.md)
 - [DOC-08 Observability & Reliability](DOC-08-observability-and-reliability.md)
 - [DOC-09 Definition of Done](DOC-09-definition-of-done.md)
+- [Manual Steps Checklist](MANUAL-STEPS.md)
+
+## Architecture Decisions (ADRs)
+
+- [ADR-001 CQRS without MediatR](ADR-001-cqrs-without-mediatr.md)
+- [ADR-002 Transactional Projections Variant A](ADR-002-transactional-projections-variant-a.md)
+- [ADR-003 Global Counter from Event Position](ADR-003-global-counter-from-event-position.md)
 
 ## Milestones
 
