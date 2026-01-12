@@ -86,7 +86,7 @@ echo "Simulator booted and ready"
 # ============================================================================
 echo ""
 echo "=== Building iOS Simulator App ==="
-dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj \
+dotnet build src/mobile/TheButton.Mobile/TheButton.Mobile.csproj \
   -f net10.0-ios \
   -c Debug \
   -r iossimulator-arm64 \
@@ -94,10 +94,10 @@ dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj \
   -v minimal
 
 # Find the .app bundle
-APP_PATH=$(find src/TheButton.Mobile/bin/Debug/net10.0-ios/iossimulator-arm64 -name "*.app" -type d | head -1)
+APP_PATH=$(find src/mobile/TheButton.Mobile/bin/Debug/net10.0-ios/iossimulator-arm64 -name "*.app" -type d | head -1)
 if [ -z "$APP_PATH" ]; then
   echo "ERROR: Could not find .app bundle"
-  find src/TheButton.Mobile/bin -name "*.app" -type d || true
+  find src/mobile/TheButton.Mobile/bin -name "*.app" -type d || true
   exit 1
 fi
 echo "Built app: $APP_PATH"
