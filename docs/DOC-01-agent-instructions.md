@@ -97,33 +97,55 @@ For each PR:
    - List acceptance criteria and how they will be verified.
    - Identify any likely manual steps (if any).
 
-2. **Create branch**
+2. **Update Roadmap Status (Work in progress)**
+   - Update the status of the targeted item(s) in [Roadmap](roadmap.md) to `**[InProgress]**`.
+   - If this is the first item in an Epic, update the Epic status to `**[InProgress]**`.
+
+3. **Create branch**
    - `git checkout main`
    - `git pull --ff-only`
    - `git switch -c pr/M{n}-{area}-{slug}`
 
-3. **Implement**
+4. **Implement**
    - Make focused changes only for the PR scope.
 
-4. **Verify locally**
+5. **Verify locally**
    - `dotnet build`
    - `dotnet test` (or `.\scripts\test.ps1` if present)
 
-5. **Commit and push**
+6. **Commit and push**
    - `git add -A`
    - `git commit -m "M{n}: <area> - <action>"`
    - `git push -u origin HEAD`
 
-6. **Create PR**
+7. **Update Roadmap Status (In Review)**
+   - Update the status of the targeted item(s) in [Roadmap](roadmap.md) to `**[InReview]**`.
+
+8. **Create PR**
    - Create `.pr-body.md` (required; template below).
    - `gh pr create --title "M{n}: <area> - <action>" --body-file .\.pr-body.md`
 
-7. **Monitor CI and pull logs on failure**
+9. **Monitor CI and pull logs on failure**
    - `gh pr checks --watch`
    - If failing:
      - `gh run list --branch <branch> --limit 5`
      - `gh run view <run-id> --log-failed`
-   - Fix, commit, push until green.
+    - Update status to `**[InProgress]**` if major fixes are needed.
+    - Fix, commit, push until green.
+
+## Backlog Status Management
+
+The agent is responsible for maintaining the visual status of the backlog in `docs/roadmap.md` following these rules:
+
+### Status transition rules (Work Items)
+- **Start working**: Update item to `**[InProgress]**`.
+- **Finish working (PR opened)**: Update item to `**[InReview]**`.
+- **Fixes required during review**: Update item back to `**[InProgress]**`.
+- **Review successful (Merged)**: Update item to `**[Done]**`.
+
+### Status transition rules (Epics)
+- **InProgress**: When any child work item starts, the parent Epic must be marked as `**[InProgress]**`.
+- **Done**: When **all** child work items under an Epic are `**[Done]**`, the parent Epic must be marked as `**[Done]**`.
 
 ## PR body template (required)
 
