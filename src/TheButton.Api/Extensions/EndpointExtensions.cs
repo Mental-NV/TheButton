@@ -17,9 +17,9 @@ public static class EndpointExtensions
         return services;
     }
 
-    public static WebApplication MapEndpoints(this WebApplication app)
+    public static IEndpointRouteBuilder MapEndpoints(this IEndpointRouteBuilder app)
     {
-        var endpoints = app.Services.CreateScope().ServiceProvider.GetServices<IEndpoint>();
+        var endpoints = app.ServiceProvider.GetServices<IEndpoint>();
 
         foreach (var endpoint in endpoints)
         {
