@@ -1,9 +1,18 @@
 # DOC-05 — Persistence Design (Event Store + Transactional Projections)
 
+This design implements Event Sourcing with **Variant A transactional projections**: the event append, projection update, and idempotency record are committed in **one SQL transaction**.
+
 ## Schemas
 
 - `write`: event store + idempotency
-- `read`: projections
+- `read`: projections (query-optimized)
+
+## Event model
+
+There is **one global increment event** type with an **optional `UserId`**.
+
+- Global increment (`POST /counter`): event has `UserId = NULL`.
+- User increment (`POST /counter/{userId}`): event has `UserId = <userId>` and a per-user monotonic `UserVersion`.
 
 ## Tables
 
@@ -13,25 +22,33 @@
 |---|---|---|
 | `Position` | `BIGINT IDENTITY(1,1)` | Global order; clustered PK |
 | `EventId` | `UNIQUEIDENTIFIER` | Unique id for event |
-| `StreamId` | `NVARCHAR(200)` | `user:{userId}` |
-| `StreamVersion` | `INT` | Per-stream version; can equal new userValue |
 | `EventType` | `NVARCHAR(100)` | `CounterIncremented` |
 | `OccurredUtc` | `DATETIME2` | UTC timestamp |
-| `PayloadJson` | `NVARCHAR(MAX)` | JSON payload |
+| `UserId` | `UNIQUEIDENTIFIER NULL` | NULL for global-only increments |
+| `UserVersion` | `BIGINT NULL` | Per-user sequence; NULL for global-only |
+| `PayloadJson` | `NVARCHAR(MAX)` | JSON payload; includes optional userId and any future metadata |
 
 **Constraints / indexes**
 - PK clustered: `(Position)`
-- Unique: `(StreamId, StreamVersion)`
-- Index: `(StreamId, StreamVersion DESC)`
+- Unique (filtered): `(UserId, UserVersion)` where `UserId IS NOT NULL`
+  - Ensures per-user sequencing is conflict-free and supports high concurrency without a single hot row.
+- Index: `(EventType, Position DESC)`
 
 ### `write.Commands` (idempotency)
 
+Idempotency is scoped by operation and optional user.
+
 | Column | Type | Notes |
 |---|---|---|
-| `IdempotencyKey` | `NVARCHAR(100)` | PK or unique |
-| `UserId` | `UNIQUEIDENTIFIER` | |
+| `Operation` | `NVARCHAR(50)` | `GlobalIncrement` or `UserIncrement` |
+| `UserId` | `UNIQUEIDENTIFIER NULL` | NULL for global increment |
+| `IdempotencyKey` | `NVARCHAR(100)` | From `Idempotency-Key` header |
 | `CreatedUtc` | `DATETIME2` | |
-| `ResultJson` | `NVARCHAR(MAX)` | Cached response |
+| `ResultJson` | `NVARCHAR(MAX)` | Cached response payload |
+
+**Constraints / indexes**
+- Unique: `(Operation, UserId, IdempotencyKey)`
+  - Prevents collisions when the same idempotency key is reused across different operations.
 
 ### `read.UserCounters` (projection)
 
@@ -48,17 +65,32 @@ FROM write.Events
 WHERE EventType = 'CounterIncremented';
 ```
 
-## Atomic increment algorithm (single SQL transaction)
+## Atomic write algorithms (single SQL transaction)
 
-For `POST /counter/increment`:
+### A) Global increment (`POST /counter`)
 
-1. If `write.Commands` contains `IdempotencyKey`, return stored `ResultJson`.
-2. Upsert and increment `read.UserCounters` for the `UserId`, producing `userValue`.
-3. Insert a new `CounterIncremented` row into `write.Events`, capture `Position` as `globalValue`.
-4. Insert `write.Commands` row with `ResultJson = { globalValue, userValue }`.
+Transaction steps:
+
+1. If `write.Commands` contains `(Operation='GlobalIncrement', UserId=NULL, IdempotencyKey=...)`, return stored `ResultJson`.
+2. Insert `CounterIncremented` event into `write.Events` with `UserId=NULL`, `UserVersion=NULL`, capture `Position` as `globalValue`.
+3. Insert into `write.Commands` the cached result `{ globalValue }`.
+4. Commit.
+
+### B) User increment (`POST /counter/{userId}`)
+
+Transaction steps:
+
+1. If `write.Commands` contains `(Operation='UserIncrement', UserId=<userId>, IdempotencyKey=...)`, return stored `ResultJson`.
+2. Upsert+increment `read.UserCounters.Value` for `<userId>`, producing `userValue`.
+3. Insert `CounterIncremented` event into `write.Events` with:
+   - `UserId=<userId>`
+   - `UserVersion=userValue` (per-user monotonic sequence)
+   Capture `Position` as `globalValue`.
+4. Insert into `write.Commands` the cached result `{ globalValue, userValue }`.
 5. Commit.
 
 ## Implementation notes
 
-- The projection increment must be concurrency-safe (single-statement upsert where feasible).
-- Bounded retries may be applied for transient or concurrency exceptions ([DOC-08](DOC-08-observability-and-reliability.md)).
+- Projection upsert should be concurrency-safe (single-statement upsert where feasible).
+- Bounded retries may be applied for transient and concurrency exceptions (DOC-08).
+- The global counter is derived from event `Position` and does not require a separate hot row (ADR-003).

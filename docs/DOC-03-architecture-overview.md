@@ -4,6 +4,7 @@
 
 - **TheButton.Api**
   - Minimal APIs and endpoint mapping
+  - API versioning configuration (Asp.Versioning)
   - Request/response DTOs
   - Composition root (DI wiring)
 
@@ -36,9 +37,11 @@ src/
   TheButton.Api/
     Features/
       Counter/
-        Increment/
+        IncrementGlobal/
           Endpoint.cs
-          Request.cs
+          Response.cs
+        IncrementUser/
+          Endpoint.cs
           Response.cs
         GetGlobal/
           Endpoint.cs
@@ -52,16 +55,20 @@ src/
       ICounterWriter.cs
       ICounterReadRepository.cs
     Counter/
-      Increment/
-        IncrementCommand.cs
-        IncrementCommandHandler.cs
-        IncrementResult.cs
+      IncrementGlobal/
+        GlobalIncrementCommand.cs
+        GlobalIncrementHandler.cs
+        GlobalIncrementResult.cs
+      IncrementUser/
+        UserIncrementCommand.cs
+        UserIncrementHandler.cs
+        UserIncrementResult.cs
       GetGlobal/
         GetGlobalQuery.cs
         GetGlobalQueryHandler.cs
       GetUser/
-        GetUserCounterQuery.cs
-        GetUserCounterQueryHandler.cs
+        GetUserCountersQuery.cs
+        GetUserCountersQueryHandler.cs
 
   TheButton.Domain/
     Events/
@@ -77,18 +84,28 @@ src/
       SqlCounterReadRepository.cs
 ```
 
+## API versioning (Asp.Versioning)
+
+- Keep Asp.Versioning.
+- Expose **v3** via URL segment: `/api/v3/...`.
+- Implement endpoints using **versioned route groups**, so all v3 endpoints live under a single `MapGroup("/api/v{version:apiVersion}")` and are annotated with API version `3.0`.
+
+This ensures:
+- The runtime routes match DOC-04.
+- OpenAPI groups endpoints under v3 correctly via ApiExplorer.
+
 ## Variant A: Transactional projections (strong consistency)
 
 - A single database contains:
   - `write` schema: event store + idempotency
   - `read` schema: projections
-- The increment command executes a **single SQL transaction** that:
+- Write operations execute a **single SQL transaction** that:
   - enforces idempotency
-  - updates projections
+  - updates projections when applicable
   - appends the event
   - stores the command result
 
 ## References
 
-- [DOC-04 — API Contract](DOC-04-api-contract.md)
-- [DOC-05 — Persistence Design](DOC-05-persistence-design.md)
+- [DOC-04 API Contract](DOC-04-api-contract.md)
+- [DOC-05 Persistence Design](DOC-05-persistence-design.md)

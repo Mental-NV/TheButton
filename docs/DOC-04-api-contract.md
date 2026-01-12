@@ -2,23 +2,42 @@
 
 ## Base path
 
-`/api/v1`
+`/api/v3`
 
 ## Endpoints
 
-### POST `/counter/increment`
+### POST `/counter`
 
-Increments the global counter and the per-user counter.
+Increments the **global** counter.
 
 **Headers**
 - `Idempotency-Key: <string>` (required)
 
-**Body**
+**Response (200)**
 ```json
 {
-  "userId": "00000000-0000-0000-0000-000000000000"
+  "globalValue": 1
 }
 ```
+
+**Semantics**
+- `globalValue` is the monotonic global ordering number of the latest increment event (from `write.Events.Position`).
+
+**Errors**
+- `400` if `Idempotency-Key` is missing/blank
+- `409` if a concurrency conflict cannot be resolved with bounded retries
+
+---
+
+### POST `/counter/{userId}`
+
+Increments the **global** counter and the **per-user** counter.
+
+**Route parameters**
+- `userId` — GUID (required)
+
+**Headers**
+- `Idempotency-Key: <string>` (required)
 
 **Response (200)**
 ```json
@@ -30,18 +49,18 @@ Increments the global counter and the per-user counter.
 
 **Semantics**
 - `globalValue` is the monotonic global ordering number of the latest increment event (from `write.Events.Position`).
-- `userValue` is the per-user counter value from `read.UserCounters.Value`.
+- `userValue` is the per-user counter value from `read.UserCounters.Value` after the increment.
 
 **Errors**
 - `400` if `Idempotency-Key` is missing/blank
 - `400` if `userId` is missing/invalid GUID
-- `409` if concurrency conflict cannot be resolved with bounded retries
+- `409` if a concurrency conflict cannot be resolved with bounded retries
 
 ---
 
-### GET `/counter/global`
+### GET `/counter`
 
-Returns global counter value.
+Returns the global counter value.
 
 **Response (200)**
 ```json
@@ -52,13 +71,17 @@ Returns global counter value.
 
 ---
 
-### GET `/counter/users/{userId}`
+### GET `/counter/{userId}`
 
-Returns per-user counter value.
+Returns the global counter value and the per-user counter value.
+
+**Route parameters**
+- `userId` — GUID (required)
 
 **Response (200)**
 ```json
 {
+  "globalValue": 123,
   "userId": "00000000-0000-0000-0000-000000000000",
   "userValue": 42
 }
@@ -67,7 +90,10 @@ Returns per-user counter value.
 **Semantics**
 - If the user has no recorded counter, return `userValue = 0`.
 
+**Errors**
+- `400` if `userId` is missing/invalid GUID
+
 ## Notes
 
 - Authentication is out of scope. The client should provide a stable `userId` (persisted GUID).
-- Increment is synchronous and strongly consistent (Variant A).
+- Both POST endpoints are synchronous and strongly consistent (Variant A).
