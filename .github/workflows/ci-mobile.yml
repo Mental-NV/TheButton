@@ -1,14 +1,24 @@
-name: CI
+name: CI Mobile
 
 on:
   push:
     branches: [ main ]
-    paths-ignore:
-      - "**/*.md"
+    paths:
+      - "src/mobile/**"
+      - "tests/mobile/**"
+      - ".github/workflows/ci-mobile.yml"
+      - ".github/workflows/e2e-mobile.yml"
+      - ".maestro/**"
+      - "scripts/run-*-e2e.sh"
   pull_request:
     branches: [ main ]
-    paths-ignore:
-      - "**/*.md"
+    paths:
+      - "src/mobile/**"
+      - "tests/mobile/**"
+      - ".github/workflows/ci-mobile.yml"
+      - ".github/workflows/e2e-mobile.yml"
+      - ".maestro/**"
+      - "scripts/run-*-e2e.sh"
   workflow_dispatch:
 
 concurrency:
@@ -25,8 +35,8 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
 
 jobs:
-  dotnet:
-    name: .NET build & test
+  mobile:
+    name: Mobile build & test
     runs-on: windows-latest
     env:
       DOTNET_ROOT: "" # Silences the linter
@@ -66,57 +76,26 @@ jobs:
 
       # Critical: restore with RID so the win-x64 runtime pack is downloaded,
       # without overriding TargetFramework (prevents NETSDK1005).
+      # Restoring full solution is fine for Mobile since it has MAUI workloads restored.
       - name: Restore (solution, win-x64 RID)
         shell: pwsh
         run: |
           dotnet restore TheButton.sln -r win-x64
 
-      - name: Build
-        run: dotnet build TheButton.sln -c Release --no-restore
+      - name: Build Mobile
+        run: dotnet build src/mobile/TheButton.Mobile/TheButton.Mobile.csproj -c Release --no-restore
 
-      - name: Test
-        run: dotnet test TheButton.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx"
+      - name: Test Mobile Unit
+        run: dotnet test tests/mobile/TheButton.Mobile.UnitTests/TheButton.Mobile.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-mobile-unit.trx"
+      
+      - name: Test Mobile Integration
+        run: dotnet test tests/mobile/TheButton.Mobile.IntegrationTests/TheButton.Mobile.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-mobile-integration.trx"
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-mobile
           path: "**/*.trx"
           if-no-files-found: warn
           retention-days: 7
-
-  web:
-    name: Web build & test
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "lts/*"
-          cache: "npm"
-          cache-dependency-path: src/TheButton.Web/package-lock.json
-
-      - name: Install
-        working-directory: src/TheButton.Web
-        run: npm ci
-
-      - name: Test
-        working-directory: src/TheButton.Web
-        run: npm test --if-present
-
-      - name: Build
-        working-directory: src/TheButton.Web
-        run: npm run build --if-present
-
-      - name: Upload web build output
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-dist
-          path: src/TheButton.Web/dist
-          if-no-files-found: ignore
-          retention-days: 3

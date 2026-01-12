@@ -1,0 +1,138 @@
+name: CI Backend
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - "src/mobile/**"
+      - "tests/mobile/**"
+      - ".github/workflows/ci-mobile.yml"
+      - ".github/workflows/e2e-mobile.yml"
+      - ".maestro/**"
+      - "scripts/run-*-e2e.sh"
+      - "**/*.md"
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - "src/mobile/**"
+      - "tests/mobile/**"
+      - ".github/workflows/ci-mobile.yml"
+      - ".github/workflows/e2e-mobile.yml"
+      - ".maestro/**"
+      - "scripts/run-*-e2e.sh"
+      - "**/*.md"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_MULTILEVEL_LOOKUP: 0
+  NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
+
+jobs:
+  backend:
+    name: Backend build & test
+    runs-on: windows-latest
+    env:
+      DOTNET_ROOT: "" # Silences the linter
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/*.fsproj', '**/*.props', '**/*.targets', 'Directory.Packages.props', 'NuGet.config', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Cache .NET workload packs (Windows)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.DOTNET_ROOT }}/packs
+            ${{ env.DOTNET_ROOT }}/sdk-manifests
+            ${{ env.DOTNET_ROOT }}/metadata/workloads
+          key: ${{ runner.os }}-dotnetpacks-${{ hashFiles('global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-dotnetpacks-
+
+      # Skip workload restore for backend only
+
+      - name: Restore (solution)
+        shell: pwsh
+        run: |
+          # Only restore backend projects to avoid MAUI issues?
+          # Actually, 'dotnet restore TheButton.sln' might fail if MAUI workloads are missing.
+          # We should restore specifically the API/Application/Infrastructure/Domain projects?
+          # OR allow 'ignore-failed-sources' and hope SDK can handle it?
+          # Better: dotnet restore src/TheButton.Api/TheButton.Api.csproj etc.
+          # However, to be safe and simple, let's try restoring just the backend solution or projects.
+          # Since we are using standard 'dotnet build' on a specific project, it implicitly restores.
+          dotnet restore src/TheButton.Api/TheButton.Api.csproj
+
+      - name: Build Api
+        run: dotnet build src/TheButton.Api/TheButton.Api.csproj -c Release --no-restore
+
+      - name: Test Api Unit
+        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --logger "trx;LogFileName=test-results-unit.trx"
+
+      - name: Test Api Integration
+        run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --logger "trx;LogFileName=test-results-integration.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-backend
+          path: "**/*.trx"
+          if-no-files-found: warn
+          retention-days: 7
+
+  web:
+    name: Web build & test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+          cache-dependency-path: src/TheButton.Web/package-lock.json
+
+      - name: Install
+        working-directory: src/TheButton.Web
+        run: npm ci
+
+      - name: Test
+        working-directory: src/TheButton.Web
+        run: npm test --if-present
+
+      - name: Build
+        working-directory: src/TheButton.Web
+        run: npm run build --if-present
+
+      - name: Upload web build output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: src/TheButton.Web/dist
+          if-no-files-found: ignore
+          retention-days: 3
