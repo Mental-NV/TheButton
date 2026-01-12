@@ -1,11 +1,13 @@
 using Scalar.AspNetCore;
 using TheButton.Services;
 using Asp.Versioning;
+using TheButton.Api.Extensions;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddEndpoints(typeof(Program).Assembly);
 builder.Services.AddSingleton<ICounterService, CounterService>();
 builder.Services.AddOpenApi();
 
@@ -40,7 +42,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
-app.MapControllers();
+app.MapEndpoints();
 
 app.Run();
 
