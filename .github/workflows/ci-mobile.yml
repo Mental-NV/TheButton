@@ -10,8 +10,7 @@ on:
       - ".github/workflows/e2e-mobile.yml"
       - ".maestro/**"
       - "scripts/run-*-e2e.sh"
-    paths-ignore:
-      - "**/*.md"
+
   pull_request:
     branches: [ main ]
     paths:
@@ -21,8 +20,7 @@ on:
       - ".github/workflows/e2e-mobile.yml"
       - ".maestro/**"
       - "scripts/run-*-e2e.sh"
-    paths-ignore:
-      - "**/*.md"
+
   workflow_dispatch:
 
 concurrency:

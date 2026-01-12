@@ -12,8 +12,6 @@ on:
       - "src/mobile/TheButton.Mobile.Infrastructure/**"
       - "src/mobile/TheButton.Mobile/**"
       - "tools/TheButton.MockApi/**"
-    paths-ignore:
-      - "**/*.md"
 
   push:
     branches: [ main ]
