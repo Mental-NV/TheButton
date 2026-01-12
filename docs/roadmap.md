@@ -45,8 +45,8 @@ This is the authoritative entry point for AI agents and developers. It provides 
   - [Add dotnet tool manifest with dotnet-ef](backlog/M0/E0-2/TASK-M0-E0-2-add-dotnet-tool-manifest-with-dotnet-ef.md) **[Done]**
   - [Add scripts/bootstrap-db.ps1 and scripts/bootstrap-db.sh](backlog/M0/E0-2/TASK-M0-E0-2-add-scripts-bootstrap-db-ps1-and-scripts-bootstrap-db-sh.md) **[Done]**
   - [Add scripts/test.ps1 and scripts/test.sh](backlog/M0/E0-2/TASK-M0-E0-2-add-scripts-test-ps1-and-scripts-test-sh.md) **[Done]**
-- [EPIC: Restore V2 endpoints + tests (backward compatibility guardrail)](backlog/M0/E0-3/EPIC-M0-E0-3-restore-v2-endpoints-tests-backward-compatibility-guardrail.md) **[New]**
-  - [Restore V2 endpoints integration tests (keep V2 behavior stable)](backlog/M0/E0-3/TASK-M0-E0-3-restore-v2-endpoints-integration-tests-keep-v2-behavior-stable.md) **[New]**
+- [EPIC: Restore V2 endpoints + tests (backward compatibility guardrail)](backlog/M0/E0-3/EPIC-M0-E0-3-restore-v2-endpoints-tests-backward-compatibility-guardrail.md) **[InReview]**
+  - [Restore V2 endpoints integration tests (keep V2 behavior stable)](backlog/M0/E0-3/TASK-M0-E0-3-restore-v2-endpoints-integration-tests-keep-v2-behavior-stable.md) **[InReview]**
 
 ---
 

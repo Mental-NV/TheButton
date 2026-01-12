@@ -59,3 +59,5 @@ TestResults/
 coverage.json
 *.coverage
 *.cobertura.xml
+
+.pr-body.md

@@ -3,6 +3,7 @@ using TheButton.Services;
 using Asp.Versioning;
 using TheButton.Api.Extensions;
 using System.Reflection;
+using TheButton.Api.Features.V2.Counter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +17,7 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = new ApiVersion(3, 0);
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
-    options.ApiVersionReader = ApiVersionReader.Combine(
-        new HeaderApiVersionReader("X-Api-Version"),
-        new QueryStringApiVersionReader("api-version"));
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
 }).AddApiExplorer(options =>
 {
     options.GroupNameFormat = "'v'VVV";
@@ -57,6 +56,8 @@ app.NewVersionedApi("v3")
    .MapGroup("/api/v3")
    .HasApiVersion(new ApiVersion(3, 0))
    .MapEndpoints();
+
+app.MapCounterEndpoints();
 
 app.Run();
 
