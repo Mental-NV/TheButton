@@ -1,14 +1,22 @@
 #!/bin/bash
 # Test script for Linux/macOS (Bash)
-# Runs build + unit + integration tests
+# Runs build + unit + integration tests for both Backend and Mobile projects
 
 set -e
 
-echo "Running dotnet build..."
-dotnet build
+run_tests() {
+    local solution=$1
+    echo "--- Processing $solution ---"
+    
+    echo "Running dotnet build for $solution..."
+    dotnet build "$solution"
 
-echo "Running dotnet test..."
-dotnet test --no-build
+    echo "Running dotnet test for $solution..."
+    dotnet test "$solution" --no-build
+}
 
-echo "All tests passed!"
+run_tests "TheButton.Backend.sln"
+run_tests "TheButton.Mobile.sln"
+
+echo "All tests passed for all solutions!"
 exit 0
