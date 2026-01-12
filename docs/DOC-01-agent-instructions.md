@@ -22,7 +22,16 @@ Implement a scalable production architecture for **TheButton.API** using:
 - Must run in production on Azure SQL.
 - Write operations must be atomic.
 - Prefer small, cohesive PRs mapped to roadmap milestones and epics.
-- If a manual step is required, follow `docs/MANUAL-STEPS.md` and explicitly prompt the user.
+
+## Manual steps protocol
+
+When a manual step is required (e.g., running EF migrations, provisioning Azure resources), the agent must:
+
+1. **Stop** at an appropriate task boundary
+2. **Explicitly tell the user** what command/action to run
+3. **Wait for user confirmation** before continuing
+
+See `docs/MANUAL-STEPS.md` for the complete checklist of manual steps and expected human actions.
 
 ## Branching and PR hygiene
 
