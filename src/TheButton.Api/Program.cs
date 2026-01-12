@@ -13,11 +13,17 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApiVersioning(options =>
 {
-    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.DefaultApiVersion = new ApiVersion(3, 0);
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
-    options.ApiVersionReader = new UrlSegmentApiVersionReader();
-}).AddMvc();
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new HeaderApiVersionReader("X-Api-Version"),
+        new QueryStringApiVersionReader("api-version"));
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
 
 builder.Services.AddCors(options =>
 {
@@ -42,7 +48,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
-app.MapEndpoints();
+var versionSet = app.NewApiVersionSet()
+    .HasApiVersion(new ApiVersion(3, 0))
+    .ReportApiVersions()
+    .Build();
+
+app.NewVersionedApi("v3")
+   .MapGroup("/api/v3")
+   .HasApiVersion(new ApiVersion(3, 0))
+   .MapEndpoints();
 
 app.Run();
 
