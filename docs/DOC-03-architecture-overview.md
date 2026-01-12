@@ -91,7 +91,7 @@ src/
 - Implement endpoints using **versioned route groups**, so all v3 endpoints live under a single `MapGroup("/api/v{version:apiVersion}")` and are annotated with API version `3.0`.
 
 This ensures:
-- The runtime routes match DOC-04.
+- The runtime routes match [DOC-04 API Contract](DOC-04-api-contract.md).
 - OpenAPI groups endpoints under v3 correctly via ApiExplorer.
 
 ## Variant A: Transactional projections (strong consistency)

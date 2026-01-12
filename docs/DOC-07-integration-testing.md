@@ -83,4 +83,4 @@ All against a real SQL engine (LocalDB in CI on Windows).
 
 ## Manual steps note
 
-If migrations need to be **generated** (not just applied), follow `docs/MANUAL-STEPS.md` and have the agent explicitly prompt the user to run the required `dotnet ef migrations add` command.
+If migrations need to be **generated** (not just applied), follow [Manual Steps Checklist](MANUAL-STEPS.md) and have the agent explicitly prompt the user to run the required `dotnet ef migrations add` command.

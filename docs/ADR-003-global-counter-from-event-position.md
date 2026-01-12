@@ -29,5 +29,5 @@ Use the event store’s identity position (`write.Events.Position`) as the globa
   - `globalValue` represents event sequence rather than a separate “business counter” if semantics diverge
 
 ## References
-- [DOC-04 API Contract](../DOC-04-api-contract.md)
-- [DOC-05 Persistence Design](../DOC-05-persistence-design.md)
+- [DOC-04 API Contract](DOC-04-api-contract.md)
+- [DOC-05 Persistence Design](DOC-05-persistence-design.md)

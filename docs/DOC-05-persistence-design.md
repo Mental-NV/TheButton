@@ -92,5 +92,5 @@ Transaction steps:
 ## Implementation notes
 
 - Projection upsert should be concurrency-safe (single-statement upsert where feasible).
-- Bounded retries may be applied for transient and concurrency exceptions (DOC-08).
-- The global counter is derived from event `Position` and does not require a separate hot row (ADR-003).
+- Bounded retries may be applied for transient and concurrency exceptions ([DOC-08 Observability & Reliability](DOC-08-observability-and-reliability.md)).
+- The global counter is derived from event `Position` and does not require a separate hot row ([ADR-003 Global Counter from Event Position](ADR-003-global-counter-from-event-position.md)).

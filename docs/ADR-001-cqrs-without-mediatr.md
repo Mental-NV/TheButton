@@ -25,5 +25,5 @@ Implement CQRS by defining per-use-case command/query types and handler classes,
   - Some duplication across use cases (acceptable in vertical slices)
 
 ## References
-- [DOC-01 Agent Operating Instructions](../DOC-01-agent-instructions.md)
-- [DOC-03 Architecture Overview](../DOC-03-architecture-overview.md)
+- [DOC-01 Agent Operating Instructions](DOC-01-agent-instructions.md)
+- [DOC-03 Architecture Overview](DOC-03-architecture-overview.md)

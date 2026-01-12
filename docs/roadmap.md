@@ -1,12 +1,12 @@
 # Roadmap
 
-This roadmap is designed for coding AI agents. It links milestones to epics and references the authoritative docs.
+This roadmap serves as a high-level index for the project's milestones, epics, and backlog items.
 
 ## References
 
 - [DOC-00 Index](DOC-00-index.md)
 - [DOC-01 Agent Operating Instructions](DOC-01-agent-instructions.md)
-- [DOC-02 Goals, Constraints, Non-Goals](DOC-02-goals-constraints-non-goals.md)
+- [DOC-02 Product Goals, Constraints, Non-Goals](DOC-02-goals-constraints-non-goals.md)
 - [DOC-03 Architecture Overview](DOC-03-architecture-overview.md)
 - [DOC-04 API Contract](DOC-04-api-contract.md)
 - [DOC-05 Persistence Design](DOC-05-persistence-design.md)
@@ -19,20 +19,6 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 
 ### M0 — Planning & Solution Restructure
 
-**Goal:** Establish solution structure and Minimal API endpoint mapping foundation aligned with Clean Architecture + Vertical Slices.
-
-**Epics**
-- **E0.1** — Introduce Clean Architecture solution structure (Api/Application/Domain/Infrastructure)
-
-**Key outputs**
-- Projects and dependency direction enforced (DOC-03)
-- Minimal API mapping skeleton in place (DOC-03)
-- Baseline build remains green (DOC-09)
-
----
-
-**Backlog links**
-
 - [EPIC: Introduce Clean Architecture solution structure](backlog/M0/E0-1/EPIC-M0-E0-1-introduce-clean-architecture-solution-structure.md)
   - [Add Asp.Versioning v3 route group conventions](backlog/M0/E0-1/TASK-M0-E0-1-add-asp-versioning-v3-route-group-conventions.md)
   - [Create new projects (Application/Domain/Infrastructure)](backlog/M0/E0-1/TASK-M0-E0-1-create-new-projects-application-domain-infrastructure.md)
@@ -43,24 +29,12 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
   - [Add dotnet tool manifest with dotnet-ef](backlog/M0/E0-2/TASK-M0-E0-2-add-dotnet-tool-manifest-with-dotnet-ef.md)
   - [Add scripts/bootstrap-db.ps1 and scripts/bootstrap-db.sh](backlog/M0/E0-2/TASK-M0-E0-2-add-scripts-bootstrap-db-ps1-and-scripts-bootstrap-db-sh.md)
   - [Add scripts/test.ps1 and scripts/test.sh](backlog/M0/E0-2/TASK-M0-E0-2-add-scripts-test-ps1-and-scripts-test-sh.md)
+- [EPIC: Restore V2 endpoints + tests (backward compatibility guardrail)](backlog/M0/E0-3/EPIC-M0-E0-3-restore-v2-endpoints-tests-backward-compatibility-guardrail.md)
+  - [Restore V2 endpoints integration tests (keep V2 behavior stable)](backlog/M0/E0-3/TASK-M0-E0-3-restore-v2-endpoints-integration-tests-keep-v2-behavior-stable.md)
 
 ---
 
 ### M1 — Persistence Foundations (EF Core + Migrations)
-
-**Goal:** Implement SQL persistence layout (write/read schemas) and migrations for LocalDB + Azure SQL.
-
-**Epics**
-- **E1.1** — Add EF Core persistence with write/read schemas and migrations
-
-**Key outputs**
-- EF Core DbContext + entity mapping for event store, idempotency, projections (DOC-05)
-- Initial migration creates schemas/tables + view (DOC-05)
-- LocalDB connectivity and DB creation workflow (DOC-06)
-
----
-
-**Backlog links**
 
 - [EPIC: Add EF Core persistence with write/read schemas and migrations](backlog/M1/E1-1/EPIC-M1-E1-1-add-ef-core-persistence-with-write-read-schemas-and-migrations.md)
   - [Add ConnectionStrings:Sql for LocalDB and Azure SQL](backlog/M1/E1-1/TASK-M1-E1-1-add-connectionstrings-sql-for-localdb-and-azure-sql.md)
@@ -72,25 +46,12 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
   - [Dev-only auto-migrate on startup (optional)](backlog/M1/E1-1/TASK-M1-E1-1-dev-only-auto-migrate-on-startup-optional.md)
   - [Map entities for write.Events/write.Commands/read.UserCounters](backlog/M1/E1-1/TASK-M1-E1-1-map-entities-for-write-events-write-commands-read-usercounters.md)
   - [Update DOC-05 to reflect optional userId + idempotency scoping](backlog/M1/E1-1/TASK-M1-E1-1-update-doc-05-to-reflect-optional-userid-idempotency-scoping.md)
+- [EPIC: CI split (backend/web vs mobile) to avoid MAUI workloads on backend changes](backlog/M1/E1-2/EPIC-M1-E1-2-ci-split-backend-web-vs-mobile-to-avoid-maui-workloads-on-backend-changes.md)
+  - [Implement CI workflow split (path filtering) backend/web vs mobile](backlog/M1/E1-2/TASK-M1-E1-2-implement-ci-workflow-split-path-filtering-backend-web-vs-mobile.md)
 
 ---
 
 ### M2 — Increment Write Path (Atomic + Idempotent)
-
-**Goal:** Implement synchronous strong-consistency `POST /api/v1/counter/increment` using Variant A transactional projections.
-
-**Epics**
-- **E2.1** — Implement /counter/increment (atomic + idempotent)
-
-**Key outputs**
-- Minimal API endpoint matches contract (DOC-04)
-- Single-transaction algorithm implemented (DOC-05)
-- In-memory counter removed/deprecated (DOC-02)
-- Bounded retry strategy may be deferred to M5 (DOC-08)
-
----
-
-**Backlog links**
 
 - [EPIC: Implement v3 counter write endpoints (atomic + idempotent)](backlog/M2/E2-1/EPIC-M2-E2-1-implement-v3-counter-write-endpoints-atomic-idempotent.md)
   - [Add GlobalIncrement command/handler/result](backlog/M2/E2-1/TASK-M2-E2-1-add-globalincrement-command-handler-result.md)
@@ -105,19 +66,6 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 
 ### M3 — Read Endpoints (Global + Per-User)
 
-**Goal:** Provide query endpoints backed by projection tables/views.
-
-**Epics**
-- **E3.1** — Implement read endpoints (global + per-user)
-
-**Key outputs**
-- `GET /counter/global` and `GET /counter/users/{userId}` live (DOC-04)
-- Queries read projections only (DOC-05)
-
----
-
-**Backlog links**
-
 - [EPIC: Implement v3 counter read endpoints](backlog/M3/E3-1/EPIC-M3-E3-1-implement-v3-counter-read-endpoints.md)
   - [Add Minimal API endpoint GET /api/v3/counter/{userId}](backlog/M3/E3-1/TASK-M3-E3-1-add-minimal-api-endpoint-get-api-v3-counter-userid.md)
   - [Add Minimal API endpoint GET /api/v3/counter](backlog/M3/E3-1/TASK-M3-E3-1-add-minimal-api-endpoint-get-api-v3-counter.md)
@@ -126,20 +74,6 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 ---
 
 ### M4 — Integration Tests (LocalDB)
-
-**Goal:** Validate correctness under real SQL behavior: atomicity, idempotency, concurrency.
-
-**Epics**
-- **E4.1** — Integration tests with LocalDB (per-run DB + reset between tests)
-
-**Key outputs**
-- Per-run unique test DB provisioning and migrations (DOC-07)
-- Reset strategy for deterministic tests (DOC-07)
-- Core integration tests: increment, idempotency, concurrency (DOC-07)
-
----
-
-**Backlog links**
 
 - [EPIC: Integration tests with LocalDB (per-run DB + reset)](backlog/M4/E4-1/EPIC-M4-E4-1-integration-tests-with-localdb-per-run-db-reset.md)
   - [CI: ensure integration tests run on Windows with LocalDB](backlog/M4/E4-1/TASK-M4-E4-1-ci-ensure-integration-tests-run-on-windows-with-localdb.md)
@@ -156,21 +90,6 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 
 ### M5 — Observability, Health, Hardening
 
-**Goal:** Add operational readiness and resilience features.
-
-**Epics**
-- **E5.1** — Add health checks and structured logging
-- **E5.2** — Bounded retry for concurrency/transient SQL faults
-
-**Key outputs**
-- `/health/live` and `/health/ready` endpoints (DOC-08)
-- Structured log enrichment and correlation fields (DOC-08)
-- Bounded retry for transient/concurrency faults (DOC-08)
-
----
-
-**Backlog links**
-
 - [EPIC: Observability and health](backlog/M5/E5-1/EPIC-M5-E5-1-observability-and-health.md)
   - [Add health check endpoints (live/ready)](backlog/M5/E5-1/TASK-M5-E5-1-add-health-check-endpoints-live-ready.md)
   - [Add structured logging enrichment for requests](backlog/M5/E5-1/TASK-M5-E5-1-add-structured-logging-enrichment-for-requests.md)
@@ -181,22 +100,6 @@ This roadmap is designed for coding AI agents. It links milestones to epics and 
 ---
 
 ### M6 — Documentation & Polish
-
-**Goal:** Ensure repo is self-serve for developers and agents; finalize runbook-quality docs.
-
-**Epics**
-- **E6.1** — Update README with local run, migrations, API usage
-
-**Key outputs**
-- README reflects LocalDB, migrations, API usage patterns (DOC-04, DOC-06)
-- Docs updated to reflect final state (DOC-09)
-
-## Cross-cutting conventions
-
-- Architectural decisions are recorded as ADRs in `docs/decisions/`.
-- If a decision changes an existing ADR, update that ADR and add a superseding ADR if needed.
-
-**Backlog links**
 
 - [EPIC: Documentation updates (README + examples)](backlog/M6/E6-1/EPIC-M6-E6-1-documentation-updates-readme-examples.md)
   - [README: API examples (curl) for v3 endpoints](backlog/M6/E6-1/TASK-M6-E6-1-readme-api-examples-curl-for-v3-endpoints.md)

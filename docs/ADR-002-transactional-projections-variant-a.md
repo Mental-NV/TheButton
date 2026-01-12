@@ -33,7 +33,7 @@ There is **one** increment event type (`CounterIncremented`) with **optional `Us
   - Future extreme scale may require sharding or an async projection model (Variant B)
 
 ## References
-- [DOC-02 Goals, Constraints, Non-Goals](../DOC-02-goals-constraints-non-goals.md)
-- [DOC-04 API Contract](../DOC-04-api-contract.md)
-- [DOC-05 Persistence Design](../DOC-05-persistence-design.md)
-- [DOC-07 Integration Testing Strategy](../DOC-07-integration-testing.md)
+- [DOC-02 Product Goals, Constraints, Non-Goals](DOC-02-goals-constraints-non-goals.md)
+- [DOC-04 API Contract](DOC-04-api-contract.md)
+- [DOC-05 Persistence Design](DOC-05-persistence-design.md)
+- [DOC-07 Integration Testing Strategy](DOC-07-integration-testing.md)
