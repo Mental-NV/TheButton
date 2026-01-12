@@ -1,12 +1,12 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using TheButton.Services;
+using TheButton.Api.Abstractions;
 
 namespace TheButton.Api.Features.V2.Counter;
 
-public static class CounterEndpoints
+public class CounterEndpoints : IEndpoint
 {
-    public static void MapCounterEndpoints(this IEndpointRouteBuilder app)
+    public void Map(IEndpointRouteBuilder app)
     {
         var versionedGroup = app.NewVersionedApi("v2")
             .MapGroup("/api/v{version:apiVersion}/counter")

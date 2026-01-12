@@ -29,7 +29,7 @@ public class HealthTests
         var client = _factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync("/api/v3/health");
+        var response = await client.GetAsync("/health");
 
         // Assert
         response.EnsureSuccessStatusCode();
