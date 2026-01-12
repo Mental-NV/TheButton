@@ -1,0 +1,93 @@
+name: CI - Mobile
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "src/mobile/**"
+      - "tests/mobile/**"
+      - ".github/workflows/ci-mobile.yml"
+      - ".github/workflows/e2e-mobile.yml"
+      - ".maestro/**"
+      - "scripts/run-*-e2e.sh"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "src/mobile/**"
+      - "tests/mobile/**"
+      - ".github/workflows/ci-mobile.yml"
+      - ".github/workflows/e2e-mobile.yml"
+      - ".maestro/**"
+      - "scripts/run-*-e2e.sh"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_MULTILEVEL_LOOKUP: 0
+  NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
+
+jobs:
+  dotnet:
+    name: .NET Mobile build & test
+    runs-on: windows-latest
+    env:
+        DOTNET_ROOT: "" # Silences the linter
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/*.fsproj', '**/*.props', '**/*.targets', 'Directory.Packages.props', 'NuGet.config', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Cache .NET workload packs (Windows)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.DOTNET_ROOT }}/packs
+            ${{ env.DOTNET_ROOT }}/sdk-manifests
+            ${{ env.DOTNET_ROOT }}/metadata/workloads
+          key: ${{ runner.os }}-dotnetpacks-${{ hashFiles('global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-dotnetpacks-
+
+      - name: Restore MAUI workloads (pinned by SDK)
+        run: |
+          dotnet workload restore TheButton.sln --skip-manifest-update --ignore-failed-sources
+
+      - name: Restore (solution, win-x64 RID)
+        shell: pwsh
+        run: |
+          dotnet restore TheButton.sln -r win-x64
+
+      - name: Build
+        run: dotnet build TheButton.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test TheButton.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-mobile
+          path: "**/*.trx"
+          if-no-files-found: warn
+          retention-days: 7

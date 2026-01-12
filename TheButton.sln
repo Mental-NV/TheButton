@@ -13,19 +13,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Api.UnitTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Api.IntegrationTests", "tests\TheButton.Api.IntegrationTests\TheButton.Api.IntegrationTests.csproj", "{41C96A6F-231D-4C33-845A-759DCBC66181}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile.Core", "src\TheButton.Mobile.Core\TheButton.Mobile.Core.csproj", "{A4950756-3375-4273-B655-F56BD421062E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile.Core", "src\mobile\TheButton.Mobile.Core\TheButton.Mobile.Core.csproj", "{A4950756-3375-4273-B655-F56BD421062E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile.Infrastructure", "src\TheButton.Mobile.Infrastructure\TheButton.Mobile.Infrastructure.csproj", "{97739E92-D035-42A7-8BF5-EDEA3AA7C3EA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile.Infrastructure", "src\mobile\TheButton.Mobile.Infrastructure\TheButton.Mobile.Infrastructure.csproj", "{97739E92-D035-42A7-8BF5-EDEA3AA7C3EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile", "src\TheButton.Mobile\TheButton.Mobile.csproj", "{54F10542-75CC-4CF9-837A-F78E787D64C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile", "src\mobile\TheButton.Mobile\TheButton.Mobile.csproj", "{54F10542-75CC-4CF9-837A-F78E787D64C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{07C2787E-EAC7-C090-1BA3-A61EC2A24D84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.MockApi", "tools\TheButton.MockApi\TheButton.MockApi.csproj", "{A8327631-8A2A-49D5-A400-A27921EB124D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.MockApi", "src\mobile\TheButton.MockApi\TheButton.MockApi.csproj", "{A8327631-8A2A-49D5-A400-A27921EB124D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile.UnitTests", "tests\TheButton.Mobile.UnitTests\TheButton.Mobile.UnitTests.csproj", "{0FD8E11B-6728-4C24-BAC6-A74CAED576D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile.UnitTests", "tests\mobile\TheButton.Mobile.UnitTests\TheButton.Mobile.UnitTests.csproj", "{0FD8E11B-6728-4C24-BAC6-A74CAED576D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile.IntegrationTests", "tests\TheButton.Mobile.IntegrationTests\TheButton.Mobile.IntegrationTests.csproj", "{480DF9A0-1A41-4170-B2C6-3EE431F15184}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Mobile.IntegrationTests", "tests\mobile\TheButton.Mobile.IntegrationTests\TheButton.Mobile.IntegrationTests.csproj", "{480DF9A0-1A41-4170-B2C6-3EE431F15184}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheButton.Application", "src\TheButton.Application\TheButton.Application.csproj", "{3B0D762B-3CA5-4E3A-976B-E292AA21EBF2}"
 EndProject
