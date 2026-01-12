@@ -16,8 +16,6 @@ on:
   push:
     branches: [ main ]
     paths: *mobile_paths
-    paths-ignore:
-      - "**/*.md"
 
   workflow_dispatch:
     
