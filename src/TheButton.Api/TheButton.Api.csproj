@@ -13,4 +13,9 @@
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TheButton.Application\TheButton.Application.csproj" />
+    <ProjectReference Include="..\TheButton.Infrastructure\TheButton.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
