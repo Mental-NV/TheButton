@@ -55,20 +55,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.NUGET_PACKAGES }}
-          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/*.fsproj', '**/*.props', '**/*.targets', 'Directory.Packages.props', 'NuGet.config', '**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-backend-${{ hashFiles('global.json', 'src/TheButton.*/**/*.csproj', 'tests/TheButton.*/**/*.csproj', '**/*.props', '**/*.targets', 'NuGet.config') }}
           restore-keys: |
-            ${{ runner.os }}-nuget-
+            ${{ runner.os }}-nuget-backend-
 
-      - name: Cache .NET workload packs (Windows)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.DOTNET_ROOT }}/packs
-            ${{ env.DOTNET_ROOT }}/sdk-manifests
-            ${{ env.DOTNET_ROOT }}/metadata/workloads
-          key: ${{ runner.os }}-dotnetpacks-${{ hashFiles('global.json') }}
-          restore-keys: |
-            ${{ runner.os }}-dotnetpacks-
+
 
       # Skip workload restore for backend only
 
