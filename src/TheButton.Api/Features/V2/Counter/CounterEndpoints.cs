@@ -12,11 +12,13 @@ public static class CounterEndpoints
             .MapGroup("/api/v{version:apiVersion}/counter")
             .HasApiVersion(new ApiVersion(2, 0));
 
-        versionedGroup.MapPost("", (ICounterService counterService) =>
-        {
-            var newValue = counterService.Increment();
-            return Results.Ok(new CounterResponse(newValue));
-        })
-        .WithTags("Counter");
+        versionedGroup.MapPost("", Increment)
+            .WithTags("Counter");
+    }
+
+    public static Microsoft.AspNetCore.Http.HttpResults.Ok<CounterResponse> Increment(ICounterService counterService)
+    {
+        var newValue = counterService.Increment();
+        return TypedResults.Ok(new CounterResponse(newValue));
     }
 }
