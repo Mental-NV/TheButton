@@ -38,8 +38,8 @@ jobs:
         shell: pwsh
         run: dotnet restore TheButton.Backend.sln
 
-      - name: Build Infrastructure (Metadata)
-        run: dotnet build src/TheButton.Infrastructure/TheButton.Infrastructure.csproj --no-restore
+      - name: Build Backend (Generate Metadata)
+        run: dotnet build TheButton.Backend.sln --no-restore
 
       - name: Restore tools
         run: dotnet tool restore
