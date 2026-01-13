@@ -40,6 +40,7 @@ Idempotency is scoped by operation and optional user.
 
 | Column | Type | Notes |
 |---|---|---|
+| `Id` | `BIGINT IDENTITY(1,1)` | Clustered PK |
 | `Operation` | `NVARCHAR(50)` | `GlobalIncrement` or `UserIncrement` |
 | `UserId` | `UNIQUEIDENTIFIER NULL` | NULL for global increment |
 | `IdempotencyKey` | `NVARCHAR(100)` | From `Idempotency-Key` header |
@@ -47,8 +48,10 @@ Idempotency is scoped by operation and optional user.
 | `ResultJson` | `NVARCHAR(MAX)` | Cached response payload |
 
 **Constraints / indexes**
+- PK clustered: `(Id)`
 - Unique: `(Operation, UserId, IdempotencyKey)`
   - Prevents collisions when the same idempotency key is reused across different operations.
+  - Note: SQL Server allows multiple rows with NULL in individual columns of a unique index but EF Core + SQL Server handle this as a standard unique constraint.
 
 ### `read.UserCounters` (projection)
 
