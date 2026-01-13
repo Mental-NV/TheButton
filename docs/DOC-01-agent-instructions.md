@@ -110,8 +110,7 @@ For each PR:
    - Make focused changes only for the PR scope.
 
 5. **Verify locally**
-   - `dotnet build`
-   - `dotnet test` (or `.\scripts\test.ps1` if present)
+   - `./test.cmd`
 
 6. **Commit and push**
    - `git add -A`
@@ -188,22 +187,6 @@ the agent must:
 - stop at an appropriate boundary,
 - provide exact commands/actions from [Manual Steps Checklist](MANUAL-STEPS.md),
 - ask the user to confirm success before proceeding.
-
-## Coding conventions
-
-- Feature folders follow vertical slice structure: `Features/<Area>/<UseCase>/`
-- Endpoints are thin:
-  - parse + validate request
-  - invoke handler
-  - map response
-- Application layer contains:
-  - commands/queries
-  - handlers
-  - abstractions (interfaces) used by handlers
-- Infrastructure layer contains:
-  - EF Core DbContext
-  - migrations
-  - repository implementations
 
 ## Validation and quality gates
 

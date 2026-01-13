@@ -30,45 +30,49 @@ Each use case has:
 - `Handler` class with `Handle(...)` method
 - Endpoint calls handler directly (DI resolves handler)
 
+## Vertical Slices
+- Feature folders follow vertical slice structure: `Features/<Version>/<Area>/<UseCase>/`
+
 ### Example folder structure
 
 ```text
 src/
   TheButton.Api/
     Features/
-      Counter/
-        IncrementGlobal/
-          Endpoint.cs
-          Response.cs
-        IncrementUser/
-          Endpoint.cs
-          Response.cs
-        GetGlobal/
-          Endpoint.cs
-          Response.cs
-        GetUser/
-          Endpoint.cs
-          Response.cs
-
+      V3/
+        Counter/
+          IncrementGlobal/
+            Endpoint.cs
+            Response.cs
+          IncrementUser/
+            Endpoint.cs
+            Response.cs
+          GetGlobal/
+            Endpoint.cs
+            Response.cs
+          GetUser/
+            Endpoint.cs
+            Response.cs
   TheButton.Application/
     Abstractions/
       ICounterWriter.cs
       ICounterReadRepository.cs
     Counter/
-      IncrementGlobal/
-        GlobalIncrementCommand.cs
-        GlobalIncrementHandler.cs
-        GlobalIncrementResult.cs
-      IncrementUser/
-        UserIncrementCommand.cs
-        UserIncrementHandler.cs
-        UserIncrementResult.cs
-      GetGlobal/
-        GetGlobalQuery.cs
-        GetGlobalQueryHandler.cs
-      GetUser/
-        GetUserCountersQuery.cs
-        GetUserCountersQueryHandler.cs
+      V3/
+        IncrementGlobal/
+          GlobalIncrementCommand.cs
+          GlobalIncrementHandler.cs
+          GlobalIncrementResult.cs
+        IncrementUser/
+          UserIncrementCommand.cs
+          UserIncrementHandler.cs
+          UserIncrementResult.cs
+        GetGlobal/
+          GetGlobalQuery.cs
+          GetGlobalQueryHandler.cs
+        GetUser/
+          GetUserCountersQuery.cs
+          GetUserCountersQueryHandler.cs
 
   TheButton.Domain/
     Events/
@@ -80,8 +84,8 @@ src/
       Entities/
       Configurations/
     Counter/
-      SqlCounterWriter.cs
-      SqlCounterReadRepository.cs
+        SqlCounterWriter.cs
+        SqlCounterReadRepository.cs
 ```
 
 ## API versioning (Manual)
@@ -94,7 +98,7 @@ This ensures:
 - The runtime routes match [DOC-04 API Contract](DOC-04-api-contract.md).
 - OpenAPI/Scalar groups endpoints intuitively based on the route structure.
 
-## Variant A: Transactional projections (strong consistency)
+## Transactional projections (strong consistency)
 
 - A single database contains:
   - `write` schema: event store + idempotency
