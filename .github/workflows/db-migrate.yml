@@ -15,10 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Use Backend global.json (Unpin workloads)
+        shell: pwsh
+        run: Copy-Item global-backend.json global.json -Force
+
+      - name: Setup .NET (global.json)
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x' # Aligned with project's net10.0
+          global-json-file: global.json
 
       - name: Restore tools
         run: dotnet tool restore
