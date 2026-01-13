@@ -11,7 +11,11 @@ builder.Services.AddSingleton<TheButton.Application.Counter.V2.Increment.ICounte
 builder.Services.AddScoped<TheButton.Application.Counter.V2.Increment.IncrementHandler>();
 
 builder.Services.AddDbContext<TheButtonDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Sql")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Sql"), 
+    sqlOptions =>sqlOptions.EnableRetryOnFailure(
+        maxRetryCount: 10,
+        maxRetryDelay: TimeSpan.FromSeconds(30),
+        errorNumbersToAdd: null)));
 
 builder.Services.AddOpenApi();
 
