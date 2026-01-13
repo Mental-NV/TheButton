@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Hosting;
 using TheButton.Api.Features.V2.Counter;
 
 namespace TheButton.Api.IntegrationTests.Features.V2;
@@ -14,7 +15,11 @@ public class CounterApiTests
     [ClassInitialize]
     public static void ClassInit(TestContext context)
     {
-        _factory = new WebApplicationFactory<Program>();
+        _factory = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+                builder.UseEnvironment("Testing");
+            });
     }
 
     [ClassCleanup]
