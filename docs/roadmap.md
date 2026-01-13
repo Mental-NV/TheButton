@@ -76,7 +76,6 @@ This is the authoritative entry point for AI agents and developers. It provides 
   - [Add UserIncrement command/handler/result](backlog/M2/E2-1/TASK-M2-E2-1-add-userincrement-command-handler-result.md) **[New]**
   - [Define Application abstractions for counter writer and reads](backlog/M2/E2-1/TASK-M2-E2-1-define-application-abstractions-for-counter-writer-and-reads.md) **[New]**
   - [Implement SQL counter writer (single-transaction, two modes)](backlog/M2/E2-1/TASK-M2-E2-1-implement-sql-counter-writer-single-transaction-two-modes.md) **[New]**
-  - [Remove in-memory counter service and legacy controller routes](backlog/M2/E2-1/TASK-M2-E2-1-remove-in-memory-counter-service-and-legacy-controller-routes.md) **[New]**
 
 ---
 
