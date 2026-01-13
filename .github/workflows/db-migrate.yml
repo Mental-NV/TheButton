@@ -39,11 +39,11 @@ jobs:
         run: dotnet restore TheButton.Backend.sln
 
       - name: Build Infrastructure (Metadata)
-        run: dotnet build src/TheButton.Infrastructure/TheButton.Infrastructure.csproj -c Release --no-restore
+        run: dotnet build src/TheButton.Infrastructure/TheButton.Infrastructure.csproj --no-restore
 
       - name: Restore tools
         run: dotnet tool restore
 
       - name: Apply Migrations
         run: |
-          dotnet ef database update --project src/TheButton.Infrastructure --startup-project src/TheButton.Api --connection "${{ secrets.THEBUTTON_AZURESQL_CONNECTIONSTRING }}" --no-build
+          dotnet ef database update --project src/TheButton.Infrastructure --startup-project src/TheButton.Api --connection "${{ secrets.THEBUTTON_AZURESQL_CONNECTIONSTRING }}" --no-build --configuration Debug
