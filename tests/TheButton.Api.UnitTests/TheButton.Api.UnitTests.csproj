@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TheButton.Api\TheButton.Api.csproj" />
+    <ProjectReference Include="..\..\src\TheButton.Application\TheButton.Application.csproj" />
+    <ProjectReference Include="..\..\src\TheButton.Infrastructure\TheButton.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

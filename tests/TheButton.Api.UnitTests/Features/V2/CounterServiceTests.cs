@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TheButton.Api.Features.V2.Counter;
+using TheButton.Infrastructure.Counter.V2;
 
 namespace TheButton.Api.UnitTests.Features.V2;
 

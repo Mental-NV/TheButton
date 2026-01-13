@@ -5,7 +5,8 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddEndpoints(typeof(Program).Assembly);
-builder.Services.AddSingleton<TheButton.Api.Features.V2.Counter.ICounterService, TheButton.Api.Features.V2.Counter.CounterService>();
+builder.Services.AddSingleton<TheButton.Application.Counter.V2.Increment.ICounterService, TheButton.Infrastructure.Counter.V2.CounterService>();
+builder.Services.AddScoped<TheButton.Application.Counter.V2.Increment.IncrementHandler>();
 builder.Services.AddOpenApi();
 
 builder.Services.AddCors(options =>
