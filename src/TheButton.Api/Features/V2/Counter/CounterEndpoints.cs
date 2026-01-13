@@ -1,4 +1,5 @@
 using TheButton.Api.Abstractions;
+using TheButton.Application.Counter.V2.Increment;
 
 namespace TheButton.Api.Features.V2.Counter;
 
@@ -12,9 +13,9 @@ public class CounterEndpoints : IEndpoint
         group.MapPost("", Increment);
     }
 
-    public static Microsoft.AspNetCore.Http.HttpResults.Ok<CounterResponse> Increment(ICounterService counterService)
+    public static Microsoft.AspNetCore.Http.HttpResults.Ok<CounterResponse> Increment(IncrementHandler handler)
     {
-        var newValue = counterService.Increment();
-        return TypedResults.Ok(new CounterResponse(newValue));
+        var result = handler.Handle(new IncrementCommand());
+        return TypedResults.Ok(new CounterResponse(result.Value));
     }
 }
