@@ -52,16 +52,16 @@ This is the authoritative entry point for AI agents and developers. It provides 
 
 ### M1 — Persistence Foundations (EF Core + Migrations)
 
-- [EPIC: Add EF Core persistence with write/read schemas and migrations](backlog/M1/E1-1/EPIC-M1-E1-1-add-ef-core-persistence-with-write-read-schemas-and-migrations.md) **[New]**
-  - [Add ConnectionStrings:Sql for LocalDB and Azure SQL](backlog/M1/E1-1/TASK-M1-E1-1-add-connectionstrings-sql-for-localdb-and-azure-sql.md) **[New]**
-  - [Add EF Core SQL Server packages and DbContext skeleton](backlog/M1/E1-1/TASK-M1-E1-1-add-ef-core-sql-server-packages-and-dbcontext-skeleton.md) **[New]**
-  - [Add migration SQL for read.GlobalCounter view](backlog/M1/E1-1/TASK-M1-E1-1-add-migration-sql-for-read-globalcounter-view.md) **[New]**
-  - [Create initial migration for schemas/tables/indexes](backlog/M1/E1-1/TASK-M1-E1-1-create-initial-migration-for-schemas-tables-indexes.md) **[New]**
-  - [Define event schema: CounterIncremented with optional UserId](backlog/M1/E1-1/TASK-M1-E1-1-define-event-schema-counterincremented-with-optional-userid.md) **[New]**
-  - [Define idempotency schema scoped by operation and user](backlog/M1/E1-1/TASK-M1-E1-1-define-idempotency-schema-scoped-by-operation-and-user.md) **[New]**
-  - [Dev-only auto-migrate on startup (optional)](backlog/M1/E1-1/TASK-M1-E1-1-dev-only-auto-migrate-on-startup-optional.md) **[New]**
-  - [Map entities for write.Events/write.Commands/read.UserCounters](backlog/M1/E1-1/TASK-M1-E1-1-map-entities-for-write-events-write-commands-read-usercounters.md) **[New]**
-  - [Update DOC-05 to reflect optional userId + idempotency scoping](backlog/M1/E1-1/TASK-M1-E1-1-update-doc-05-to-reflect-optional-userid-idempotency-scoping.md) **[New]**
+- [EPIC: Add EF Core persistence with write/read schemas and migrations](backlog/M1/E1-1/EPIC-M1-E1-1-add-ef-core-persistence-with-write-read-schemas-and-migrations.md) **[InProgress]**
+  - [Add ConnectionStrings:Sql for LocalDB and Azure SQL](backlog/M1/E1-1/TASK-M1-E1-1-add-connectionstrings-sql-for-localdb-and-azure-sql.md) **[InProgress]**
+  - [Add EF Core SQL Server packages and DbContext skeleton](backlog/M1/E1-1/TASK-M1-E1-1-add-ef-core-sql-server-packages-and-dbcontext-skeleton.md) **[InProgress]**
+  - [Add migration SQL for read.GlobalCounter view](backlog/M1/E1-1/TASK-M1-E1-1-add-migration-sql-for-read-globalcounter-view.md) **[InProgress]**
+  - [Create initial migration for schemas/tables/indexes](backlog/M1/E1-1/TASK-M1-E1-1-create-initial-migration-for-schemas-tables-indexes.md) **[InProgress]**
+  - [Define event schema: CounterIncremented with optional UserId](backlog/M1/E1-1/TASK-M1-E1-1-define-event-schema-counterincremented-with-optional-userid.md) **[InProgress]**
+  - [Define idempotency schema scoped by operation and user](backlog/M1/E1-1/TASK-M1-E1-1-define-idempotency-schema-scoped-by-operation-and-user.md) **[InProgress]**
+  - [Dev-only auto-migrate on startup (optional)](backlog/M1/E1-1/TASK-M1-E1-1-dev-only-auto-migrate-on-startup-optional.md) **[InProgress]**
+  - [Map entities for write.Events/write.Commands/read.UserCounters](backlog/M1/E1-1/TASK-M1-E1-1-map-entities-for-write-events-write-commands-read-usercounters.md) **[InProgress]**
+  - [Update DOC-05 to reflect optional userId + idempotency scoping](backlog/M1/E1-1/TASK-M1-E1-1-update-doc-05-to-reflect-optional-userid-idempotency-scoping.md) **[InProgress]**
 - [EPIC: CI split (backend/web vs mobile) to avoid MAUI workloads on backend changes](backlog/M1/E1-2/EPIC-M1-E1-2-ci-split-backend-web-vs-mobile-to-avoid-maui-workloads-on-backend-changes.md) **[Done]**
   - [Implement CI workflow split (path filtering) backend/web vs mobile](backlog/M1/E1-2/TASK-M1-E1-2-implement-ci-workflow-split-path-filtering-backend-web-vs-mobile.md) **[Done]**
 
