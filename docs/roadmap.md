@@ -62,8 +62,8 @@ This is the authoritative entry point for AI agents and developers. It provides 
   - [Dev-only auto-migrate on startup (optional)](backlog/M1/E1-1/TASK-M1-E1-1-dev-only-auto-migrate-on-startup-optional.md) **[New]**
   - [Map entities for write.Events/write.Commands/read.UserCounters](backlog/M1/E1-1/TASK-M1-E1-1-map-entities-for-write-events-write-commands-read-usercounters.md) **[New]**
   - [Update DOC-05 to reflect optional userId + idempotency scoping](backlog/M1/E1-1/TASK-M1-E1-1-update-doc-05-to-reflect-optional-userid-idempotency-scoping.md) **[New]**
-- [EPIC: CI split (backend/web vs mobile) to avoid MAUI workloads on backend changes](backlog/M1/E1-2/EPIC-M1-E1-2-ci-split-backend-web-vs-mobile-to-avoid-maui-workloads-on-backend-changes.md) **[InReview]**
-  - [Implement CI workflow split (path filtering) backend/web vs mobile](backlog/M1/E1-2/TASK-M1-E1-2-implement-ci-workflow-split-path-filtering-backend-web-vs-mobile.md) **[InReview]**
+- [EPIC: CI split (backend/web vs mobile) to avoid MAUI workloads on backend changes](backlog/M1/E1-2/EPIC-M1-E1-2-ci-split-backend-web-vs-mobile-to-avoid-maui-workloads-on-backend-changes.md) **[Done]**
+  - [Implement CI workflow split (path filtering) backend/web vs mobile](backlog/M1/E1-2/TASK-M1-E1-2-implement-ci-workflow-split-path-filtering-backend-web-vs-mobile.md) **[Done]**
 
 ---
 
