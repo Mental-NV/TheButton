@@ -11,6 +11,8 @@ jobs:
     env:
       DOTNET_NOLOGO: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
+      DOTNET_MULTILEVEL_LOOKUP: 0
+      NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
 
     steps:
       - uses: actions/checkout@v4
@@ -24,9 +26,24 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ runner.os }}-nuget-backend-${{ hashFiles('global.json', 'src/TheButton.*/**/*.csproj', 'tests/TheButton.*/**/*.csproj', '**/*.props', '**/*.targets', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-backend-
+
+      - name: Restore (Backend Solution)
+        shell: pwsh
+        run: dotnet restore TheButton.Backend.sln
+
+      - name: Build Infrastructure (Metadata)
+        run: dotnet build src/TheButton.Infrastructure/TheButton.Infrastructure.csproj -c Release --no-restore
+
       - name: Restore tools
         run: dotnet tool restore
 
       - name: Apply Migrations
         run: |
-          dotnet ef database update --project src/TheButton.Infrastructure --startup-project src/TheButton.Api --connection "${{ secrets.THEBUTTON_AZURESQL_CONNECTIONSTRING }}"
+          dotnet ef database update --project src/TheButton.Infrastructure --startup-project src/TheButton.Api --connection "${{ secrets.THEBUTTON_AZURESQL_CONNECTIONSTRING }}" --no-build
