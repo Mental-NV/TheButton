@@ -1,5 +1,4 @@
 using Scalar.AspNetCore;
-using Asp.Versioning;
 using TheButton.Api.Extensions;
 using System.Reflection;
 
@@ -8,18 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpoints(typeof(Program).Assembly);
 builder.Services.AddSingleton<TheButton.Api.Features.V2.Counter.ICounterService, TheButton.Api.Features.V2.Counter.CounterService>();
 builder.Services.AddOpenApi();
-
-builder.Services.AddApiVersioning(options =>
-{
-    options.DefaultApiVersion = new ApiVersion(2, 0);
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ReportApiVersions = true;
-    options.ApiVersionReader = new UrlSegmentApiVersionReader();
-}).AddApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'VVV";
-    options.SubstituteApiVersionInUrl = true;
-});
 
 builder.Services.AddCors(options =>
 {

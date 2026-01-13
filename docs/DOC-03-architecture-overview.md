@@ -84,15 +84,15 @@ src/
       SqlCounterReadRepository.cs
 ```
 
-## API versioning (Asp.Versioning)
+## API versioning (Manual)
 
-- Keep Asp.Versioning.
-- Expose **v3** via URL segment: `/api/v3/...`.
-- Implement endpoints using **versioned route groups**, so all v3 endpoints live under a single `MapGroup("/api/v{version:apiVersion}")` and are annotated with API version `3.0`.
+- Expose versions via URL segments: `/api/v2/...`, `/api/v3/...`.
+- Implement endpoints using standard `MapGroup` with explicit version segments.
+- This provides maximum control and simplicity without external library overhead.
 
 This ensures:
 - The runtime routes match [DOC-04 API Contract](DOC-04-api-contract.md).
-- OpenAPI groups endpoints under v3 correctly via ApiExplorer.
+- OpenAPI/Scalar groups endpoints intuitively based on the route structure.
 
 ## Variant A: Transactional projections (strong consistency)
 

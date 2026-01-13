@@ -97,3 +97,22 @@ Returns the global counter value and the per-user counter value.
 
 - Authentication is out of scope. The client should provide a stable `userId` (persisted GUID).
 - Both POST endpoints are synchronous and strongly consistent (Variant A).
+
+---
+
+## Legacy Version (v2)
+
+### Base path
+
+`/api/v2`
+
+### POST `/counter`
+
+Increments the **global** counter using the legacy in-memory implementation. (For backward compatibility only).
+
+**Response (200)**
+```json
+{
+  "value": 1
+}
+```
