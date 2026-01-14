@@ -1,5 +1,5 @@
-## Backlog item(s)
-- <title> (Milestone: M{n}, Epic: E{n.n})
+## Context / Backlog item(s)
+- <description of work or backlog title> (Include Milestone/Epic if applicable: M{n}, E{n.n})
 
 ## Scope
 - <what changed, bullet points>
