@@ -69,13 +69,13 @@ This is the authoritative entry point for AI agents and developers. It provides 
 
 ### M2 — Increment Write Path (Atomic + Idempotent)
 
-- [EPIC: Implement v3 counter write endpoints (atomic + idempotent)](backlog/M2/E2-1/EPIC-M2-E2-1-implement-v3-counter-write-endpoints-atomic-idempotent.md) **[New]**
-  - [Add GlobalIncrement command/handler/result](backlog/M2/E2-1/TASK-M2-E2-1-add-globalincrement-command-handler-result.md) **[New]**
-  - [Add Minimal API endpoint POST /api/v3/counter/{userId}](backlog/M2/E2-1/TASK-M2-E2-1-add-minimal-api-endpoint-post-api-v3-counter-userid.md) **[New]**
-  - [Add Minimal API endpoint POST /api/v3/counter](backlog/M2/E2-1/TASK-M2-E2-1-add-minimal-api-endpoint-post-api-v3-counter.md) **[New]**
-  - [Add UserIncrement command/handler/result](backlog/M2/E2-1/TASK-M2-E2-1-add-userincrement-command-handler-result.md) **[New]**
-  - [Define Application abstractions for counter writer and reads](backlog/M2/E2-1/TASK-M2-E2-1-define-application-abstractions-for-counter-writer-and-reads.md) **[New]**
-  - [Implement SQL counter writer (single-transaction, two modes)](backlog/M2/E2-1/TASK-M2-E2-1-implement-sql-counter-writer-single-transaction-two-modes.md) **[New]**
+- [EPIC: Implement v3 counter write endpoints (atomic + idempotent)](backlog/M2/E2-1/EPIC-M2-E2-1-implement-v3-counter-write-endpoints-atomic-idempotent.md) **[InProgress]**
+  - [Add GlobalIncrement command/handler/result](backlog/M2/E2-1/TASK-M2-E2-1-add-globalincrement-command-handler-result.md) **[InProgress]**
+  - [Add Minimal API endpoint POST /api/v3/counter/{userId}](backlog/M2/E2-1/TASK-M2-E2-1-add-minimal-api-endpoint-post-api-v3-counter-userid.md) **[InProgress]**
+  - [Add Minimal API endpoint POST /api/v3/counter](backlog/M2/E2-1/TASK-M2-E2-1-add-minimal-api-endpoint-post-api-v3-counter.md) **[InProgress]**
+  - [Add UserIncrement command/handler/result](backlog/M2/E2-1/TASK-M2-E2-1-add-userincrement-command-handler-result.md) **[InProgress]**
+  - [Define Application abstractions for counter writer and reads](backlog/M2/E2-1/TASK-M2-E2-1-define-application-abstractions-for-counter-writer-and-reads.md) **[InProgress]**
+  - [Implement SQL counter writer (single-transaction, two modes)](backlog/M2/E2-1/TASK-M2-E2-1-implement-sql-counter-writer-single-transaction-two-modes.md) **[InProgress]**
 
 ---
 
