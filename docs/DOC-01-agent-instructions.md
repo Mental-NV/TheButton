@@ -86,51 +86,15 @@ Guidelines:
 - If using squash merges, enforce this convention in **PR titles**.
 - If not squashing, enforce this convention in **commit messages** (or at minimum on the final merge commit).
 
-## Required PR workflow (Windows / PowerShell)
+## Required PR workflow
 
-For each PR:
+For each PR, follow the automated **PR Skill** and **Workflow** defined in `.agent/`.
 
-1. **Plan first** (do not code yet)
-   - Identify the backlog item(s) targeted.
-   - List files to change/create.
-   - List commands to run.
-   - List acceptance criteria and how they will be verified.
-   - Identify any likely manual steps (if any).
+1. **Verify Policies**: Ensure the branch name follows `pr/M{n}-{area}-{slug}` and the PR title matches `M{n}: <area> - <action>`.
+2. **Execute**: Use the `/pr` workflow (slash command) or follow the instructions in `.agent/skills/pr/SKILL.md`.
+3. **Template**: Always use the `.pr-body.md` template defined below.
+4. **Monitor**: Use `gh pr checks --watch` to monitor CI status.
 
-2. **Update Roadmap Status (Work in progress)**
-   - Update the status of the targeted item(s) in [Roadmap](roadmap.md) to `**[InProgress]**`.
-   - If this is the first item in an Epic, update the Epic status to `**[InProgress]**`.
-
-3. **Create branch**
-   - `git checkout main`
-   - `git pull --ff-only`
-   - `git switch -c pr/M{n}-{area}-{slug}`
-
-4. **Implement**
-   - Make focused changes only for the PR scope.
-
-5. **Verify locally**
-   - `./test.cmd`
-
-6. **Commit and push**
-   - `git add -A`
-   - `git commit -m "M{n}: <area> - <action>"`
-   - `git push -u origin HEAD`
-
-7. **Update Roadmap Status (In Review)**
-   - Update the status of the targeted item(s) in [Roadmap](roadmap.md) to `**[InReview]**`.
-
-8. **Create PR**
-   - Create `.pr-body.md` (required; template below).
-   - `gh pr create --title "M{n}: <area> - <action>" --body-file .\.pr-body.md`
-
-9. **Monitor CI and pull logs on failure**
-   - `gh pr checks --watch`
-   - If failing:
-     - `gh run list --branch <branch> --limit 5`
-     - `gh run view <run-id> --log-failed`
-    - Update status to `**[InProgress]**` if major fixes are needed.
-    - Fix, commit, push until green.
 
 ## Backlog Status Management
 
@@ -148,33 +112,9 @@ The agent is responsible for maintaining the visual status of the backlog in `do
 
 ## PR body template (required)
 
-For every PR, create `.pr-body.md` with the following structure:
+For every PR, generate `.pr-body.md` using the template located at:
+`[PR Body Template](/.agent/skills/pr/resources/pr-body-template.md)`.
 
-```md
-## Backlog item(s)
-- <title> (Milestone: M{n}, Epic: E{n.n})
-
-## Scope
-- <what changed, bullet points>
-
-## Verification
-- `dotnet build`
-- `dotnet test` (or `.\scripts\test.ps1`)
-
-## Notes / Risks
-- <anything that reviewers should know>
-
-## Manual steps required
-- None
-```
-
-If manual steps are required, replace the last section with:
-
-```md
-## Manual steps required
-1. <exact command(s) the user must run>
-2. <what output to confirm / what success looks like>
-```
 
 ## Manual steps rule
 
