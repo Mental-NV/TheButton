@@ -5,7 +5,7 @@ using TheButton.Infrastructure.Persistence;
 namespace TheButton.Infrastructure.Counter;
 
 /// <summary>
-/// SQL-based read repository for counter queries.
+/// SQL-based read repository for unified counter queries.
 /// </summary>
 public class SqlCounterReadRepository : ICounterReadRepository
 {
@@ -30,10 +30,11 @@ public class SqlCounterReadRepository : ICounterReadRepository
     /// <inheritdoc />
     public async Task<long> GetUserValueAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userCounter = await _context.UserCounters
-            .Where(uc => uc.UserId == userId)
-            .FirstOrDefaultAsync(cancellationToken);
+        // User counter is derived from MAX(UserVersion) for the specific user
+        var maxUserVersion = await _context.Events
+            .Where(e => e.UserId == userId)
+            .MaxAsync(e => (long?)e.UserVersion, cancellationToken);
 
-        return userCounter?.Value ?? 0;
+        return maxUserVersion ?? 0;
     }
 }

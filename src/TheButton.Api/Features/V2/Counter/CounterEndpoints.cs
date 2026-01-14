@@ -1,16 +1,13 @@
-using TheButton.Api.Abstractions;
 using TheButton.Application.Counter.V2.Increment;
 
 namespace TheButton.Api.Features.V2.Counter;
 
-public class CounterEndpoints : IEndpoint
+public static class CounterEndpoints
 {
-    public void Map(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapV2CounterEndpoints(this RouteGroupBuilder group)
     {
-        var group = app.MapGroup("/api/v2/counter")
-            .WithTags("Counter");
-
-        group.MapPost("", Increment);
+        group.MapPost("/", Increment);
+        return group;
     }
 
     public static Microsoft.AspNetCore.Http.HttpResults.Ok<CounterResponse> Increment(IncrementHandler handler)

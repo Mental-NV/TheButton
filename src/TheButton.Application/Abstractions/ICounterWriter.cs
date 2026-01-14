@@ -6,37 +6,21 @@ namespace TheButton.Application.Abstractions;
 public interface ICounterWriter
 {
     /// <summary>
-    /// Increments the global counter atomically.
+    /// Increments the counter atomically, optionally scoped to a user.
     /// </summary>
     /// <param name="idempotencyKey">Unique key for idempotency enforcement.</param>
+    /// <param name="userId">Optional user identifier. If provided, increments also the user counter.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>Result containing the global value.</returns>
-    Task<GlobalIncrementResult> IncrementGlobalAsync(
+    /// <returns>Result containing the global value and optional user value.</returns>
+    Task<IncrementResult> IncrementAsync(
         string idempotencyKey,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Increments both the global counter and the per-user counter atomically.
-    /// </summary>
-    /// <param name="userId">User identifier.</param>
-    /// <param name="idempotencyKey">Unique key for idempotency enforcement.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>Result containing the global value and user value.</returns>
-    Task<UserIncrementResult> IncrementUserAsync(
-        Guid userId,
-        string idempotencyKey,
+        Guid? userId = null,
         CancellationToken cancellationToken = default);
 }
 
 /// <summary>
-/// Result of a global increment operation.
+/// Result of an increment operation.
 /// </summary>
 /// <param name="GlobalValue">The monotonic global ordering number from write.Events.Position.</param>
-public record GlobalIncrementResult(long GlobalValue);
-
-/// <summary>
-/// Result of a user increment operation.
-/// </summary>
-/// <param name="GlobalValue">The monotonic global ordering number from write.Events.Position.</param>
-/// <param name="UserValue">The per-user counter value from read.UserCounters.Value.</param>
-public record UserIncrementResult(long GlobalValue, long UserValue);
+/// <param name="UserValue">The per-user counter value (UserVersion), if userId was provided.</param>
+public record IncrementResult(long GlobalValue, long? UserValue);

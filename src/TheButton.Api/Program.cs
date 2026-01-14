@@ -6,7 +6,6 @@ using TheButton.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
-builder.Services.AddEndpoints(typeof(Program).Assembly);
 
 // V2 services (backward compatibility)
 builder.Services.AddSingleton<TheButton.Application.Counter.V2.Increment.ICounterService, TheButton.Infrastructure.Counter.V2.CounterService>();
@@ -15,8 +14,7 @@ builder.Services.AddScoped<TheButton.Application.Counter.V2.Increment.IncrementH
 // V3 services
 builder.Services.AddScoped<TheButton.Application.Abstractions.ICounterWriter, TheButton.Infrastructure.Counter.SqlCounterWriter>();
 builder.Services.AddScoped<TheButton.Application.Abstractions.ICounterReadRepository, TheButton.Infrastructure.Counter.SqlCounterReadRepository>();
-builder.Services.AddScoped<TheButton.Application.Counter.V3.IncrementGlobal.GlobalIncrementHandler>();
-builder.Services.AddScoped<TheButton.Application.Counter.V3.IncrementUser.UserIncrementHandler>();
+builder.Services.AddScoped<TheButton.Application.Counter.V3.Increment.IncrementHandler>();
 
 builder.Services.AddDbContext<TheButtonDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Sql"), 
