@@ -6,12 +6,4 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <MauiVersion>10.0.20</MauiVersion>
   </PropertyGroup>
-
-  <!-- strict pinning for non-mobile projects to fix 10.0.1/10.0.2 mismatch -->
-  <!-- Properties in Directory.Build.props are evaluated before project properties, so we check path instead of UseMaui -->
-  <PropertyGroup Condition="!$(MSBuildProjectDirectory.Contains('mobile'))">
-    <RuntimeFrameworkVersion>10.0.1</RuntimeFrameworkVersion>
-    <TargetLatestRuntimePatch>false</TargetLatestRuntimePatch>
-    <RollForward>Disable</RollForward>
-  </PropertyGroup>
 </Project>
