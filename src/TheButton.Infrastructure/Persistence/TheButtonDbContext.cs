@@ -11,8 +11,6 @@ public class TheButtonDbContext : DbContext
 
     public DbSet<CounterIncrementedEvent> Events => Set<CounterIncrementedEvent>();
     public DbSet<IdempotentCommand> Commands => Set<IdempotentCommand>();
-    public DbSet<UserCounter> UserCounters => Set<UserCounter>();
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -33,12 +31,6 @@ public class TheButtonDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => new { e.Operation, e.UserId, e.IdempotencyKey }).IsUnique();
-        });
-
-        // read.UserCounters
-        modelBuilder.Entity<UserCounter>(entity =>
-        {
-            entity.HasKey(e => e.UserId);
         });
     }
 }

@@ -2,12 +2,12 @@ using TheButton.Api.Abstractions;
 
 namespace TheButton.Api.Features.Health.GetHealth;
 
-public class Endpoint : IEndpoint
+public static class Endpoint
 {
-    public void Map(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapHealthEndpoints(this RouteGroupBuilder group)
     {
-        app.MapGet("/health", () => Results.Ok(new { Status = "Healthy" }))
-           .WithTags("Health")
-           .WithName("GetHealth");
+        group.MapGet("/", () => Results.Ok(new { Status = "Healthy" }))
+             .WithName("GetHealth");
+        return group;
     }
 }

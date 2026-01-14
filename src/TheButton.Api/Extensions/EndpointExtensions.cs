@@ -1,31 +1,28 @@
-using System.Reflection;
-using TheButton.Api.Abstractions;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using TheButton.Api.Features.Health.GetHealth;
+using TheButton.Api.Features.V2.Counter;
+using TheButton.Api.Features.V3.Counter;
 
 namespace TheButton.Api.Extensions;
 
 public static class EndpointExtensions
 {
-    public static IServiceCollection AddEndpoints(this IServiceCollection services, Assembly assembly)
+    public static void MapEndpoints(this WebApplication app)
     {
-        var endpoints = assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.GetInterfaces().Contains(typeof(IEndpoint)))
-            .Select(t => ServiceDescriptor.Transient(typeof(IEndpoint), t));
+        var api = app.MapGroup("/api");
 
-        services.TryAddEnumerable(endpoints);
+        // V2
+        api.MapGroup("/v2/counter")
+           .WithTags("Counter V2")
+           .MapV2CounterEndpoints();
 
-        return services;
-    }
-
-    public static IEndpointRouteBuilder MapEndpoints(this IEndpointRouteBuilder app)
-    {
-        var endpoints = app.ServiceProvider.GetServices<IEndpoint>();
-
-        foreach (var endpoint in endpoints)
-        {
-            endpoint.Map(app);
-        }
-
-        return app;
+        // V3
+        api.MapGroup("/v3/counter")
+           .WithTags("Counter V3")
+           .MapV3CounterEndpoints();
+           
+        // Health
+        app.MapGroup("/health")
+           .WithTags("Health")
+           .MapHealthEndpoints();
     }
 }
