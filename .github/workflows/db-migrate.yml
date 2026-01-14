@@ -45,5 +45,7 @@ jobs:
         run: dotnet tool restore
 
       - name: Apply Migrations
+        shell: pwsh
         run: |
-          dotnet ef database update --project src/TheButton.Infrastructure --startup-project src/TheButton.Api --connection "${{ secrets.THEBUTTON_AZURESQL_CONNECTIONSTRING }}" --no-build --configuration Debug
+          $connStr = '${{ secrets.THEBUTTON_AZURESQL_CONNECTIONSTRING }}'
+          dotnet ef database update --project src/TheButton.Infrastructure --startup-project src/TheButton.Api --connection $connStr --no-build --configuration Debug
