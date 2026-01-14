@@ -9,7 +9,7 @@
 - Labels: `type:task`, `area:testing`, `priority:p0`, `testing`
 
 ## Description
-Run N parallel POST /api/v3/counter/{userId}; assert userValue==N; events==N; filtered uniqueness (UserId,UserVersion) holds. Refs: DOC-05,DOC-07.
+Run N parallel POST /api/v3/counter?userId={userId}; assert userValue==N; events==N; filtered uniqueness (UserId,UserVersion) holds in write.Events. Refs: DOC-05,DOC-07.
 
 ## Acceptance criteria
 - Implemented as described above

@@ -4,8 +4,8 @@
 
 Validate correctness of:
 
-- transactional atomicity (event + projection + command result)
-- idempotency behavior (including operation scoping)
+- transactional atomicity (event + command result)
+- idempotency behavior (including user scoping)
 - concurrency behavior under parallel increments (global and per-user)
 
 All against a real SQL engine (LocalDB in CI on Windows).
@@ -31,7 +31,6 @@ All against a real SQL engine (LocalDB in CI on Windows).
 
 - `write.Commands`
 - `write.Events`
-- `read.UserCounters`
 
 ## Minimum integration test suite (v3 contract)
 
@@ -40,33 +39,33 @@ All against a real SQL engine (LocalDB in CI on Windows).
    - Assert:
      - exactly one `write.Events` row with `UserId IS NULL`
      - response `globalValue == write.Events.Position`
-     - one `write.Commands` row for `(Operation='GlobalIncrement', UserId=NULL, IdempotencyKey=...)`
+     - one `write.Commands` row for `(Operation='Increment', UserId=NULL, IdempotencyKey=...)`
 
-2. **POST /api/v3/counter/{userId} increments user and persists event**
-   - Call `POST /api/v3/counter/{userId}` with `Idempotency-Key`.
+2. **POST /api/v3/counter?userId={guid} increments user and persists event**
+   - Call `POST /api/v3/counter?userId={userId}` with `Idempotency-Key`.
    - Assert:
-     - `read.UserCounters.Value == 1`
+     - `MAX(UserVersion) == 1` for `{userId}` in `write.Events`
      - one `write.Events` row with `UserId=<userId>` and `UserVersion==1`
      - response contains `{globalValue, userValue}`
 
-3. **Idempotency (same operation) prevents double increment**
-   - Repeat the same request twice with the same `Idempotency-Key`:
-     - global increment: only one event
-     - user increment: only one event and `read.UserCounters` increments once
-   - Assert response payloads are identical.
+3. **Idempotency prevents double increment**
+   - Repeat the same request twice (with or without `userId`) with the same `Idempotency-Key`:
+     - only one event is persisted
+     - `globalValue` and `userValue` (if applicable) are the same in both responses
+   - Assert response payloads from `write.Commands.ResultJson` are identical.
 
-4. **Idempotency is scoped by operation and user**
+4. **Idempotency is scoped by user**
    - Use the same `Idempotency-Key` for:
-     - `POST /counter` and
-     - `POST /counter/{userId}`
+     - `POST /api/v3/counter` (global) and
+     - `POST /api/v3/counter?userId={userId}` (user)
    - Assert no collisions:
-     - both operations persist distinct command rows
-     - event counts reflect both operations
+     - both operations persist distinct command rows (due to different `UserId` in `write.Commands`)
+     - two distinct events are persisted
 
 5. **Concurrency (N parallel user increments)**
-   - Fire N parallel `POST /api/v3/counter/{userId}` calls with distinct idempotency keys.
+   - Fire N parallel `POST /api/v3/counter?userId={userId}` calls with distinct idempotency keys.
    - Assert:
-     - `read.UserCounters.Value == N`
+     - `MAX(UserVersion) == N` for `{userId}` in `write.Events`
      - N events with `UserId=<userId>`
      - uniqueness holds for `(UserId, UserVersion)`
 

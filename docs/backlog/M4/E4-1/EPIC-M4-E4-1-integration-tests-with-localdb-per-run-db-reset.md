@@ -9,7 +9,9 @@
 - Labels: `type:epic`, `area:testing`, `priority:p0`, `testing`
 
 ## Description
-Implement DOC-07 harness with WebApplicationFactory and LocalDB; create per-run DB; reset between tests. AC: runs locally and in CI. Refs: DOC-07,DOC-09.
+Implement DOC-07 harness with  - [Integration test: POST /counter (global) increments and persists event](TASK-M4-E4-1-integration-test-post-counter-global-increments-and-persists-event.md)
+  - [Integration test: POST /counter?userId={guid} increments user and persists event](TASK-M4-E4-1-integration-test-post-counter-userid-increments-user-and-persists-event.md)
+  - [Provision per-run unique LocalDB database and apply migrations](TASK-M4-E4-1-provision-per-run-unique-localdb-database-and-apply-migrations.md)
 
 ## Acceptance criteria
 - Implemented as described above

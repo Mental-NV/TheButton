@@ -9,7 +9,7 @@
 - Labels: `type:task`, `area:testing`, `priority:p0`, `testing`
 
 ## Description
-Use same Idempotency-Key for GlobalIncrement and UserIncrement and verify no collision; repeat same call twice and verify single event. Refs: DOC-05,DOC-07.
+Use same Idempotency-Key for global increment (userId=null) and user increment (userId=uuid); assert both succeed and persist separate command result and events. Refs: DOC-05,DOC-07.
 
 ## Acceptance criteria
 - Implemented as described above

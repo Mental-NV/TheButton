@@ -96,7 +96,7 @@ This is the authoritative entry point for AI agents and developers. It provides 
   - [Integration test: concurrency (N parallel user increments)](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-concurrency-n-parallel-user-increments.md) **[New]**
   - [Integration test: idempotency scoped by operation and user](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-idempotency-scoped-by-operation-and-user.md) **[New]**
   - [Integration test: POST /counter (global) increments and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-global-increments-and-persists-event.md) **[New]**
-  - [Integration test: POST /counter/{userId} increments user and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-userid-increments-user-and-persists-event.md) **[New]**
+  - [Integration test: POST /counter?userId={guid} increments user and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-userid-increments-user-and-persists-event.md) **[New]**
   - [Provision per-run unique LocalDB database and apply migrations](backlog/M4/E4-1/TASK-M4-E4-1-provision-per-run-unique-localdb-database-and-apply-migrations.md) **[New]**
 
 ---

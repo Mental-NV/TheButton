@@ -1,4 +1,4 @@
-# Integration test: POST /counter/{userId} increments user and persists event
+# Integration test: POST /counter?userId={guid} increments user and persists event
 
 ## Metadata
 - Type: **Task**
@@ -9,7 +9,7 @@
 - Labels: `type:task`, `area:testing`, `priority:p0`, `testing`
 
 ## Description
-Call POST /api/v3/counter/{userId}; assert UserCounters.Value=1; event has UserId set and UserVersion=1; response includes globalValue+userValue. Refs: DOC-04,DOC-05,DOC-07.
+Call POST /api/v3/counter?userId={guid}; assert event has UserId set and UserVersion=1; response includes globalValue+userValue. Refs: DOC-04,DOC-05,DOC-07.
 
 ## Acceptance criteria
 - Implemented as described above
