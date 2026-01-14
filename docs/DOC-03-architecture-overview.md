@@ -41,32 +41,18 @@ src/
     Features/
       V3/
         Counter/
-          IncrementGlobal/
-            Endpoint.cs
-            Response.cs
-          IncrementUser/
-            Endpoint.cs
-            Response.cs
-          GetGlobal/
-            Endpoint.cs
-            Response.cs
-          GetUser/
-            Endpoint.cs
-            Response.cs
+          CounterEndpoints.cs
+          Response.cs
   TheButton.Application/
     Abstractions/
       ICounterWriter.cs
       ICounterReadRepository.cs
     Counter/
       V3/
-        IncrementGlobal/
-          GlobalIncrementCommand.cs
-          GlobalIncrementHandler.cs
-          GlobalIncrementResult.cs
-        IncrementUser/
-          UserIncrementCommand.cs
-          UserIncrementHandler.cs
-          UserIncrementResult.cs
+        Increment/
+          IncrementCommand.cs
+          IncrementHandler.cs
+          IncrementResult.cs
         GetGlobal/
           GetGlobalQuery.cs
           GetGlobalQueryHandler.cs
@@ -102,10 +88,8 @@ This ensures:
 
 - A single database contains:
   - `write` schema: event store + idempotency
-  - `read` schema: projections
 - Write operations execute a **single SQL transaction** that:
   - enforces idempotency
-  - updates projections when applicable
   - appends the event
   - stores the command result
 

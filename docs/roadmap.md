@@ -69,11 +69,11 @@ This is the authoritative entry point for AI agents and developers. It provides 
 
 ### M2 — Increment Write Path (Atomic + Idempotent)
 
-- [EPIC: Implement v3 counter write endpoints (atomic + idempotent)](backlog/M2/E2-1/EPIC-M2-E2-1-implement-v3-counter-write-endpoints-atomic-idempotent.md) **[InProgress]**
-  - [Add Unified Increment command/handler/result](backlog/M2/E2-1/TASK-M2-E2-1-add-globalincrement-command-handler-result.md) **[InProgress]**
-  - [Add Unified Minimal API endpoint POST /api/v3/counter](backlog/M2/E2-1/TASK-M2-E2-1-add-minimal-api-endpoint-post-api-v3-counter.md) **[InProgress]**
-  - [Define Application abstractions for unified counter writer and reads](backlog/M2/E2-1/TASK-M2-E2-1-define-application-abstractions-for-counter-writer-and-reads.md) **[InProgress]**
-  - [Implement Unified SQL counter writer](backlog/M2/E2-1/TASK-M2-E2-1-implement-sql-counter-writer-single-transaction-two-modes.md) **[InProgress]**
+- [EPIC: Implement v3 counter write endpoints (atomic + idempotent)](backlog/M2/E2-1/EPIC-M2-E2-1-implement-v3-counter-write-endpoints-atomic-idempotent.md) **[Done]**
+  - [Add Unified Increment command/handler/result](backlog/M2/E2-1/TASK-M2-E2-1-add-globalincrement-command-handler-result.md) **[Done]**
+  - [Add Unified Minimal API endpoint POST /api/v3/counter](backlog/M2/E2-1/TASK-M2-E2-1-add-minimal-api-endpoint-post-api-v3-counter.md) **[Done]**
+  - [Define Application abstractions for unified counter writer and reads](backlog/M2/E2-1/TASK-M2-E2-1-define-application-abstractions-for-counter-writer-and-reads.md) **[Done]**
+  - [Implement Unified SQL counter writer](backlog/M2/E2-1/TASK-M2-E2-1-implement-sql-counter-writer-single-transaction-two-modes.md) **[Done]**
 
 ---
 

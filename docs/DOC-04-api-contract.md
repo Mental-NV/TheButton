@@ -8,33 +8,10 @@
 
 ### POST `/counter`
 
-Increments the **global** counter.
+Increments the **global** counter and optionally the **per-user** counter.
 
-**Headers**
-- `Idempotency-Key: <string>` (required)
-
-**Response (200)**
-```json
-{
-  "globalValue": 1
-}
-```
-
-**Semantics**
-- `globalValue` is the monotonic global ordering number of the latest increment event (from `write.Events.Position`).
-
-**Errors**
-- `400` if `Idempotency-Key` is missing/blank
-- `409` if a concurrency conflict cannot be resolved with bounded retries
-
----
-
-### POST `/counter/{userId}`
-
-Increments the **global** counter and the **per-user** counter.
-
-**Route parameters**
-- `userId` — GUID (required)
+**Query Parameters**
+- `userId` — GUID (optional). If provided, increments the user-specific counter.
 
 **Headers**
 - `Idempotency-Key: <string>` (required)
@@ -49,11 +26,11 @@ Increments the **global** counter and the **per-user** counter.
 
 **Semantics**
 - `globalValue` is the monotonic global ordering number of the latest increment event (from `write.Events.Position`).
-- `userValue` is the per-user counter value from `read.UserCounters.Value` after the increment.
+- `userValue` is the per-user counter value (calculated as `MAX(UserVersion)` for the provided `userId`) after the increment. It is `null` if no `userId` was provided.
 
 **Errors**
 - `400` if `Idempotency-Key` is missing/blank
-- `400` if `userId` is missing/invalid GUID
+- `400` if `userId` is provided but is an invalid GUID
 - `409` if a concurrency conflict cannot be resolved with bounded retries
 
 ---
@@ -89,6 +66,7 @@ Returns the global counter value and the per-user counter value.
 
 **Semantics**
 - If the user has no recorded counter, return `userValue = 0`.
+- `userValue` is calculated by querying the `write.Events` table for the target `userId`.
 
 **Errors**
 - `400` if `userId` is missing/invalid GUID
@@ -96,7 +74,7 @@ Returns the global counter value and the per-user counter value.
 ## Notes
 
 - Authentication is out of scope. The client should provide a stable `userId` (persisted GUID).
-- Both POST endpoints are synchronous and strongly consistent (Variant A).
+- POST `/counter` is synchronous and strongly consistent (Variant A).
 
 ---
 
