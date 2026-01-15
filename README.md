@@ -1,6 +1,6 @@
 # TheButton
 
-TheButton is a demonstration project showcasing modern, industrial-grade software development practices for building, testing, and deploying cross-platform applications (Web, iOS, and Android) using a unified architectural approach.
+TheButton is a demonstration project showcasing modern, industrial-grade software development practices for building, testing, and deploying cross-platform applications (API, Web UI, iOS, and Android) using a unified architectural approach.
 
 ## Deployments
 
