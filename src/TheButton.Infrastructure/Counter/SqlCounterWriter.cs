@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TheButton.Application.Abstractions;
 using TheButton.Infrastructure.Persistence;
 using TheButton.Infrastructure.Persistence.Entities;
+using TheButton.Domain.Features.V3.Counter;
 
 namespace TheButton.Infrastructure.Counter;
 
