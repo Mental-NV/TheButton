@@ -9,7 +9,7 @@
 - Labels: `type:epic`, `area:api`, `area:app`, `area:infra`, `priority:p0`
 
 ## Description
-Add GET /api/v3/counter (global) and GET /api/v3/counter/{userId} (global+user). Reads from projections/view only. AC: matches DOC-04. Refs: DOC-04,DOC-05.
+Add GET /api/v3/counter (global) and GET /api/v3/counter/{userId} (global+user). Global and user counters are derived directly from the event store (`write.Events`) to ensure consistency. AC: matches DOC-04. Refs: DOC-04, DOC-05.
 
 ## Acceptance criteria
 - Implemented as described above

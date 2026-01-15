@@ -9,7 +9,7 @@
 - Labels: `type:task`, `area:infra`, `priority:p0`
 
 ## Description
-Query read.GlobalCounter view and read.UserCounters table; return userValue=0 when missing. AC: efficient queries; no event-store scan for user reads. Refs: DOC-05.
+Query `write.Events` for both global counter (MAX Position) and per-user counter (MAX UserVersion); return userValue=0 when missing. AC: efficient queries using indexed `UserId` and `Position`; no full table scan. Refs: DOC-05.
 
 ## Acceptance criteria
 - Implemented as described above
