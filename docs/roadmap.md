@@ -88,16 +88,16 @@ This is the authoritative entry point for AI agents and developers. It provides 
 
 ### M4 — Integration Tests (LocalDB)
 
-- [EPIC: Integration tests with LocalDB (per-run DB + reset)](backlog/M4/E4-1/EPIC-M4-E4-1-integration-tests-with-localdb-per-run-db-reset.md) **[New]**
-  - [CI: ensure integration tests run on Windows with LocalDB](backlog/M4/E4-1/TASK-M4-E4-1-ci-ensure-integration-tests-run-on-windows-with-localdb.md) **[New]**
-  - [Create integration test project and test server factory](backlog/M4/E4-1/TASK-M4-E4-1-create-integration-test-project-and-test-server-factory.md) **[New]**
-  - [Implement DB reset utility (truncate tables)](backlog/M4/E4-1/TASK-M4-E4-1-implement-db-reset-utility-truncate-tables.md) **[New]**
-  - [Integration test: concurrency (N parallel global increments)](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-concurrency-n-parallel-global-increments.md) **[New]**
-  - [Integration test: concurrency (N parallel user increments)](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-concurrency-n-parallel-user-increments.md) **[New]**
-  - [Integration test: idempotency scoped by operation and user](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-idempotency-scoped-by-operation-and-user.md) **[New]**
-  - [Integration test: POST /counter (global) increments and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-global-increments-and-persists-event.md) **[New]**
-  - [Integration test: POST /counter?userId={guid} increments user and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-userid-increments-user-and-persists-event.md) **[New]**
-  - [Provision per-run unique LocalDB database and apply migrations](backlog/M4/E4-1/TASK-M4-E4-1-provision-per-run-unique-localdb-database-and-apply-migrations.md) **[New]**
+- [EPIC: Integration tests with LocalDB (per-run DB + reset)](backlog/M4/E4-1/EPIC-M4-E4-1-integration-tests-with-localdb-per-run-db-reset.md) **[Done]**
+  - [CI: ensure integration tests run on Windows with LocalDB](backlog/M4/E4-1/TASK-M4-E4-1-ci-ensure-integration-tests-run-on-windows-with-localdb.md) **[Done]**
+  - [Create integration test project and test server factory](backlog/M4/E4-1/TASK-M4-E4-1-create-integration-test-project-and-test-server-factory.md) **[Done]**
+  - [Implement DB reset utility (truncate tables)](backlog/M4/E4-1/TASK-M4-E4-1-implement-db-reset-utility-truncate-tables.md) **[Done]**
+  - [Integration test: concurrency (N parallel global increments)](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-concurrency-n-parallel-global-increments.md) **[Done]**
+  - [Integration test: concurrency (N parallel user increments)](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-concurrency-n-parallel-user-increments.md) **[Done]**
+  - [Integration test: idempotency scoped by operation and user](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-idempotency-scoped-by-operation-and-user.md) **[Done]**
+  - [Integration test: POST /counter (global) increments and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-global-increments-and-persists-event.md) **[Done]**
+  - [Integration test: POST /counter?userId={guid} increments user and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-userid-increments-user-and-persists-event.md) **[Done]**
+  - [Provision per-run unique LocalDB database and apply migrations](backlog/M4/E4-1/TASK-M4-E4-1-provision-per-run-unique-localdb-database-and-apply-migrations.md) **[Done]**
 
 ---
 
