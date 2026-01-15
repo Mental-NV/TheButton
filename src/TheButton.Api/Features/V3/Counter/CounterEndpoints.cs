@@ -29,6 +29,18 @@ public static class CounterEndpoints
             return Results.Ok(new { globalValue });
         });
 
+        // GET /api/v3/counter/{userId}
+        group.MapGet("/{userId:guid}", async (
+            Guid userId,
+            [FromServices] TheButton.Application.Abstractions.ICounterReadRepository repository,
+            CancellationToken ct) =>
+        {
+            var globalValue = await repository.GetGlobalValueAsync(ct);
+            var userValue = await repository.GetUserValueAsync(userId, ct);
+
+            return Results.Ok(new { globalValue, userId, userValue });
+        });
+
         return group;
     }
 }
