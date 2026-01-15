@@ -79,10 +79,10 @@ This is the authoritative entry point for AI agents and developers. It provides 
 
 ### M3 — Read Endpoints (Global + Per-User)
 
-- [EPIC: Implement v3 counter read endpoints](backlog/M3/E3-1/EPIC-M3-E3-1-implement-v3-counter-read-endpoints.md) **[InReview]**
-  - [Add Minimal API endpoint GET /api/v3/counter/{userId}](backlog/M3/E3-1/TASK-M3-E3-1-add-minimal-api-endpoint-get-api-v3-counter-userid.md) **[InReview]**
-  - [Add Minimal API endpoint GET /api/v3/counter](backlog/M3/E3-1/TASK-M3-E3-1-add-minimal-api-endpoint-get-api-v3-counter.md) **[InReview]**
-  - [Implement SQL read repository (global and per-user)](backlog/M3/E3-1/TASK-M3-E3-1-implement-sql-read-repository-global-and-per-user.md) **[InReview]**
+- [EPIC: Implement v3 counter read endpoints](backlog/M3/E3-1/EPIC-M3-E3-1-implement-v3-counter-read-endpoints.md) **[Done]**
+  - [Add Minimal API endpoint GET /api/v3/counter/{userId}](backlog/M3/E3-1/TASK-M3-E3-1-add-minimal-api-endpoint-get-api-v3-counter-userid.md) **[Done]**
+  - [Add Minimal API endpoint GET /api/v3/counter](backlog/M3/E3-1/TASK-M3-E3-1-add-minimal-api-endpoint-get-api-v3-counter.md) **[Done]**
+  - [Implement SQL read repository (global and per-user)](backlog/M3/E3-1/TASK-M3-E3-1-implement-sql-read-repository-global-and-per-user.md) **[Done]**
 
 ---
 
