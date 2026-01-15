@@ -17,7 +17,7 @@ Implement a scalable production architecture for **TheButton.API** using:
 
 - Do **not** introduce MediatR.
 - Do **not** implement new endpoints using Controllers; use Minimal APIs.
-- Use naming containing **increment** rather than click in API designs (internal naming); external API contract is defined in [DOC-04 API Contract](DOC-04-api-contract.md).
+- Use naming containing **increment** rather than click in API designs (internal naming); external API contract is defined in [DOC-04 API Contract](/docs/DOC-04-api-contract.md).
 - Must run locally on SQL Server LocalDB: `(localdb)\MSSQLLocalDB`
 - Must run in production on Azure SQL.
 - Write operations must be atomic.
@@ -31,7 +31,7 @@ When a manual step is required (e.g., running EF migrations, provisioning Azure 
 2. **Explicitly tell the user** what command/action to run
 3. **Wait for user confirmation** before continuing
 
-See [Manual Steps Checklist](MANUAL-STEPS.md) for the complete checklist of manual steps and expected human actions.
+See [Manual Steps Checklist](/docs/MANUAL-STEPS.md) for the complete checklist of manual steps and expected human actions.
 
 ## Branching and PR hygiene
 
@@ -112,7 +112,7 @@ The agent is responsible for maintaining the visual status of the backlog in `do
 
 ## PR body template (required)
 
-For every PR, generate `.pr-body.md` using the template located at:
+For every PR, generate `/.pr-body.md` using the template located at:
 `[PR Body Template](/.agent/skills/pr/resources/pr-body-template.md)`.
 
 
@@ -125,7 +125,7 @@ If a PR requires:
 
 the agent must:
 - stop at an appropriate boundary,
-- provide exact commands/actions from [Manual Steps Checklist](MANUAL-STEPS.md),
+- provide exact commands/actions from [Manual Steps Checklist](/docs/MANUAL-STEPS.md),
 - ask the user to confirm success before proceeding.
 
 ## Validation and quality gates
@@ -134,16 +134,16 @@ Do not open a PR (or mark it ready) unless:
 
 - solution builds
 - tests pass (unit + integration where applicable)
-- endpoint contract matches [DOC-04 API Contract](DOC-04-api-contract.md) (when endpoints are touched)
+- endpoint contract matches [DOC-04 API Contract](/docs/DOC-04-api-contract.md) (when endpoints are touched)
 - docs are updated if contract/architecture changed
 
 ## References
 
-- [DOC-02 Product Goals, Constraints, Non-Goals](DOC-02-goals-constraints-non-goals.md)
-- [DOC-03 Architecture Overview](DOC-03-architecture-overview.md)
-- [DOC-04 API Contract](DOC-04-api-contract.md)
-- [DOC-05 Persistence Design](DOC-05-persistence-design.md)
-- [DOC-07 Integration Testing Strategy](DOC-07-integration-testing.md)
-- [DOC-08 Observability & Reliability](DOC-08-observability-and-reliability.md)
-- [DOC-09 Definition of Done](DOC-09-definition-of-done.md)
-- [Manual Steps Checklist](MANUAL-STEPS.md)
+- [DOC-02 Product Goals, Constraints, Non-Goals](/docs/DOC-02-goals-constraints-non-goals.md)
+- [DOC-03 Architecture Overview](/docs/DOC-03-architecture-overview.md)
+- [DOC-04 API Contract](/docs/DOC-04-api-contract.md)
+- [DOC-05 Persistence Design](/docs/DOC-05-persistence-design.md)
+- [DOC-07 Integration Testing Strategy](/docs/DOC-07-integration-testing.md)
+- [DOC-08 Observability & Reliability](/docs/DOC-08-observability-and-reliability.md)
+- [DOC-09 Definition of Done](/docs/DOC-09-definition-of-done.md)
+- [Manual Steps Checklist](/docs/MANUAL-STEPS.md)
