@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TheButton.Application.Counter.V3.Increment;
+using TheButton.Domain.Features.V3.Counter;
 
 namespace TheButton.Api.Features.V3.Counter;
 
@@ -17,7 +18,7 @@ public static class CounterEndpoints
         {
             var command = new IncrementCommand(idempotencyKey, userId);
             var result = await handler.Handle(command, ct);
-            return Results.Ok(result);
+            return Results.Ok(new CounterResponse(result.Value, result.UserValue));
         });
 
         // GET /api/v3/counter
@@ -26,7 +27,7 @@ public static class CounterEndpoints
              CancellationToken ct) =>
         {
             var globalValue = await repository.GetGlobalValueAsync(ct);
-            return Results.Ok(new { globalValue });
+            return Results.Ok(new CounterResponse(globalValue, null));
         });
 
         // GET /api/v3/counter/{userId}
@@ -38,7 +39,7 @@ public static class CounterEndpoints
             var globalValue = await repository.GetGlobalValueAsync(ct);
             var userValue = await repository.GetUserValueAsync(userId, ct);
 
-            return Results.Ok(new { globalValue, userId, userValue });
+            return Results.Ok(new CounterResponse(globalValue, userValue));
         });
 
         return group;

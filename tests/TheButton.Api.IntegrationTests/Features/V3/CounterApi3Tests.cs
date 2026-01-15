@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TheButton.Infrastructure.Persistence;
+using TheButton.Api.Features.V3.Counter;
 
 namespace TheButton.Api.IntegrationTests.Features.V3;
 
@@ -48,7 +49,7 @@ public class UnifiedCounterTests : IntegrationTestBase
         
         var result = await response.Content.ReadFromJsonAsync<CounterResponse>();
         Assert.IsNotNull(result);
-        Assert.IsTrue(result.GlobalValue > 0);
+        Assert.IsTrue(result.Value > 0);
 
         // Verify DB
         using var scope = Factory.Services.CreateScope();
@@ -209,6 +210,4 @@ public class UnifiedCounterTests : IntegrationTestBase
         
         Assert.AreEqual(parallelCount, count);
     }
-
-    record CounterResponse(long GlobalValue, long? UserValue);
 }

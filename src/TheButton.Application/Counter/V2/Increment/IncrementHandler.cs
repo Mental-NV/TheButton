@@ -1,6 +1,6 @@
-namespace TheButton.Application.Counter.V2.Increment;
+using TheButton.Domain.Features.V2.Counter;
 
-public record IncrementResult(int Value);
+namespace TheButton.Application.Counter.V2.Increment;
 
 public class IncrementHandler(ICounterService counterService)
 {

@@ -1,3 +1,5 @@
+using TheButton.Domain.Features.V3.Counter;
+
 namespace TheButton.Application.Abstractions;
 
 /// <summary>
@@ -18,9 +20,3 @@ public interface ICounterWriter
         CancellationToken cancellationToken = default);
 }
 
-/// <summary>
-/// Result of an increment operation.
-/// </summary>
-/// <param name="GlobalValue">The monotonic global ordering number from write.Events.Position.</param>
-/// <param name="UserValue">The per-user counter value (UserVersion), if userId was provided.</param>
-public record IncrementResult(long GlobalValue, long? UserValue);

@@ -3,7 +3,7 @@ using Moq;
 using Microsoft.AspNetCore.Http.HttpResults;
 using TheButton.Api.Features.V2.Counter;
 using TheButton.Application.Counter.V2.Increment;
-
+using TheButton.Domain.Features.V2.Counter;
 
 namespace TheButton.Api.UnitTests.Features.V2.Counter;
 

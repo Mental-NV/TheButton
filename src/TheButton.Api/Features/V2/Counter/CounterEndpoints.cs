@@ -1,4 +1,5 @@
 using TheButton.Application.Counter.V2.Increment;
+using TheButton.Domain.Features.V2.Counter;
 
 namespace TheButton.Api.Features.V2.Counter;
 
