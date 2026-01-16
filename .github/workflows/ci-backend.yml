@@ -76,10 +76,20 @@ jobs:
         run: dotnet build TheButton.Backend.sln -c Release --no-restore
 
       - name: Test Api Unit
-        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-unit.trx"
+        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-unit.trx" --collect:"XPlat Code Coverage" --results-directory ./coverage
 
       - name: Test Api Integration
-        run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx"
+        run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx" --collect:"XPlat Code Coverage" --results-directory ./coverage
+
+      - name: Code Coverage (New Code)
+        uses: shogo82148/actions-code-coverage@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-revision: ${{ github.event.pull_request.base.sha || github.event.before }}
+          cobertura-path: "./coverage/**/coverage.cobertura.xml"
+          minimum-coverage: 80
+          fail-on-low-coverage: true
+          title: "Code Coverage (New Code)"
 
       - name: Upload test results
         if: always()
