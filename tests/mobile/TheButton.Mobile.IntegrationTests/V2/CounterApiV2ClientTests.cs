@@ -7,7 +7,7 @@ using Moq.Protected;
 namespace TheButton.Mobile.IntegrationTests;
 
 [TestClass]
-public class CounterApiClientTests
+public class CounterApiV2ClientTests
 {
     [TestMethod]
     public async Task IncrementAsync_PostsToEndpoint_ParsesValue()
@@ -34,10 +34,10 @@ public class CounterApiClientTests
             BaseAddress = new Uri("http://localhost:5001/")
         };
 
-        var client = new CounterApiClient(httpClient);
+        var client = new CounterApiV2Client(httpClient);
 
         // Act
-        var result = await client.IncrementAsync("api/v2/counter");
+        var result = await client.IncrementAsync();
 
         // Assert
         Assert.AreEqual(10, result);
