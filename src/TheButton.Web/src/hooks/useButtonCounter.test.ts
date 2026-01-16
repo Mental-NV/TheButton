@@ -18,8 +18,8 @@ describe('useButtonCounter', () => {
 
     it('updates count on successful API response', async () => {
         const mockResponse = { value: 42 }
-        vi.stubGlobal('fetch', vi.fn((url) => {
-            if (url.endsWith('/api/v2/counter')) {
+        vi.stubGlobal('fetch', vi.fn((url, init) => {
+            if (url.endsWith('/api/v3/counter') && init?.headers?.['Idempotency-Key'] !== undefined) {
                 return Promise.resolve({
                     ok: true,
                     json: () => Promise.resolve(mockResponse),
