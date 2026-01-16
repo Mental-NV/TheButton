@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
             baseApiUrl += "/";
         }
 
-        services.AddHttpClient<ICounterApiClient, CounterApiClient>(client =>
+        services.AddHttpClient<ICounterApiClient, CounterApiV3Client>(client =>
         {
             client.BaseAddress = new Uri(baseApiUrl);
         });

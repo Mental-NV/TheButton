@@ -18,8 +18,11 @@ export function useButtonCounter(): UseButtonCounterResult {
 
         try {
             const apiUrl = import.meta.env.VITE_API_URL
-            const response = await fetch(`${apiUrl}/api/v2/counter`, {
+            const response = await fetch(`${apiUrl}/api/v3/counter`, {
                 method: 'POST',
+                headers: {
+                    'Idempotency-Key': crypto.randomUUID(),
+                },
             })
 
             if (response.ok) {

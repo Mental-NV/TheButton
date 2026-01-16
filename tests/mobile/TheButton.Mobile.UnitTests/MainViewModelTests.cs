@@ -21,7 +21,7 @@ public class MainViewModelTests
     public async Task Click_Success_UpdatesValue_AndClearsError()
     {
         // Arrange
-        _mockApiClient.Setup(x => x.IncrementAsync(It.IsAny<string>())).ReturnsAsync(5);
+        _mockApiClient.Setup(x => x.IncrementAsync()).ReturnsAsync(5);
         _viewModel.ErrorMessage = "Old Error";
 
         // Act
@@ -37,7 +37,7 @@ public class MainViewModelTests
     public async Task Click_Failure_SetsUserFacingError_AndClearsBusy()
     {
         // Arrange
-        _mockApiClient.Setup(x => x.IncrementAsync(It.IsAny<string>())).ThrowsAsync(new Exception("API Error"));
+        _mockApiClient.Setup(x => x.IncrementAsync()).ThrowsAsync(new Exception("API Error"));
 
         // Act
         await _viewModel.ClickCommand.ExecuteAsync(null);

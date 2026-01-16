@@ -14,7 +14,7 @@ if (app.Environment.IsDevelopment())
 
 int counter = 0;
 
-app.MapPost("/api/v2/counter", () =>
+app.MapPost("/api/v3/counter", () =>
 {
     var newValue = Interlocked.Increment(ref counter);
     return Results.Ok(new { value = newValue });

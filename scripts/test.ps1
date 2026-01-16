@@ -25,5 +25,12 @@ function Run-Tests($solution) {
 Run-Tests "TheButton.Backend.sln"
 Run-Tests "TheButton.Mobile.sln"
 
+Write-Host "Running npm tests for TheButton.Web..." -ForegroundColor Cyan
+npm --prefix src\TheButton.Web test
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "npm tests failed for TheButton.Web!" -ForegroundColor Red
+    exit $LASTEXITCODE
+}
+
 Write-Host "All tests passed for all solutions!" -ForegroundColor Green
 exit 0

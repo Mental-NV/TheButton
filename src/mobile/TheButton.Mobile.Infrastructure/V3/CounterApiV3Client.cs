@@ -3,18 +3,21 @@ using TheButton.Mobile.Core;
 
 namespace TheButton.Mobile.Infrastructure;
 
-public class CounterApiClient : ICounterApiClient
+public class CounterApiV3Client : ICounterApiClient
 {
+    private readonly string _endpoint = "api/v3/counter";
     private readonly HttpClient _httpClient;
 
-    public CounterApiClient(HttpClient httpClient)
+    public CounterApiV3Client(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
-    public async Task<int> IncrementAsync(string endpoint = "api/v2/counter")
+    public async Task<int> IncrementAsync()
     {
-        var response = await _httpClient.PostAsync(endpoint, null);
+        var request = new HttpRequestMessage(HttpMethod.Post, _endpoint);
+        request.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
+        var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<ButtonResponse>();
