@@ -90,15 +90,18 @@ jobs:
       - name: Test Mobile Integration
         run: dotnet test tests/mobile/TheButton.Mobile.IntegrationTests/TheButton.Mobile.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-mobile-integration.trx" --collect:"XPlat Code Coverage" --results-directory ./coverage
 
-      - name: Code Coverage (New Code)
-        uses: shogo82148/actions-code-coverage@v1
+      - name: Code Coverage Summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-revision: ${{ github.event.pull_request.base.sha || github.event.before }}
-          cobertura-path: "./coverage/**/coverage.cobertura.xml"
-          minimum-coverage: 80
-          fail-on-low-coverage: true
-          title: "Code Coverage (New Code)"
+          filename: ./coverage/**/coverage.cobertura.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '80 80'
 
       - name: Upload test results
         if: always()
