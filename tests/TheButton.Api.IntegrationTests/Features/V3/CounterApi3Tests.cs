@@ -210,4 +210,44 @@ public class UnifiedCounterTests : IntegrationTestBase
         
         Assert.AreEqual(parallelCount, count);
     }
+
+    [TestMethod]
+    public async Task Post_MissingIdempotencyKey_ReturnsBadRequest()
+    {
+        // Act
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v3/counter");
+        // No Idempotency-Key header
+        var response = await _client.SendAsync(request);
+
+        // Assert
+        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [TestMethod]
+    public async Task GetEndpoints_ReturnConsistentValues()
+    {
+        var userId = Guid.NewGuid();
+        var key = Guid.NewGuid().ToString();
+
+        // 1. Increment for user
+        using var postReq = new HttpRequestMessage(HttpMethod.Post, $"/api/v3/counter?userId={userId}");
+        postReq.Headers.Add("Idempotency-Key", key);
+        var postResp = await _client.SendAsync(postReq);
+        postResp.EnsureSuccessStatusCode();
+        var postResult = await postResp.Content.ReadFromJsonAsync<CounterResponse>();
+
+        // 2. GET global
+        var globalResp = await _client.GetAsync("/api/v3/counter");
+        globalResp.EnsureSuccessStatusCode();
+        var globalResult = await globalResp.Content.ReadFromJsonAsync<CounterResponse>();
+        Assert.AreEqual(postResult!.Value, globalResult!.Value);
+        Assert.IsNull(globalResult.UserValue);
+
+        // 3. GET user-specific
+        var userResp = await _client.GetAsync($"/api/v3/counter/{userId}");
+        userResp.EnsureSuccessStatusCode();
+        var userResult = await userResp.Content.ReadFromJsonAsync<CounterResponse>();
+        Assert.AreEqual(postResult.Value, userResult!.Value);
+        Assert.AreEqual(postResult.UserValue, userResult.UserValue);
+    }
 }
