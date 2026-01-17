@@ -8,29 +8,52 @@
 
 ### POST `/counter`
 
-Increments the **global** counter and optionally the **per-user** counter.
-
-**Query Parameters**
-- `userId` — GUID (optional). If provided, increments the user-specific counter.
+Increments the **global** counter only.
 
 **Headers**
-- `Idempotency-Key: <string>` (required)
+- `Idempotency-Key: <string>` (optional, auto-generated if not provided)
 
 **Response (200)**
 ```json
 {
-  "globalValue": 1,
+  "value": 1,
+  "userValue": null
+}
+```
+
+**Semantics**
+- `value` is the monotonic global ordering number of the latest increment event (from `write.Events.Position`).
+- `userValue` is always `null` for this endpoint.
+
+**Errors**
+- `409` if a concurrency conflict cannot be resolved with bounded retries
+
+---
+
+### POST `/counter/{userId}`
+
+Increments the **global** counter and the **per-user** counter.
+
+**Route parameters**
+- `userId` — GUID (required)
+
+**Headers**
+- `Idempotency-Key: <string>` (optional, auto-generated if not provided)
+
+**Response (200)**
+```json
+{
+  "value": 1,
   "userValue": 1
 }
 ```
 
 **Semantics**
-- `globalValue` is the monotonic global ordering number of the latest increment event (from `write.Events.Position`).
-- `userValue` is the per-user counter value (calculated as `MAX(UserVersion)` for the provided `userId`) after the increment. It is `null` if no `userId` was provided.
+- `value` is the monotonic global ordering number of the latest increment event (from `write.Events.Position`).
+- `userValue` is the per-user counter value (calculated as `MAX(UserVersion)` for the provided `userId`) after the increment.
 
 **Errors**
-- `400` if `Idempotency-Key` is missing/blank
-- `400` if `userId` is provided but is an invalid GUID
+- `400` if `userId` is an invalid GUID
 - `409` if a concurrency conflict cannot be resolved with bounded retries
 
 ---
@@ -42,7 +65,8 @@ Returns the global counter value.
 **Response (200)**
 ```json
 {
-  "globalValue": 123
+  "value": 123,
+  "userValue": null
 }
 ```
 
@@ -58,8 +82,7 @@ Returns the global counter value and the per-user counter value.
 **Response (200)**
 ```json
 {
-  "globalValue": 123,
-  "userId": "00000000-0000-0000-0000-000000000000",
+  "value": 123,
   "userValue": 42
 }
 ```
