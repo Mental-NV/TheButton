@@ -10,6 +10,7 @@ describe('useButtonCounter', () => {
     it('returns initial state with count 0 (GET mocked)', async () => {
         // Ensure initial GET resolves to 0
         vi.stubGlobal('fetch', vi.fn((url, init) => {
+            void url
             // GET
             if (!init || init.method === undefined) {
                 return Promise.resolve({ ok: true, json: () => Promise.resolve({ value: 0 }) })
@@ -37,6 +38,7 @@ describe('useButtonCounter', () => {
 
     it('initializes count from GET /api/v3/counter (success)', async () => {
         vi.stubGlobal('fetch', vi.fn((url, init) => {
+            void url
             if (!init || init.method === undefined) {
                 return Promise.resolve({ ok: true, json: () => Promise.resolve({ value: 5 }) })
             }
@@ -94,6 +96,7 @@ describe('useButtonCounter', () => {
     it('updates count on successful API response', async () => {
         const mockResponse = { value: 42 }
         vi.stubGlobal('fetch', vi.fn((url, init) => {
+            void url
             // GET -> initial value
             if (!init || init.method === undefined) {
                 return Promise.resolve({ ok: true, json: () => Promise.resolve({ value: 0 }) })
