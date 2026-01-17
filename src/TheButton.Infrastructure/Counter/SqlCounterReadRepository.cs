@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TheButton.Application.Abstractions;
 using TheButton.Infrastructure.Persistence;
+using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace TheButton.Infrastructure.Counter;
 
@@ -10,10 +12,12 @@ namespace TheButton.Infrastructure.Counter;
 public class SqlCounterReadRepository : ICounterReadRepository
 {
     private readonly TheButtonDbContext _context;
+    private readonly ILogger<SqlCounterReadRepository> _logger;
 
-    public SqlCounterReadRepository(TheButtonDbContext context)
+    public SqlCounterReadRepository(TheButtonDbContext context, ILogger<SqlCounterReadRepository> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <inheritdoc />
@@ -33,8 +37,10 @@ public class SqlCounterReadRepository : ICounterReadRepository
         // User counter is derived from MAX(UserVersion) for the specific user
         var maxUserVersion = await _context.Events
             .Where(e => e.UserId == userId)
-            .MaxAsync(e => (long?)e.UserVersion, cancellationToken);
+            .CountAsync(cancellationToken);
 
-        return maxUserVersion ?? 0;
+        _logger.LogInformation($"User value for {userId}: {maxUserVersion}");
+
+        return maxUserVersion;
     }
 }

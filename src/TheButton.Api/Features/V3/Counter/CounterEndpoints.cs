@@ -9,13 +9,25 @@ public static class CounterEndpoints
     public static RouteGroupBuilder MapV3CounterEndpoints(this RouteGroupBuilder group)
     {
         // POST /api/v3/counter
-        // Supports optional userId via query parameter: POST /api/v3/counter?userId=...
         group.MapPost("/", async (
-            [FromHeader(Name = "Idempotency-Key")] string idempotencyKey,
-            [FromQuery] Guid? userId,
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,
             [FromServices] IncrementHandler handler,
             CancellationToken ct) =>
         {
+            idempotencyKey = string.IsNullOrWhiteSpace(idempotencyKey) ? Guid.NewGuid().ToString() : idempotencyKey;
+            var command = new IncrementCommand(idempotencyKey, null);
+            var result = await handler.Handle(command, ct);
+            return Results.Ok(new CounterResponse(result.Value, result.UserValue));
+        });
+
+        // POST /api/v3/counter/{userId}
+        group.MapPost("/{userId:guid}", async (
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,
+            Guid userId,
+            [FromServices] IncrementHandler handler,
+            CancellationToken ct) =>
+        {
+            idempotencyKey = string.IsNullOrWhiteSpace(idempotencyKey) ? Guid.NewGuid().ToString() : idempotencyKey;
             var command = new IncrementCommand(idempotencyKey, userId);
             var result = await handler.Handle(command, ct);
             return Results.Ok(new CounterResponse(result.Value, result.UserValue));
