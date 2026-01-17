@@ -7,24 +7,103 @@ describe('useButtonCounter', () => {
         vi.resetAllMocks()
     })
 
-    it('returns initial state with count 0', () => {
+    it('returns initial state with count 0 (GET mocked)', async () => {
+        // Ensure initial GET resolves to 0
+        vi.stubGlobal('fetch', vi.fn((url, init) => {
+            // GET
+            if (!init || init.method === undefined) {
+                return Promise.resolve({ ok: true, json: () => Promise.resolve({ value: 0 }) })
+            }
+            // default POST fallback
+            return Promise.resolve({ ok: true, json: () => Promise.resolve({ value: 0 }) })
+        }))
+
         const { result } = renderHook(() => useButtonCounter())
 
+        // initial synchronous expectations
         expect(result.current.count).toBe(0)
-        expect(result.current.isLoading).toBe(false)
         expect(result.current.error).toBeNull()
         expect(typeof result.current.handleClick).toBe('function')
+
+        // initialization should set loading true, then false after resolving
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(true)
+        })
+
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false)
+        })
+    })
+
+    it('initializes count from GET /api/v3/counter (success)', async () => {
+        vi.stubGlobal('fetch', vi.fn((url, init) => {
+            if (!init || init.method === undefined) {
+                return Promise.resolve({ ok: true, json: () => Promise.resolve({ value: 5 }) })
+            }
+            return Promise.resolve({ ok: true, json: () => Promise.resolve({ value: 5 }) })
+        }))
+
+        const { result } = renderHook(() => useButtonCounter())
+
+        await waitFor(() => {
+            expect(result.current.count).toBe(5)
+            expect(result.current.isLoading).toBe(false)
+            expect(result.current.error).toBeNull()
+        })
+    })
+
+    it('initializes count from GET /api/v3/counter (failure)', async () => {
+        vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: false, status: 500 })))
+
+        const { result } = renderHook(() => useButtonCounter())
+
+        await waitFor(() => {
+            expect(result.current.count).toBe(0)
+            expect(result.current.isLoading).toBe(false)
+            expect(result.current.error).toBe('Failed to load counter')
+        })
+    })
+
+    it('sets loading during initial GET', async () => {
+        let resolvePromise: (value: unknown) => void
+        const pendingPromise = new Promise((resolve) => {
+            resolvePromise = resolve
+        })
+
+        // initial GET is pending
+        const fetchMock = vi.fn().mockReturnValueOnce(pendingPromise)
+        vi.stubGlobal('fetch', fetchMock)
+
+        const { result } = renderHook(() => useButtonCounter())
+
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(true)
+        })
+
+        // resolve initial GET
+        await act(async () => {
+            resolvePromise!({ ok: true, json: () => Promise.resolve({ value: 3 }) })
+        })
+
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false)
+            expect(result.current.count).toBe(3)
+        })
     })
 
     it('updates count on successful API response', async () => {
         const mockResponse = { value: 42 }
         vi.stubGlobal('fetch', vi.fn((url, init) => {
-            if (url.endsWith('/api/v3/counter') && init?.headers?.['Idempotency-Key'] !== undefined) {
-                return Promise.resolve({
-                    ok: true,
-                    json: () => Promise.resolve(mockResponse),
-                })
+            // GET -> initial value
+            if (!init || init.method === undefined) {
+                return Promise.resolve({ ok: true, json: () => Promise.resolve({ value: 0 }) })
             }
+
+            // POST
+            if (init?.headers?.['Idempotency-Key'] !== undefined) {
+                return Promise.resolve({ ok: true, json: () => Promise.resolve(mockResponse) })
+            }
+
             return Promise.resolve({ ok: false })
         }))
 
@@ -47,7 +126,12 @@ describe('useButtonCounter', () => {
             resolvePromise = resolve
         })
 
-        vi.stubGlobal('fetch', vi.fn().mockReturnValueOnce(pendingPromise))
+        // First call: GET resolves immediately; second call (POST) is pending
+        const fetchMock = vi.fn()
+            .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ value: 0 }) })
+            .mockReturnValueOnce(pendingPromise)
+
+        vi.stubGlobal('fetch', fetchMock)
 
         const { result } = renderHook(() => useButtonCounter())
 
@@ -59,17 +143,19 @@ describe('useButtonCounter', () => {
             expect(result.current.isLoading).toBe(true)
         })
 
-        // Cleanup - resolve the promise
+        // Cleanup - resolve the POST promise
         await act(async () => {
             resolvePromise!({ ok: true, json: () => Promise.resolve({ value: 1 }) })
         })
     })
 
     it('sets error on API failure response', async () => {
-        vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
-            ok: false,
-            status: 500,
-        }))
+        // GET succeeds, POST fails with non-ok
+        const fetchMock = vi.fn()
+            .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ value: 0 }) })
+            .mockResolvedValueOnce({ ok: false, status: 500 })
+
+        vi.stubGlobal('fetch', fetchMock)
 
         const { result } = renderHook(() => useButtonCounter())
 
@@ -84,7 +170,12 @@ describe('useButtonCounter', () => {
     })
 
     it('sets error on network failure', async () => {
-        vi.stubGlobal('fetch', vi.fn().mockRejectedValueOnce(new Error('Network error')))
+        // GET succeeds, POST rejects
+        const fetchMock = vi.fn()
+            .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ value: 0 }) })
+            .mockRejectedValueOnce(new Error('Network error'))
+
+        vi.stubGlobal('fetch', fetchMock)
 
         const { result } = renderHook(() => useButtonCounter())
 

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 export interface UseButtonCounterResult {
     count: number
@@ -38,6 +38,41 @@ export function useButtonCounter(): UseButtonCounterResult {
             console.error('Error clicking button:', err)
         } finally {
             setIsLoading(false)
+        }
+    }, [])
+
+    useEffect(() => {
+        let cancelled = false
+
+        const init = async () => {
+            setIsLoading(true)
+            try {
+                const apiUrl = import.meta.env.VITE_API_URL
+                const response = await fetch(`${apiUrl}/api/v3/counter`)
+
+                if (cancelled) return
+
+                if (response.ok) {
+                    const data = await response.json()
+                    setCount(data.value)
+                } else {
+                    setError('Failed to load counter')
+                    console.error('Failed to load counter')
+                }
+            } catch (err) {
+                if (cancelled) return
+                const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+                setError(errorMessage)
+                console.error('Error loading counter:', err)
+            } finally {
+                if (!cancelled) setIsLoading(false)
+            }
+        }
+
+        init()
+
+        return () => {
+            cancelled = true
         }
     }, [])
 
