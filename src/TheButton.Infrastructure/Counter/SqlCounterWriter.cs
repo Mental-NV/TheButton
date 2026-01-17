@@ -4,6 +4,7 @@ using TheButton.Application.Abstractions;
 using TheButton.Infrastructure.Persistence;
 using TheButton.Infrastructure.Persistence.Entities;
 using TheButton.Domain.Features.V3.Counter;
+using Microsoft.Extensions.Logging;
 
 namespace TheButton.Infrastructure.Counter;
 
@@ -13,10 +14,12 @@ namespace TheButton.Infrastructure.Counter;
 public class SqlCounterWriter : ICounterWriter
 {
     private readonly TheButtonDbContext _context;
+    private readonly ILogger<SqlCounterWriter> _logger;
 
-    public SqlCounterWriter(TheButtonDbContext context)
+    public SqlCounterWriter(TheButtonDbContext context, ILogger<SqlCounterWriter> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <inheritdoc />
@@ -53,6 +56,7 @@ public class SqlCounterWriter : ICounterWriter
 
                     if (existingCommand != null)
                     {
+                        _logger.LogWarning($"Idempotency key {idempotencyKey} already exists for user {userId}. Returning cached result.");
                         var cachedResult = JsonSerializer.Deserialize<IncrementResult>(existingCommand.ResultJson);
                         return cachedResult ?? throw new InvalidOperationException("Failed to deserialize cached result.");
                     }
@@ -63,9 +67,9 @@ public class SqlCounterWriter : ICounterWriter
                     {
                         var currentMax = await _context.Events
                             .Where(e => e.UserId == userId)
-                            .MaxAsync(e => (long?)e.UserVersion, cancellationToken);
+                            .CountAsync(cancellationToken);
                         
-                        newUserVersion = (currentMax ?? 0) + 1;
+                        newUserVersion = currentMax + 1;
                     }
 
                     // 3. Insert event
@@ -102,6 +106,8 @@ public class SqlCounterWriter : ICounterWriter
                     // 5. Commit transaction
                     await transaction.CommitAsync(cancellationToken);
 
+                    _logger.LogInformation($"Incremented counter for user {userId}. Global value: {globalValue}, User value: {newUserVersion}");
+
                     return result;
                 }
                 catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex) && retryCount < maxRetries)
@@ -115,7 +121,7 @@ public class SqlCounterWriter : ICounterWriter
                     retryCount++;
                     // Dynamic jitter to break the "retry storm"
                     var delayMs = Random.Shared.Next(50, 100 + (retryCount * 10));
-                    Console.WriteLine($"[SqlCounterWriter] Concurrency conflict detected for user {userId}. Attempt {retryCount}/{maxRetries}. Jittering {delayMs}ms...");
+                    _logger.LogWarning($"Concurrency conflict detected for user {userId}. Attempt {retryCount}/{maxRetries}. Jittering {delayMs}ms...");
                     
                     await Task.Delay(delayMs, cancellationToken);
                     continue; 
@@ -126,10 +132,10 @@ public class SqlCounterWriter : ICounterWriter
                     // Clear tracker on any failure to keep the context reuse-safe
                     _context.ChangeTracker.Clear();
                     
-                    Console.WriteLine($"[SqlCounterWriter] Final error after {retryCount} retries: {ex.GetType().Name} - {ex.Message}");
+                    _logger.LogError($"Final error after {retryCount} retries: {ex.GetType().Name} - {ex.Message}");
                     if (ex.InnerException != null)
                     {
-                        Console.WriteLine($"[SqlCounterWriter] Inner Error: {ex.InnerException.GetType().Name} - {ex.InnerException.Message}");
+                        _logger.LogError($"Inner Error: {ex.InnerException.GetType().Name} - {ex.InnerException.Message}");
                     }
                     throw;
                 }

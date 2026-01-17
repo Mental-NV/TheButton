@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using TheButton.Infrastructure.Counter;
 using TheButton.Infrastructure.Persistence;
@@ -9,10 +10,14 @@ public class SqlCounterWriterTests
 {
     private DbContextOptions<TheButtonDbContext> _options;
     private Microsoft.Data.Sqlite.SqliteConnection _connection;
+    private ILogger<SqlCounterWriter> _logger;
 
     [TestInitialize]
     public void Setup()
     {
+        var loggerFactory = new LoggerFactory();
+        _logger = loggerFactory.CreateLogger<SqlCounterWriter>();
+
         _connection = new Microsoft.Data.Sqlite.SqliteConnection("Filename=:memory:");
         _connection.Open();
 
@@ -35,7 +40,8 @@ public class SqlCounterWriterTests
     {
         // Arrange
         using var context = new TheButtonDbContext(_options);
-        var writer = new SqlCounterWriter(context);
+        
+        var writer = new SqlCounterWriter(context, _logger);
         var idempotencyKey = "key1";
 
         // Act
@@ -59,7 +65,7 @@ public class SqlCounterWriterTests
     {
         // Arrange
         using var context = new TheButtonDbContext(_options);
-        var writer = new SqlCounterWriter(context);
+        var writer = new SqlCounterWriter(context, _logger);
         var userId = Guid.NewGuid();
 
         // Act
@@ -78,7 +84,7 @@ public class SqlCounterWriterTests
     {
         // Arrange
         using var context = new TheButtonDbContext(_options);
-        var writer = new SqlCounterWriter(context);
+        var writer = new SqlCounterWriter(context, _logger);
         var idempotencyKey = "idempotent-key";
         var userId = Guid.NewGuid();
 
