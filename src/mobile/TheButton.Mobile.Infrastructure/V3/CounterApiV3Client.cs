@@ -23,4 +23,13 @@ public class CounterApiV3Client : ICounterApiClient
         var result = await response.Content.ReadFromJsonAsync<ButtonResponse>();
         return result?.Value ?? throw new InvalidOperationException("API returned null response");
     }
+
+    public async Task<int> GetAsync()
+    {
+        var response = await _httpClient.GetAsync(_endpoint);
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<ButtonResponse>();
+        return result?.Value ?? throw new InvalidOperationException("API returned null response");
+    }
 }

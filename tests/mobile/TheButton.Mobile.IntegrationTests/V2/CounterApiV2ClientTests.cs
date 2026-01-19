@@ -52,4 +52,15 @@ public class CounterApiV2ClientTests
            ItExpr.IsAny<CancellationToken>()
         );
     }
+
+    [TestMethod]
+    public void GetAsync_ThrowsNotSupportedException()
+    {
+        // Arrange
+        var httpClient = new HttpClient();
+        var client = new CounterApiV2Client(httpClient);
+
+        // Act & Assert
+        Assert.ThrowsExceptionAsync<NotSupportedException>(async () => await client.GetAsync());
+    }
 }

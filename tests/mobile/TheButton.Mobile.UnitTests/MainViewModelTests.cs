@@ -47,4 +47,35 @@ public class MainViewModelTests
         Assert.IsFalse(string.IsNullOrEmpty(_viewModel.ErrorMessage));
         Assert.IsFalse(_viewModel.IsBusy);
     }
+
+    [TestMethod]
+    public async Task Initialize_Success_UpdatesValue_AndClearsError()
+    {
+        // Arrange
+        _mockApiClient.Setup(x => x.GetAsync()).ReturnsAsync(7);
+        _viewModel.ErrorMessage = "Old Error";
+
+        // Act
+        await _viewModel.InitializeAsync();
+
+        // Assert
+        Assert.AreEqual(7, _viewModel.Value);
+        Assert.AreEqual(string.Empty, _viewModel.ErrorMessage);
+        Assert.IsFalse(_viewModel.IsBusy);
+    }
+
+    [TestMethod]
+    public async Task Initialize_Failure_SetsUserFacingError_AndClearsBusy()
+    {
+        // Arrange
+        _mockApiClient.Setup(x => x.GetAsync()).ThrowsAsync(new Exception("API Error"));
+
+        // Act
+        await _viewModel.InitializeAsync();
+
+        // Assert
+        Assert.AreEqual(0, _viewModel.Value);
+        Assert.IsFalse(string.IsNullOrEmpty(_viewModel.ErrorMessage));
+        Assert.IsFalse(_viewModel.IsBusy);
+    }
 }

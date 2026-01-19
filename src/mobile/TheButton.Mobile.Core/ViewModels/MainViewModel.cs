@@ -20,6 +20,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _errorMessage = string.Empty;
 
+    [ObservableProperty]
+    private bool _isInitialized;
+
     public MainViewModel(ICounterApiClient apiClient)
     {
         _apiClient = apiClient;
@@ -43,6 +46,27 @@ public partial class MainViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    public async Task InitializeAsync()
+    {
+        if (IsBusy) return;
+
+        try
+        {
+            IsBusy = true;
+            ErrorMessage = string.Empty;
+            Value = await _apiClient.GetAsync();
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Something went wrong. Please try again.";
+        }
+        finally
+        {
+            IsBusy = false;
+            IsInitialized = true;
         }
     }
 }
