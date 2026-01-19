@@ -15,6 +15,7 @@
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level1"
                 AutomationId="CounterLabel"
+                IsVisible="{Binding IsInitialized}"
                 HorizontalOptions="Center" />
 
             <Button

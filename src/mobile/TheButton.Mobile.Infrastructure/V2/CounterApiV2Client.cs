@@ -21,4 +21,9 @@ public class CounterApiV2Client : ICounterApiClient
         var result = await response.Content.ReadFromJsonAsync<ButtonResponse>();
         return result?.Value ?? throw new InvalidOperationException("API returned null response");
     }
+
+    public Task<int> GetAsync()
+    {
+        throw new NotSupportedException("GET /api/v2/counter is not supported by the V2 API.");
+    }
 }

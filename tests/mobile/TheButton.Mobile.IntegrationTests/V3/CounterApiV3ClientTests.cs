@@ -52,4 +52,48 @@ public class CounterApiV3ClientTests
            ItExpr.IsAny<CancellationToken>()
         );
     }
+
+    [TestMethod]
+    public async Task GetAsync_GetsFromEndpoint_ParsesValue()
+    {
+        // Arrange
+        var handlerMock = new Mock<HttpMessageHandler>();
+        var response = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent("{\"value\": 42}")
+        };
+
+        handlerMock
+           .Protected()
+           .Setup<Task<HttpResponseMessage>>(
+              "SendAsync",
+              ItExpr.IsAny<HttpRequestMessage>(),
+              ItExpr.IsAny<CancellationToken>()
+           )
+           .ReturnsAsync(response);
+
+        var httpClient = new HttpClient(handlerMock.Object)
+        {
+            BaseAddress = new Uri("http://localhost:5001/")
+        };
+
+        var client = new CounterApiV3Client(httpClient);
+
+        // Act
+        var result = await client.GetAsync();
+
+        // Assert
+        Assert.AreEqual(42, result);
+
+        handlerMock.Protected().Verify(
+           "SendAsync",
+           Times.Exactly(1),
+           ItExpr.Is<HttpRequestMessage>(req =>
+              req.Method == HttpMethod.Get
+              && req.RequestUri.ToString().EndsWith("api/v3/counter") // Check URL
+           ),
+           ItExpr.IsAny<CancellationToken>()
+        );
+    }
 }
