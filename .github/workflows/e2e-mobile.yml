@@ -34,17 +34,17 @@ env:
 
 jobs:
   changes:
-    name: Detect non-doc changes
+    name: Detect relevant changes
     runs-on: ubuntu-latest
     outputs:
-      non_docs: ${{ steps.filter.outputs.non_docs }}
+      relevant_changes: ${{ steps.filter.outputs.relevant_changes }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            non_docs:
+            relevant_changes:
               - '**'
               - '!**/*.md'
               - '!**/*.txt'
@@ -52,7 +52,7 @@ jobs:
   android-e2e:
     name: Android E2E (Maestro)
     needs: changes
-    if: needs.changes.outputs.non_docs == 'true'
+    if: needs.changes.outputs.relevant_changes == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -167,7 +167,7 @@ jobs:
   ios-e2e:
     name: iOS E2E (Maestro)
     needs: changes
-    if: needs.changes.outputs.non_docs == 'true'
+    if: needs.changes.outputs.relevant_changes == 'true'
     runs-on: macos-15
     timeout-minutes: 60
 
