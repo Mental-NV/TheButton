@@ -76,7 +76,7 @@ jobs:
         run: dotnet build TheButton.Backend.sln -c Release --no-restore
 
       - name: Test Api Unit
-        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-unit.trx"
+        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-unit.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:Threshold=70 /p:ThresholdType=line /p:ThresholdStat=total
 
       - name: Test Api Integration
         run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx"
