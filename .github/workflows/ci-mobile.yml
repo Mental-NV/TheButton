@@ -1,7 +1,7 @@
 name: CI Mobile
 
 on:
-  push:
+  push: &mobile_ci
     branches: [ main ]
     paths:
       - "src/mobile/**"
@@ -10,16 +10,11 @@ on:
       - ".github/workflows/e2e-mobile.yml"
       - ".maestro/**"
       - "scripts/run-*-e2e.sh"
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.txt"
 
-  pull_request:
-    branches: [ main ]
-    paths:
-      - "src/mobile/**"
-      - "tests/mobile/**"
-      - ".github/workflows/ci-mobile.yml"
-      - ".github/workflows/e2e-mobile.yml"
-      - ".maestro/**"
-      - "scripts/run-*-e2e.sh"
+  pull_request: *mobile_ci
 
   workflow_dispatch:
 

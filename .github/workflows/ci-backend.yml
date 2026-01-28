@@ -1,7 +1,7 @@
 name: CI Backend
 
 on:
-  push:
+  push: &backend_ci
     branches: [ main ]
     paths-ignore:
       - "src/mobile/**"
@@ -11,16 +11,8 @@ on:
       - ".maestro/**"
       - "scripts/run-*-e2e.sh"
       - "**/*.md"
-  pull_request:
-    branches: [ main ]
-    paths-ignore:
-      - "src/mobile/**"
-      - "tests/mobile/**"
-      - ".github/workflows/ci-mobile.yml"
-      - ".github/workflows/e2e-mobile.yml"
-      - ".maestro/**"
-      - "scripts/run-*-e2e.sh"
-      - "**/*.md"
+      - "**/*.txt"
+  pull_request: *backend_ci
   workflow_dispatch:
 
 concurrency:

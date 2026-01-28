@@ -1,7 +1,7 @@
 name: Mobile E2E
 
 on:
-  pull_request:
+  pull_request: &mobile_e2e
     branches: [ main ]
     paths: &mobile_paths
       - ".github/workflows/e2e-mobile.yml"
@@ -12,10 +12,11 @@ on:
       - "src/mobile/TheButton.Mobile.Infrastructure/**"
       - "src/mobile/TheButton.Mobile/**"
       - "tools/TheButton.MockApi/**"
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.txt"
 
-  push:
-    branches: [ main ]
-    paths: *mobile_paths
+  push: *mobile_e2e
 
   workflow_dispatch:
     
