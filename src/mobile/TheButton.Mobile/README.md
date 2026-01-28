@@ -17,7 +17,7 @@ The project follows a clean architecture approach with the **MVVM (Model-View-Vi
   - Defines **Core Interfaces** (e.g., `ICounterApiClient`).
   - Not dependent on any UI-specific implementation details.
 - **TheButton.Mobile.Infrastructure**: The Infrastructure layer.
-  - Implements external concerns such as API Clients (`CounterApiClient`).
+  - Implements external concerns such as API Clients (`CounterApiV2Client`, `CounterApiV3Client`), with DI wiring `ICounterApiClient` to `CounterApiV3Client`.
   - Registered via Dependency Injection in `MauiProgram.cs`.
 
 This structure promotes testability and separation of concerns (`View` -> `ViewModel` -> `Model/Service`).
@@ -38,28 +38,28 @@ To run the application locally on different platforms:
 
 **Windows:**
 ```bash
-dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-windows10.0.19041.0
-dotnet run --project src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-windows10.0.19041.0
+dotnet build src/mobile/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-windows10.0.19041.0
+dotnet run --project src/mobile/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-windows10.0.19041.0
 ```
 
 **Android:** (Requires Emulator or Device)
 ```bash
-dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android
-dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -t:Run -f net10.0-android
+dotnet build src/mobile/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-android
+dotnet build src/mobile/TheButton.Mobile/TheButton.Mobile.csproj -t:Run -f net10.0-android
 ```
 
 **iOS:** (Mac Only)
 ```bash
-dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-ios
-dotnet build src/TheButton.Mobile/TheButton.Mobile.csproj -t:Run -f net10.0-ios
+dotnet build src/mobile/TheButton.Mobile/TheButton.Mobile.csproj -f net10.0-ios
+dotnet build src/mobile/TheButton.Mobile/TheButton.Mobile.csproj -t:Run -f net10.0-ios
 ```
 
 ### Conditional Building
 
 The project project file (`TheButton.Mobile.csproj`) is configured with **Conditional TargetFrameworks** to optimize the build process and support specific CI environments:
 
-- **Windows**: Builds `net10.0-windows...` (Android is excluded to prevent build errors if SDKs are missing)
-- **macOS**: Builds `net10.0-ios` and `net10.0-android`
+- **Windows**: Builds `net10.0-windows10.0.19041.0`
+- **macOS**: Builds `net10.0-ios`
 - **Linux** (CI): Builds `net10.0-android` (Specifically for Android E2E tests in CI)
 
 ## Testing & CI
@@ -71,30 +71,24 @@ The project uses **Maestro** for End-to-End (E2E) UI testing.
 - **Mock API**: E2E tests often run against a mock API (`TheButton.MockApi`) to ensure deterministic behavior.
 - **Test Flows**: Defined in `.maestro/` (e.g., `android-flow.yaml`, `ios-flow.yaml`).
 
-### CI Workflow (`ci.yml`)
+### CI Workflow (`ci-mobile.yml`)
 
-The GitHub Actions CI pipeline ensures code quality and functional integrity:
+The GitHub Actions CI pipeline (`.github/workflows/ci-mobile.yml`) ensures code quality and functional integrity:
 
 1.  **Build & Test (Windows)**:
     - Builds the entire solution.
     - Runs unit tests.
+    - Runs integration tests.
 2.  **Android E2E (Ubuntu)**:
-    - Sets up an Android Emulator (API 33).
-    - Installs **Maestro**.
-    - Runs the project on the emulator.
-    - Executes Maestro flows to verify UI interactions.
-    - Uploads test reports and Logcat logs on failure.
+    - Runs separately in the Mobile E2E workflow.
 
-## Release Workflow (`release.yml`)
+### Mobile E2E Workflow (`e2e-mobile.yml`)
 
-Triggered on tagging a release (e.g., `v1.0.0`).
+The GitHub Actions E2E pipeline (`.github/workflows/e2e-mobile.yml`) runs Android and iOS UI tests.
 
-1.  **Android Release**:
-    - Builds and Signs an Android App Bundle (`.aab`) using a Keystore stored in GitHub Secrets.
-    - Artifact: `android-release-aab`.
-2.  **iOS Release** (Mac):
-    - Decodes Apple Certificates (.p12) and Provisioning Profiles.
-    - Builds and Signs an iOS Application Archive (`.ipa`).
-    - Artifact: `ios-release-ipa`.
-3.  **E2E Verification**:
-    - Runs a final E2E verification on **iOS Simulator** using a Mock API to ensure the release build (in simulator config) functions correctly before distribution.
+1.  **Android E2E (Ubuntu)**:
+    - Runs `scripts/run-android-e2e.sh` to build the Android app, start the Mock API, and execute Maestro flows.
+    - Uploads Maestro reports, logcat logs, and Mock API logs as artifacts.
+2.  **iOS E2E (macOS)**:
+    - Runs `scripts/run-ios-e2e.sh` to build the iOS app, start the Mock API, and execute Maestro flows.
+    - Uploads Maestro reports and Mock API logs as artifacts.
