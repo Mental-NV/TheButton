@@ -81,6 +81,9 @@ jobs:
       - name: Test Api Integration
         run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx"
 
+      - name: Test Infrastructure Integration
+        run: dotnet test tests/TheButton.Infrastructure.IntegrationTests/TheButton.Infrastructure.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-infrastructure-integration.trx"
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
