@@ -12,7 +12,9 @@ src/TheButton.Api/
 ├── Extensions/             # Dependency injection and mapping extensions
 ├── Features/               # Vertical Slices (Core Business Logic)
 │   ├── Health/             # Self-contained health check feature
-│   └── V2/
+│   ├── V2/
+│   │   └── Counter/        # Counter management (Endpoints, Models)
+│   └── V3/
 │       └── Counter/        # Counter management (Endpoints, Models)
 ├── Properties/             # Environmental settings (launchSettings.json)
 ├── Program.cs              # Entry point and automated endpoint registration
@@ -29,9 +31,15 @@ The API uses **versioning** and provides interactive documentation via **Scalar*
 - **Health Check**: `/health` - Returns the status of the API.
 
 ### Featured Endpoints
-- **Counter (V2)**:
+- **Counter (V2 - backward compatibility)**:
     - **Base Route**: `/api/v2/counter`
     - **POST /**: Increments the counter and returns the new value.
+- **Counter (V3)**:
+    - **Base Route**: `/api/v3/counter`
+    - **POST /**: Increments the global counter. Accepts `Idempotency-Key` header for safe retries.
+    - **POST /{userId}**: Increments the global counter and the specified user counter. Accepts `Idempotency-Key`.
+    - **GET /**: Returns the current global counter value.
+    - **GET /{userId}**: Returns the current global counter value and the specified user counter.
 
 ### Documentation
 - **Scalar UI**: `/scalar/v1` (Available in Development mode)
@@ -59,11 +67,11 @@ jobs:
         with:
           global-json-file: global.json
       - name: Restore
-        run: dotnet restore TheButton.sln
+        run: dotnet restore TheButton.Backend.sln
       - name: Build
-        run: dotnet build TheButton.sln -c Release --no-restore
+        run: dotnet build TheButton.Backend.sln -c Release --no-restore
       - name: Test
-        run: dotnet test TheButton.sln -c Release --no-build
+        run: dotnet test TheButton.Backend.sln -c Release --no-build
 ```
 
 ### 🚢 Continuous Deployment (`deploy.yml`)
