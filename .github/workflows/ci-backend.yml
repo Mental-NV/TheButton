@@ -40,6 +40,12 @@ jobs:
           filters: |
             relevant_changes:
               - '**'
+              - '!src/mobile/**'
+              - '!tests/mobile/**'
+              - '!.github/workflows/ci-mobile.yml'
+              - '!.github/workflows/e2e-mobile.yml'
+              - '!.maestro/**'
+              - '!scripts/run-*-e2e.sh'
               - '!**/*.md'
               - '!**/*.txt'
 
