@@ -10,8 +10,6 @@ on:
       - ".github/workflows/e2e-mobile.yml"
       - ".maestro/**"
       - "scripts/run-*-e2e.sh"
-      - "**/*.md"
-      - "**/*.txt"
   pull_request: *backend_ci
   workflow_dispatch:
 
@@ -29,8 +27,26 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/nuget-packages
 
 jobs:
+  changes:
+    name: Detect non-doc changes
+    runs-on: ubuntu-latest
+    outputs:
+      non_docs: ${{ steps.filter.outputs.non_docs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            non_docs:
+              - '**'
+              - '!**/*.md'
+              - '!**/*.txt'
+
   backend:
     name: Backend build & test
+    needs: changes
+    if: needs.changes.outputs.non_docs == 'true'
     runs-on: windows-latest
     env:
       DOTNET_ROOT: "" # Silences the linter
@@ -84,6 +100,8 @@ jobs:
 
   web:
     name: Web build & test
+    needs: changes
+    if: needs.changes.outputs.non_docs == 'true'
     runs-on: ubuntu-latest
 
     steps:

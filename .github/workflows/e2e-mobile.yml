@@ -12,9 +12,6 @@ on:
       - "src/mobile/TheButton.Mobile.Infrastructure/**"
       - "src/mobile/TheButton.Mobile/**"
       - "tools/TheButton.MockApi/**"
-    paths-ignore:
-      - "**/*.md"
-      - "**/*.txt"
 
   push: *mobile_e2e
 
@@ -36,8 +33,26 @@ env:
   MAESTRO_DRIVER_STARTUP_TIMEOUT: 600000
 
 jobs:
+  changes:
+    name: Detect non-doc changes
+    runs-on: ubuntu-latest
+    outputs:
+      non_docs: ${{ steps.filter.outputs.non_docs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            non_docs:
+              - '**'
+              - '!**/*.md'
+              - '!**/*.txt'
+
   android-e2e:
     name: Android E2E (Maestro)
+    needs: changes
+    if: needs.changes.outputs.non_docs == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -151,6 +166,8 @@ jobs:
 
   ios-e2e:
     name: iOS E2E (Maestro)
+    needs: changes
+    if: needs.changes.outputs.non_docs == 'true'
     runs-on: macos-15
     timeout-minutes: 60
 
