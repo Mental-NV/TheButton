@@ -1,5 +1,6 @@
 using Scalar.AspNetCore;
 using TheButton.Api.Extensions;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using TheButton.Infrastructure.Persistence;
@@ -57,4 +58,5 @@ app.MapEndpoints();
 
 app.Run();
 
+[ExcludeFromCodeCoverage]
 public partial class Program { }
