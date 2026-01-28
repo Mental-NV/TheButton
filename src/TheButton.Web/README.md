@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# 🕹️ TheButton.Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + Vite front-end for **TheButton**. The app renders a single counter button, loads the current value from the API on start, and increments the counter on click while showing loading and error states.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Single-button counter UI** with loading and error states
+- **Optimistic, idempotent increments** via API calls
+- **Typed React hooks** for data access (`useButtonCounter`)
 
-## React Compiler
+## 🔌 API Integration
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The UI talks to the backend counter API:
 
-## Expanding the ESLint configuration
+- **GET** `${VITE_API_URL}/api/v3/counter` → load current count
+- **POST** `${VITE_API_URL}/api/v3/counter` → increment count
+  - Sends `Idempotency-Key` header for safe retries
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+For full backend details, see [`src/TheButton.Api/README.md`](../TheButton.Api/README.md).
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ⚙️ Environment Variables
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Create a `.env` file (or export in your shell):
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_API_URL=http://localhost:5000
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Local Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+From `src/TheButton.Web/`:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
+
+Other useful commands:
+
+- **Build**: `npm run build`
+- **Lint**: `npm run lint`
+- **Test**: `npm run test`
+- **Watch tests**: `npm run test:watch`
+- **Coverage**: `npm run test:coverage`
+
+## 🧭 Key Files
+
+- `src/App.tsx` – UI shell for the button
+- `src/hooks/useButtonCounter.ts` – API integration and state management
+- `src/App.test.tsx` – UI tests
