@@ -16,6 +16,8 @@ builder.Services.AddScoped<TheButton.Application.Counter.V2.Increment.IncrementH
 builder.Services.AddScoped<TheButton.Application.Abstractions.ICounterWriter, TheButton.Infrastructure.Counter.SqlCounterWriter>();
 builder.Services.AddScoped<TheButton.Application.Abstractions.ICounterReadRepository, TheButton.Infrastructure.Counter.SqlCounterReadRepository>();
 builder.Services.AddScoped<TheButton.Application.Counter.V3.Increment.IncrementHandler>();
+builder.Services.AddScoped<TheButton.Application.Counter.V3.GetGlobal.GetGlobalQueryHandler>();
+builder.Services.AddScoped<TheButton.Application.Counter.V3.GetUser.GetUserCountersQueryHandler>();
 
 builder.Services.AddDbContext<TheButtonDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Sql"), 

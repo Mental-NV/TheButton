@@ -42,7 +42,7 @@ src/
       V3/
         Counter/
           CounterEndpoints.cs
-          Response.cs
+          CounterResponse.cs
   TheButton.Application/
     Abstractions/
       ICounterWriter.cs
@@ -51,14 +51,17 @@ src/
       V3/
         Increment/
           IncrementCommand.cs
+          IncrementCommandFactory.cs
           IncrementHandler.cs
           IncrementResult.cs
         GetGlobal/
           GetGlobalQuery.cs
           GetGlobalQueryHandler.cs
+          GetGlobalResult.cs
         GetUser/
           GetUserCountersQuery.cs
           GetUserCountersQueryHandler.cs
+          GetUserCountersResult.cs
 
   TheButton.Domain/
     Events/
