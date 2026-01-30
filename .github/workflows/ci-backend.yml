@@ -82,7 +82,7 @@ jobs:
         run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx" /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage/coverage /p:CoverletOutputFormat=json /p:MergeWith=TestResults/coverage/coverage.json
 
       - name: Test Infrastructure Integration
-        run: dotnet test tests/TheButton.Infrastructure.IntegrationTests/TheButton.Infrastructure.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-infrastructure-integration.trx" /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage/coverage /p:CoverletOutputFormat="cobertura,json" /p:MergeWith=TestResults/coverage/coverage.json
+        run: dotnet test tests/TheButton.Infrastructure.IntegrationTests/TheButton.Infrastructure.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-infrastructure-integration.trx" /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage/coverage /p:CoverletOutputFormat=cobertura /p:MergeWith=TestResults/coverage/coverage.json
 
       - name: Assess merged coverage
         shell: pwsh
