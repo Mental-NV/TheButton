@@ -82,7 +82,22 @@ jobs:
         run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx" /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage/coverage /p:CoverletOutputFormat=json /p:MergeWith=TestResults/coverage/coverage.json
 
       - name: Test Infrastructure Integration
-        run: dotnet test tests/TheButton.Infrastructure.IntegrationTests/TheButton.Infrastructure.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-infrastructure-integration.trx" /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage/coverage /p:CoverletOutputFormat=cobertura,json /p:MergeWith=TestResults/coverage/coverage.json /p:Threshold=70 /p:ThresholdType=line /p:ThresholdStat=total
+        run: dotnet test tests/TheButton.Infrastructure.IntegrationTests/TheButton.Infrastructure.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-infrastructure-integration.trx" /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage/coverage /p:CoverletOutputFormat=cobertura,json /p:MergeWith=TestResults/coverage/coverage.json
+
+      - name: Assess merged coverage
+        shell: pwsh
+        run: |
+          $coverageReport = "TestResults/coverage/coverage.cobertura.xml"
+          if (-not (Test-Path $coverageReport)) {
+            throw "Coverage report not found at $coverageReport"
+          }
+          [xml]$coverageXml = Get-Content $coverageReport
+          $lineRate = [double]$coverageXml.coverage.'line-rate'
+          $linePercent = [math]::Round(($lineRate * 100), 2)
+          Write-Host "Merged line coverage: $linePercent%"
+          if ($linePercent -lt 70) {
+            throw "Merged line coverage $linePercent% is below the 70% threshold."
+          }
 
       - name: Upload test results
         if: always()
