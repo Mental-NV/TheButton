@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="MSTest" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="coverlet.msbuild" />
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Verify.MSTest" />
   </ItemGroup>
