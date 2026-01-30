@@ -76,18 +76,18 @@ jobs:
         run: dotnet build TheButton.Backend.sln -c Release --no-restore
 
       - name: Test Api Unit
-        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-unit.trx" /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage/coverage /p:CoverletOutputFormat=json
+        run: dotnet test tests/TheButton.Api.UnitTests/TheButton.Api.UnitTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-unit.trx" /p:CollectCoverage=true /p:CoverletOutput="${{ github.workspace }}/TestResults/coverage/coverage" /p:CoverletOutputFormat=json
 
       - name: Test Api Integration
-        run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx" /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage/coverage /p:CoverletOutputFormat=json /p:MergeWith=TestResults/coverage/coverage.json
+        run: dotnet test tests/TheButton.Api.IntegrationTests/TheButton.Api.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-integration.trx" /p:CollectCoverage=true /p:CoverletOutput="${{ github.workspace }}/TestResults/coverage/coverage" /p:CoverletOutputFormat=json /p:MergeWith="${{ github.workspace }}/TestResults/coverage/coverage.json"
 
       - name: Test Infrastructure Integration
-        run: dotnet test tests/TheButton.Infrastructure.IntegrationTests/TheButton.Infrastructure.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-infrastructure-integration.trx" /p:CollectCoverage=true /p:CoverletOutput=TestResults/coverage/coverage /p:CoverletOutputFormat=cobertura /p:MergeWith=TestResults/coverage/coverage.json
+        run: dotnet test tests/TheButton.Infrastructure.IntegrationTests/TheButton.Infrastructure.IntegrationTests.csproj -c Release --no-restore --logger "trx;LogFileName=test-results-infrastructure-integration.trx" /p:CollectCoverage=true /p:CoverletOutput="${{ github.workspace }}/TestResults/coverage/coverage" /p:CoverletOutputFormat=cobertura /p:MergeWith="${{ github.workspace }}/TestResults/coverage/coverage.json"
 
       - name: Assess merged coverage
         shell: pwsh
         run: |
-          $coverageReport = "TestResults/coverage/coverage.cobertura.xml"
+          $coverageReport = "${{ github.workspace }}/TestResults/coverage/coverage.cobertura.xml"
           if (-not (Test-Path $coverageReport)) {
             throw "Coverage report not found at $coverageReport"
           }
