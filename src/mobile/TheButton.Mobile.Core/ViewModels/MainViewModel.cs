@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -46,7 +47,7 @@ public partial class MainViewModel(ICounterApiClient apiClient)
         {
             this.IsBusy = true;
             this.ErrorMessage = string.Empty;
-            this.Value = await this._apiClient.GetAsync().ConfigureAwait(false);
+            this.Value = await this._apiClient.GetAsync().ConfigureAwait(true);
         }
         catch (HttpRequestException)
         {
@@ -55,6 +56,14 @@ public partial class MainViewModel(ICounterApiClient apiClient)
         catch (TaskCanceledException)
         {
             this.ErrorMessage = "Request timed out. Please try again.";
+        }
+        catch (JsonException)
+        {
+            this.ErrorMessage = "Something went wrong. Please try again.";
+        }
+        catch (NotSupportedException)
+        {
+            this.ErrorMessage = "Something went wrong. Please try again.";
         }
         catch (InvalidOperationException)
         {
@@ -79,7 +88,7 @@ public partial class MainViewModel(ICounterApiClient apiClient)
         {
             this.IsBusy = true;
             this.ErrorMessage = string.Empty;
-            this.Value = await this._apiClient.IncrementAsync().ConfigureAwait(false);
+            this.Value = await this._apiClient.IncrementAsync().ConfigureAwait(true);
         }
         catch (HttpRequestException)
         {
@@ -88,6 +97,14 @@ public partial class MainViewModel(ICounterApiClient apiClient)
         catch (TaskCanceledException)
         {
             this.ErrorMessage = "Request timed out. Please try again.";
+        }
+        catch (JsonException)
+        {
+            this.ErrorMessage = "Something went wrong. Please try again.";
+        }
+        catch (NotSupportedException)
+        {
+            this.ErrorMessage = "Something went wrong. Please try again.";
         }
         catch (InvalidOperationException)
         {
