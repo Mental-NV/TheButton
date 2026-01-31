@@ -6,7 +6,7 @@ namespace TheButton.Api.UnitTests.Features.V2;
 [TestClass]
 public class CounterServiceTests
 {
-    private CounterService _service;
+    private CounterService _service = null!;
 
     [TestInitialize]
     public void Setup()
@@ -37,5 +37,21 @@ public class CounterServiceTests
 
         // Assert
         Assert.AreEqual(1, count);
+    }
+
+    [TestMethod]
+    public async Task Increment_IsThreadSafe()
+    {
+        const int iterations = 100;
+        var tasks = new List<Task>();
+
+        for (int i = 0; i < iterations; i++)
+        {
+            tasks.Add(Task.Run(() => _service.Increment()));
+        }
+
+        await Task.WhenAll(tasks);
+
+        Assert.AreEqual(iterations, _service.GetCount());
     }
 }
