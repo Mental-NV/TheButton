@@ -102,4 +102,26 @@ public class SqlCounterWriterTests
         var events = await context.Events.ToListAsync();
         Assert.AreEqual(1, events.Count, "Should not create a second event for same idempotency key");
     }
+
+    [TestMethod]
+    public async Task IncrementAsync_WhenSaveFails_ClearsTrackerAndThrows()
+    {
+        using var context = new FailingDbContext(_options);
+        var writer = new SqlCounterWriter(context, _logger);
+
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => writer.IncrementAsync("key-fail"));
+        Assert.AreEqual(0, context.ChangeTracker.Entries().Count());
+    }
+
+    private sealed class FailingDbContext : TheButtonDbContext
+    {
+        public FailingDbContext(DbContextOptions<TheButtonDbContext> options) : base(options)
+        {
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("Simulated failure.");
+        }
+    }
 }
