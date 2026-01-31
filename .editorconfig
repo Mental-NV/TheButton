@@ -231,6 +231,13 @@ dotnet_diagnostic.CA1515.severity = none
 [src/mobile/TheButton.Mobile.Core/ViewModels/MainViewModel.cs]
 dotnet_diagnostic.MA0004.severity = none
 
+[src/mobile/TheButton.Mobile/Platforms/iOS/AppDelegate.cs]
+dotnet_diagnostic.CA1515.severity = none
+dotnet_diagnostic.CA1711.severity = none
+
+[src/mobile/TheButton.Mobile/Platforms/iOS/Program.cs]
+dotnet_diagnostic.CA1515.severity = none
+
 [**/obj/**]
 dotnet_diagnostic.CS1591.severity = none
 

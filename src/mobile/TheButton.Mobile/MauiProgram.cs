@@ -1,6 +1,8 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+#if DEBUG
 using Microsoft.Extensions.Logging;
+#endif
 using TheButton.Mobile.Core.ViewModels;
 using TheButton.Mobile.Infrastructure;
 

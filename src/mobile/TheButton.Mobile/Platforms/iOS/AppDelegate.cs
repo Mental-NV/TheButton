@@ -1,9 +1,16 @@
-﻿using Foundation;
+using Foundation;
 
-namespace TheButton.Mobile;
+namespace TheButton.Mobile.Platforms.iOS;
 
+/// <summary>
+/// iOS application delegate.
+/// </summary>
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate
 {
-	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+    /// <inheritdoc />
+    protected override MauiApp CreateMauiApp()
+    {
+        return MauiProgram.CreateMauiApp();
+    }
 }
