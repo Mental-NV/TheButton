@@ -19,4 +19,3 @@ public interface ICounterWriter
         Guid? userId = null,
         CancellationToken cancellationToken = default);
 }
-

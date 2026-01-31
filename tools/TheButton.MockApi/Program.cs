@@ -1,23 +1,23 @@
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+_ = builder.Services.AddOpenApi();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    _ = app.MapOpenApi();
 }
 
 int counter = 0;
 
-app.MapPost("/api/v3/counter", () =>
+_ = app.MapPost("/api/v3/counter", () =>
 {
-    var newValue = Interlocked.Increment(ref counter);
+    int newValue = Interlocked.Increment(ref counter);
     return Results.Ok(new { value = newValue });
 });
 
-app.Run();
+await app.RunAsync().ConfigureAwait(false);

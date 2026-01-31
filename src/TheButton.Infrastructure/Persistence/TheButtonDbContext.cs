@@ -3,34 +3,46 @@ using TheButton.Infrastructure.Persistence.Entities;
 
 namespace TheButton.Infrastructure.Persistence;
 
-public class TheButtonDbContext : DbContext
+/// <summary>
+/// Entity Framework Core database context for TheButton.
+/// </summary>
+/// <param name="options">The context options.</param>
+public class TheButtonDbContext(DbContextOptions<TheButtonDbContext> options)
+    : DbContext(options)
 {
-    public TheButtonDbContext(DbContextOptions<TheButtonDbContext> options) : base(options)
-    {
-    }
+    /// <summary>
+    /// Gets the counter increment events.
+    /// </summary>
+    public DbSet<CounterIncrementedEvent> Events => this.Set<CounterIncrementedEvent>();
 
-    public DbSet<CounterIncrementedEvent> Events => Set<CounterIncrementedEvent>();
-    public DbSet<IdempotentCommand> Commands => Set<IdempotentCommand>();
+    /// <summary>
+    /// Gets the idempotent command records.
+    /// </summary>
+    public DbSet<IdempotentCommand> Commands => this.Set<IdempotentCommand>();
+
+    /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        ArgumentNullException.ThrowIfNull(modelBuilder);
+
         base.OnModelCreating(modelBuilder);
 
         // write.Events
-        modelBuilder.Entity<CounterIncrementedEvent>(entity =>
+        _ = modelBuilder.Entity<CounterIncrementedEvent>(entity =>
         {
-            entity.HasKey(e => e.Position);
-            entity.HasIndex(e => new { e.UserId, e.UserVersion })
+            _ = entity.HasKey(e => e.Position);
+            _ = entity.HasIndex(e => new { e.UserId, e.UserVersion })
                 .IsUnique()
                 .HasFilter("[UserId] IS NOT NULL");
-            
-            entity.HasIndex(e => new { e.EventType, e.Position });
+
+            _ = entity.HasIndex(e => new { e.EventType, e.Position });
         });
 
         // write.Commands
-        modelBuilder.Entity<IdempotentCommand>(entity =>
+        _ = modelBuilder.Entity<IdempotentCommand>(entity =>
         {
-            entity.HasKey(e => e.Id);
-            entity.HasIndex(e => new { e.Operation, e.UserId, e.IdempotencyKey }).IsUnique();
+            _ = entity.HasKey(e => e.Id);
+            _ = entity.HasIndex(e => new { e.Operation, e.UserId, e.IdempotencyKey }).IsUnique();
         });
     }
 }

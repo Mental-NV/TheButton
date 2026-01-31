@@ -136,6 +136,7 @@ Do not open a PR (or mark it ready) unless:
 - tests pass (unit + integration where applicable)
 - endpoint contract matches [DOC-04 API Contract](/docs/DOC-04-api-contract.md) (when endpoints are touched)
 - docs are updated if contract/architecture changed
+- code quality gates in [DOC-09 Definition of Done](/docs/DOC-09-definition-of-done.md) are satisfied
 
 ## References
 

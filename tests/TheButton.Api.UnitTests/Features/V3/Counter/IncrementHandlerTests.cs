@@ -54,7 +54,7 @@ public class IncrementHandlerTests
         var idempotencyKey = "test-key";
         var userId = Guid.NewGuid();
         var command = new IncrementCommand(idempotencyKey, userId);
-        
+
         _counterWriterMock.Setup(x => x.IncrementAsync(idempotencyKey, userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TheButton.Domain.Features.V3.Counter.IncrementResult(10, 1));
 

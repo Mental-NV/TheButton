@@ -1,5 +1,3 @@
-using TheButton.Application.Abstractions;
-
 namespace TheButton.Application.Counter.V3.Increment;
 
 /// <summary>

@@ -46,7 +46,7 @@ public class UnifiedCounterTests : IntegrationTestBase
             var error = await response.Content.ReadAsStringAsync();
             Assert.Fail($"Request failed with {response.StatusCode}. Content: {error}");
         }
-        
+
         var result = await response.Content.ReadFromJsonAsync<CounterResponse>();
         Assert.IsNotNull(result);
         Assert.IsTrue(result.Value > 0);
@@ -54,7 +54,7 @@ public class UnifiedCounterTests : IntegrationTestBase
         // Verify DB
         using var scope = Factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<TheButtonDbContext>();
-        
+
         var eventCount = await db.Database.SqlQueryRaw<int>("SELECT COUNT(*) as Value FROM write.Events WHERE UserId IS NULL").SingleAsync();
         Assert.AreEqual(1, eventCount);
     }
@@ -110,7 +110,7 @@ public class UnifiedCounterTests : IntegrationTestBase
         // Verify DB (only 1 event)
         using var scope = Factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<TheButtonDbContext>();
-        
+
         var eventCount = await db.Database.SqlQueryRaw<int>(
             "SELECT COUNT(*) as Value FROM write.Events WHERE UserId = {0}", userId).SingleAsync();
         Assert.AreEqual(1, eventCount);
@@ -121,7 +121,7 @@ public class UnifiedCounterTests : IntegrationTestBase
     {
         var key = Guid.NewGuid().ToString();
         var userId = Guid.NewGuid();
-        
+
         // Act 1: User increment
         using var reqUser = new HttpRequestMessage(HttpMethod.Post, $"/api/v3/counter/{userId}");
         reqUser.Headers.Add("Idempotency-Key", key);
@@ -150,13 +150,13 @@ public class UnifiedCounterTests : IntegrationTestBase
     {
         var userId = Guid.NewGuid();
         int parallelCount = 10;
-        
+
         var tasks = new List<Task>();
-        
+
         for (int i = 0; i < parallelCount; i++)
         {
-            tasks.Add(Task.Run(async () => 
-            {               
+            tasks.Add(Task.Run(async () =>
+            {
                 var key = Guid.NewGuid().ToString();
                 using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/v3/counter/{userId}");
                 request.Headers.Add("Idempotency-Key", key);
@@ -177,7 +177,7 @@ public class UnifiedCounterTests : IntegrationTestBase
 
         var maxVersion = await db.Database.SqlQueryRaw<long>(
             "SELECT MAX(UserVersion) as Value FROM write.Events WHERE UserId = {0}", userId).SingleAsync();
-        
+
         Assert.AreEqual(parallelCount, maxVersion);
     }
 
@@ -189,7 +189,7 @@ public class UnifiedCounterTests : IntegrationTestBase
 
         for (int i = 0; i < parallelCount; i++)
         {
-            tasks.Add(Task.Run(async () => 
+            tasks.Add(Task.Run(async () =>
             {
                 var key = Guid.NewGuid().ToString();
                 using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v3/counter");
@@ -207,7 +207,7 @@ public class UnifiedCounterTests : IntegrationTestBase
 
         var count = await db.Database.SqlQueryRaw<int>(
             "SELECT COUNT(*) as Value FROM write.Events WHERE UserId IS NULL").SingleAsync();
-        
+
         Assert.AreEqual(parallelCount, count);
     }
 

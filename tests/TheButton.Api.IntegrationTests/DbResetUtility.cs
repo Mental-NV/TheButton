@@ -10,7 +10,7 @@ public static class DbResetUtility
         // Use raw SQL to truncate tables.
         // TRUNCATE is faster and resets IDENTITY seeds.
         // Assuming no FK constraints between these two tables (per design).
-        
+
         await context.Database.ExecuteSqlRawAsync(@"
             TRUNCATE TABLE write.Commands;
             TRUNCATE TABLE write.Events;

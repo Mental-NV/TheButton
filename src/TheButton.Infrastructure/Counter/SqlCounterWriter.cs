@@ -1,26 +1,58 @@
+using System.Security.Cryptography;
 using System.Text.Json;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TheButton.Application.Abstractions;
+using TheButton.Domain.Features.V3.Counter;
 using TheButton.Infrastructure.Persistence;
 using TheButton.Infrastructure.Persistence.Entities;
-using TheButton.Domain.Features.V3.Counter;
-using Microsoft.Extensions.Logging;
 
 namespace TheButton.Infrastructure.Counter;
 
 /// <summary>
 /// SQL-based counter writer implementing unified transactional projections.
 /// </summary>
-public class SqlCounterWriter : ICounterWriter
+/// <param name="context">The database context.</param>
+/// <param name="logger">The logger.</param>
+public class SqlCounterWriter(TheButtonDbContext context, ILogger<SqlCounterWriter> logger)
+    : ICounterWriter
 {
-    private readonly TheButtonDbContext _context;
-    private readonly ILogger<SqlCounterWriter> _logger;
+    private static readonly Action<ILogger, string, Guid?, Exception?> _logIdempotencyHit =
+        LoggerMessage.Define<string, Guid?>(
+            LogLevel.Warning,
+            new EventId(3001, nameof(_logIdempotencyHit)),
+            "Idempotency key {IdempotencyKey} already exists for user {UserId}. Returning cached result.");
 
-    public SqlCounterWriter(TheButtonDbContext context, ILogger<SqlCounterWriter> logger)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private static readonly Action<ILogger, Guid?, long, long?, Exception?> _logIncremented =
+        LoggerMessage.Define<Guid?, long, long?>(
+            LogLevel.Information,
+            new EventId(3002, nameof(_logIncremented)),
+            "Incremented counter for user {UserId}. Global value: {GlobalValue}, User value: {UserValue}");
+
+    private static readonly Action<ILogger, Guid?, int, int, int, Exception?> _logConcurrencyConflict =
+        LoggerMessage.Define<Guid?, int, int, int>(
+            LogLevel.Warning,
+            new EventId(3003, nameof(_logConcurrencyConflict)),
+            "Concurrency conflict detected for user {UserId}. Attempt {RetryCount}/{MaxRetries}. Jittering {DelayMs}ms...");
+
+    private static readonly Action<ILogger, int, string, string, Exception?> _logFinalError =
+        LoggerMessage.Define<int, string, string>(
+            LogLevel.Error,
+            new EventId(3004, nameof(_logFinalError)),
+            "Final error after {RetryCount} retries: {ExceptionType} - {ExceptionMessage}");
+
+    private static readonly Action<ILogger, string, string, Exception?> _logInnerError =
+        LoggerMessage.Define<string, string>(
+            LogLevel.Error,
+            new EventId(3005, nameof(_logInnerError)),
+            "Inner error: {ExceptionType} - {ExceptionMessage}");
+
+    private readonly TheButtonDbContext _context =
+        context ?? throw new ArgumentNullException(nameof(context));
+
+    private readonly ILogger<SqlCounterWriter> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
     /// <inheritdoc />
     public async Task<IncrementResult> IncrementAsync(
@@ -29,9 +61,10 @@ public class SqlCounterWriter : ICounterWriter
         CancellationToken cancellationToken = default)
     {
         const string operation = "Increment";
-        var strategy = _context.Database.CreateExecutionStrategy();
+        Microsoft.EntityFrameworkCore.Storage.IExecutionStrategy strategy =
+            this._context.Database.CreateExecutionStrategy();
 
-        // High-level strategy: The database unique index IX_Events_UserId_UserVersion acts as our 
+        // High-level strategy: The database unique index IX_Events_UserId_UserVersion acts as our
         // concurrency guard. If two requests for the same user calculate the same UserVersion,
         // one will fail. We catch that failure and retry.
         return await strategy.ExecuteAsync(async () =>
@@ -42,33 +75,38 @@ public class SqlCounterWriter : ICounterWriter
             while (true)
             {
                 // Start transaction with standard isolation (ReadCommitted)
-                await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+                await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction =
+                    await this._context.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
 
                 try
                 {
                     // 1. Check idempotency
-                    var existingCommand = await _context.Commands
+                    IdempotentCommand? existingCommand = await this._context.Commands
                         .AsNoTracking() // Ensure we don't pollute tracker with cached check
                         .Where(c => c.Operation == operation
                                  && c.UserId == userId
                                  && c.IdempotencyKey == idempotencyKey)
-                        .FirstOrDefaultAsync(cancellationToken);
+                        .FirstOrDefaultAsync(cancellationToken)
+                        .ConfigureAwait(false);
 
                     if (existingCommand != null)
                     {
-                        _logger.LogWarning($"Idempotency key {idempotencyKey} already exists for user {userId}. Returning cached result.");
-                        var cachedResult = JsonSerializer.Deserialize<IncrementResult>(existingCommand.ResultJson);
-                        return cachedResult ?? throw new InvalidOperationException("Failed to deserialize cached result.");
+                        _logIdempotencyHit(this._logger, idempotencyKey, userId, null);
+                        IncrementResult? cachedResult =
+                            JsonSerializer.Deserialize<IncrementResult>(existingCommand.ResultJson);
+                        return cachedResult
+                            ?? throw new InvalidOperationException("Failed to deserialize cached result.");
                     }
 
                     // 2. Calculate NewUserVersion if UserId is present
                     long? newUserVersion = null;
                     if (userId.HasValue)
                     {
-                        var currentMax = await _context.Events
+                        long currentMax = await this._context.Events
                             .Where(e => e.UserId == userId)
-                            .CountAsync(cancellationToken);
-                        
+                            .CountAsync(cancellationToken)
+                            .ConfigureAwait(false);
+
                         newUserVersion = currentMax + 1;
                     }
 
@@ -80,14 +118,14 @@ public class SqlCounterWriter : ICounterWriter
                         OccurredUtc = DateTime.UtcNow,
                         UserId = userId,
                         UserVersion = newUserVersion,
-                        PayloadJson = JsonSerializer.Serialize(new { operation = "increment", userId })
+                        PayloadJson = JsonSerializer.Serialize(new { operation = "increment", userId }),
                     };
 
-                    _context.Events.Add(eventEntity);
-                    await _context.SaveChangesAsync(cancellationToken);
+                    _ = this._context.Events.Add(eventEntity);
+                    _ = await this._context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
                     // Position is auto-generated, this is our globalValue
-                    var globalValue = eventEntity.Position;
+                    long globalValue = eventEntity.Position;
 
                     // 4. Store idempotency record with result
                     var result = new IncrementResult(globalValue, newUserVersion);
@@ -97,64 +135,73 @@ public class SqlCounterWriter : ICounterWriter
                         UserId = userId,
                         IdempotencyKey = idempotencyKey,
                         CreatedUtc = DateTime.UtcNow,
-                        ResultJson = JsonSerializer.Serialize(result)
+                        ResultJson = JsonSerializer.Serialize(result),
                     };
 
-                    _context.Commands.Add(commandEntity);
-                    await _context.SaveChangesAsync(cancellationToken);
+                    _ = this._context.Commands.Add(commandEntity);
+                    _ = await this._context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
                     // 5. Commit transaction
-                    await transaction.CommitAsync(cancellationToken);
+                    await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
 
-                    _logger.LogInformation($"Incremented counter for user {userId}. Global value: {globalValue}, User value: {newUserVersion}");
+                    _logIncremented(this._logger, userId, globalValue, newUserVersion, null);
 
                     return result;
                 }
                 catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex) && retryCount < maxRetries)
                 {
-                    await transaction.RollbackAsync(cancellationToken);
-                    
+                    await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+
                     // CRITICAL: Clear the ChangeTracker so that failed entities from this attempt
                     // are not carried over to the next retry attempt.
-                    _context.ChangeTracker.Clear();
+                    this._context.ChangeTracker.Clear();
 
                     retryCount++;
+
                     // Dynamic jitter to break the "retry storm"
-                    var delayMs = Random.Shared.Next(50, 100 + (retryCount * 10));
-                    _logger.LogWarning($"Concurrency conflict detected for user {userId}. Attempt {retryCount}/{maxRetries}. Jittering {delayMs}ms...");
-                    
-                    await Task.Delay(delayMs, cancellationToken);
-                    continue; 
+                    int delayMs = RandomNumberGenerator.GetInt32(50, 100 + (retryCount * 10));
+                    _logConcurrencyConflict(this._logger, userId, retryCount, maxRetries, delayMs, null);
+
+                    await Task.Delay(delayMs, cancellationToken).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
-                    await transaction.RollbackAsync(cancellationToken);
+                    await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+
                     // Clear tracker on any failure to keep the context reuse-safe
-                    _context.ChangeTracker.Clear();
-                    
-                    _logger.LogError($"Final error after {retryCount} retries: {ex.GetType().Name} - {ex.Message}");
+                    this._context.ChangeTracker.Clear();
+
+                    _logFinalError(this._logger, retryCount, ex.GetType().Name, ex.Message, ex);
+
                     if (ex.InnerException != null)
                     {
-                        _logger.LogError($"Inner Error: {ex.InnerException.GetType().Name} - {ex.InnerException.Message}");
+                        _logInnerError(
+                            this._logger,
+                            ex.InnerException.GetType().Name,
+                            ex.InnerException.Message,
+                            ex.InnerException);
                     }
+
                     throw;
                 }
             }
-        });
+        }).ConfigureAwait(false);
     }
 
     private static bool IsUniqueConstraintViolation(Exception ex)
     {
-        var current = ex;
+        Exception? current = ex;
         while (current != null)
         {
-            if (current is Microsoft.Data.SqlClient.SqlException sqlEx)
+            if (current is SqlException { Number: 2627 or 2601 })
             {
                 // SQL Server error codes: 2627 (Unique constraint), 2601 (Unique index)
-                return sqlEx.Number == 2627 || sqlEx.Number == 2601;
+                return true;
             }
+
             current = current.InnerException;
         }
+
         return false;
     }
 }

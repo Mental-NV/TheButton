@@ -1,77 +1,75 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
 using System.Reflection;
-using TheButton.Mobile.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using TheButton.Mobile.Core.ViewModels;
-using TheButton.Mobile.Core;
+using TheButton.Mobile.Infrastructure;
 
 namespace TheButton.Mobile;
 
-public static class MauiProgram
+/// <summary>
+/// Configures the MAUI application.
+/// </summary>
+internal static class MauiProgram
 {
+    /// <summary>
+    /// Creates the configured MAUI application instance.
+    /// </summary>
+    /// <returns>The configured <see cref="MauiApp"/>.</returns>
     public static MauiApp CreateMauiApp()
     {
-        var builder = MauiApp.CreateBuilder();
-        builder
-            .UseMauiApp<App>()
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-            });
+        MauiAppBuilder builder = MauiApp.CreateBuilder();
+
+        _ = builder.UseMauiApp<App>();
+        _ = builder.ConfigureFonts(fonts =>
+        {
+            fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+            fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+        });
 
 #if DEBUG
-        builder.Logging.AddDebug();
+        _ = builder.Logging.AddDebug();
 #endif
-        
+
         // Configuration
         var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.json");
-        
+        using Stream? stream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.json");
+
         var configBuilder = new ConfigurationBuilder();
-        if (stream != null)
+        if (stream is not null)
         {
-            configBuilder.AddJsonStream(stream);
+            _ = configBuilder.AddJsonStream(stream);
         }
 
 #if E2E_ANDROID_TEST
-        using var e2eStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.E2eAndroid.json");
-        if (e2eStream != null)
+        using Stream? e2eStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.E2eAndroid.json");
+        if (e2eStream is not null)
         {
-            configBuilder.AddJsonStream(e2eStream);
+            _ = configBuilder.AddJsonStream(e2eStream);
         }
 #elif E2E_IOS_TEST
-        using var e2eStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.E2eiOS.json");
-        if (e2eStream != null)
+        using Stream? e2eStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.E2eiOS.json");
+        if (e2eStream is not null)
         {
-            configBuilder.AddJsonStream(e2eStream);
+            _ = configBuilder.AddJsonStream(e2eStream);
         }
 #elif DEBUG
-        using var devStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.Development.json");
-        if (devStream != null)
+        using Stream? devStream = assembly.GetManifestResourceStream("TheButton.Mobile.appsettings.Development.json");
+        if (devStream is not null)
         {
-            configBuilder.AddJsonStream(devStream);
+            _ = configBuilder.AddJsonStream(devStream);
         }
 #endif
 
         // Environment variable override
-        configBuilder.AddEnvironmentVariables();
-        
-        // Explicit BASE_API_URL override (if not picked up by AddEnvironmentVariables on mobile)
-        // Usually AddEnvironmentVariables works, but for specific override logic requested:
-        var config = configBuilder.Build();
-        
-        // Check for specific BASE_API_URL variable if needed, but AddEnvironmentVariables handles standard mapping.
-        // However, user asked for BASE_API_URL to override. AddEnvironmentVariables does this if key matches.
-        // But appsettings uses "BaseApiUrl". Env var BASE_API_URL maps to BaseApiUrl on Linux/Windows, 
-        // but let's ensure it maps to the section we use.
+        _ = configBuilder.AddEnvironmentVariables();
 
-        builder.Configuration.AddConfiguration(config);
+        IConfigurationRoot config = configBuilder.Build();
+        _ = builder.Configuration.AddConfiguration(config);
 
         // Services
-        builder.Services.AddInfrastructure(builder.Configuration);
-        builder.Services.AddSingleton<MainPage>();
-        builder.Services.AddSingleton<MainViewModel>();
+        _ = builder.Services.AddInfrastructure(builder.Configuration);
+        _ = builder.Services.AddSingleton<MainPage>();
+        _ = builder.Services.AddSingleton<MainViewModel>();
 
         return builder.Build();
     }

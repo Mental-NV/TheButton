@@ -15,7 +15,7 @@ public abstract class IntegrationTestBase
     {
         // 1. Generate unique DB name
         DbName = $"TheButton_Tests_{Guid.NewGuid()}";
-        
+
         // 2. Construct connection string (using LocalDB)
         ConnectionString = $@"Server=(localdb)\MSSQLLocalDB;Database={DbName};Trusted_Connection=True;MultipleActiveResultSets=True";
 
@@ -36,7 +36,7 @@ public abstract class IntegrationTestBase
             using var scope = Factory.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<TheButtonDbContext>();
             await db.Database.EnsureDeletedAsync();
-            
+
             await Factory.DisposeAsync();
         }
     }
