@@ -1,14 +1,21 @@
-﻿namespace TheButton.Mobile;
+namespace TheButton.Mobile;
 
+/// <summary>
+/// Application entry point for the mobile UI.
+/// </summary>
 public partial class App : Application
 {
-	public App()
-	{
-		InitializeComponent();
-	}
+    /// <summary>
+    /// Initializes a new instance of the <see cref="App"/> class.
+    /// </summary>
+    public App()
+    {
+        this.InitializeComponent();
+    }
 
-	protected override Window CreateWindow(IActivationState? activationState)
-	{
-		return new Window(new AppShell());
-	}
+    /// <inheritdoc />
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        return new Window(new AppShell());
+    }
 }

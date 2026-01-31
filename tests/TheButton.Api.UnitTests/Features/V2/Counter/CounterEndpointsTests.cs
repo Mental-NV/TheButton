@@ -27,7 +27,7 @@ public class CounterEndpointsTests
         var okResult = (Ok<CounterResponse>)result;
         Assert.IsNotNull(okResult.Value);
         Assert.AreEqual(expectedValue, okResult.Value.Value);
-        
+
         mockService.Verify(s => s.Increment(), Times.Once);
     }
 }

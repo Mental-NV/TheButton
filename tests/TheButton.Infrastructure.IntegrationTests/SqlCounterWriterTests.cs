@@ -40,7 +40,7 @@ public class SqlCounterWriterTests
     {
         // Arrange
         using var context = new TheButtonDbContext(_options);
-        
+
         var writer = new SqlCounterWriter(context, _logger);
         var idempotencyKey = "key1";
 
@@ -50,11 +50,11 @@ public class SqlCounterWriterTests
         // Assert
         Assert.AreEqual(1, result.Value);
         Assert.IsNull(result.UserValue);
-        
+
         var events = await context.Events.ToListAsync();
         Assert.AreEqual(1, events.Count);
         Assert.IsNull(events[0].UserId);
-        
+
         var commands = await context.Commands.ToListAsync();
         Assert.AreEqual(1, commands.Count);
         Assert.AreEqual(idempotencyKey, commands[0].IdempotencyKey);
@@ -90,7 +90,7 @@ public class SqlCounterWriterTests
 
         // Act
         var result1 = await writer.IncrementAsync(idempotencyKey, userId);
-        
+
         // Change something in the DB manually to see if it uses the cache
         // Actually, the writer will check the commands table first.
         var result2 = await writer.IncrementAsync(idempotencyKey, userId);
@@ -98,7 +98,7 @@ public class SqlCounterWriterTests
         // Assert
         Assert.AreEqual(result1.Value, result2.Value);
         Assert.AreEqual(result1.UserValue, result2.UserValue);
-        
+
         var events = await context.Events.ToListAsync();
         Assert.AreEqual(1, events.Count, "Should not create a second event for same idempotency key");
     }

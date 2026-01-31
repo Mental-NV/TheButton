@@ -1,4 +1,4 @@
-﻿namespace TheButton.Infrastructure.IntegrationTests;
+namespace TheButton.Infrastructure.IntegrationTests;
 
 [TestClass]
 public sealed class Test1

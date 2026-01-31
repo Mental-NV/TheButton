@@ -37,7 +37,7 @@ public class MainViewModelTests
     public async Task Click_Failure_SetsUserFacingError_AndClearsBusy()
     {
         // Arrange
-        _mockApiClient.Setup(x => x.IncrementAsync()).ThrowsAsync(new Exception("API Error"));
+        _mockApiClient.Setup(x => x.IncrementAsync()).ThrowsAsync(new InvalidOperationException("API Error"));
 
         // Act
         await _viewModel.ClickCommand.ExecuteAsync(null);
@@ -68,7 +68,7 @@ public class MainViewModelTests
     public async Task Initialize_Failure_SetsUserFacingError_AndClearsBusy()
     {
         // Arrange
-        _mockApiClient.Setup(x => x.GetAsync()).ThrowsAsync(new Exception("API Error"));
+        _mockApiClient.Setup(x => x.GetAsync()).ThrowsAsync(new InvalidOperationException("API Error"));
 
         // Act
         await _viewModel.InitializeAsync();
@@ -103,7 +103,7 @@ public class MainViewModelTests
     public async Task Initialize_Failure_SetsIsInitializedTrue()
     {
         // Arrange
-        _mockApiClient.Setup(x => x.GetAsync()).ThrowsAsync(new Exception("API Error"));
+        _mockApiClient.Setup(x => x.GetAsync()).ThrowsAsync(new InvalidOperationException("API Error"));
 
         // Act
         await _viewModel.InitializeAsync();
@@ -171,7 +171,7 @@ public class MainViewModelTests
     public async Task Initialize_SetsBusyFalseInFinallyAfterFailure()
     {
         // Arrange
-        _mockApiClient.Setup(x => x.GetAsync()).ThrowsAsync(new Exception("Network Error"));
+        _mockApiClient.Setup(x => x.GetAsync()).ThrowsAsync(new InvalidOperationException("Network Error"));
 
         // Act
         await _viewModel.InitializeAsync();

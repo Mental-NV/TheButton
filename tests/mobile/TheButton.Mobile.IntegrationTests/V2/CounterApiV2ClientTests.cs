@@ -1,6 +1,6 @@
 using System.Net;
 using TheButton.Mobile.Core;
-using TheButton.Mobile.Infrastructure;
+using TheButton.Mobile.Infrastructure.V2;
 using Moq;
 using Moq.Protected;
 
@@ -47,7 +47,8 @@ public class CounterApiV2ClientTests
            Times.Exactly(1),
            ItExpr.Is<HttpRequestMessage>(req =>
               req.Method == HttpMethod.Post
-              && req.RequestUri.ToString().EndsWith("api/v2/counter") // Check URL
+              && req.RequestUri != null
+              && req.RequestUri.ToString().EndsWith("api/v2/counter", StringComparison.Ordinal) // Check URL
            ),
            ItExpr.IsAny<CancellationToken>()
         );

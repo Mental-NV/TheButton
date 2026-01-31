@@ -2,21 +2,29 @@
 
 namespace TheButton.Mobile;
 
+/// <summary>
+/// Main page displaying the counter and actions.
+/// </summary>
 public partial class MainPage : ContentPage
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MainPage"/> class.
+    /// </summary>
+    /// <param name="viewModel">The main view model.</param>
     public MainPage(MainViewModel viewModel)
     {
-        InitializeComponent();
-        BindingContext = viewModel;
+        this.InitializeComponent();
+        this.BindingContext = viewModel;
     }
 
+    /// <inheritdoc />
     protected override async void OnAppearing()
     {
         base.OnAppearing();
 
-        if (BindingContext is MainViewModel viewModel)
+        if (this.BindingContext is MainViewModel viewModel)
         {
-            await viewModel.InitializeAsync();
+            await viewModel.InitializeAsync().ConfigureAwait(true);
         }
     }
 }

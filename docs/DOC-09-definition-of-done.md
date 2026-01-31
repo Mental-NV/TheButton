@@ -27,6 +27,13 @@ A milestone is complete when:
   - idempotency
   - concurrency
 
+## Code quality gates
+
+- Analyzers run with `error` severity for production code.
+- Tests are analyzer-relaxed to keep feedback fast and focused.
+- Generated code (`obj/**`, `*.sg.cs`) and UI entry points (MAUI/XAML partials) are scoped to avoid noisy rules like XML docs and internal-only guidance.
+- Style-only churn rules are disabled or downgraded (e.g., expression-bodied, string interpolation, var-style), so fixes focus on correctness and clarity.
+
 ## Operational readiness
 
 - Health endpoints exist (`/health/live`, `/health/ready`).

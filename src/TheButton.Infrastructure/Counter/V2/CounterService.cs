@@ -2,25 +2,30 @@ using TheButton.Application.Counter.V2.Increment;
 
 namespace TheButton.Infrastructure.Counter.V2;
 
+/// <summary>
+/// In-memory counter service for v2 operations.
+/// </summary>
 public class CounterService : ICounterService
 {
-    private int _count = 0;
-    private readonly object _lock = new();
+    private readonly object _lock = new object();
+    private int _count;
 
+    /// <inheritdoc />
     public int GetCount()
     {
-        lock (_lock)
+        lock (this._lock)
         {
-            return _count;
+            return this._count;
         }
     }
 
+    /// <inheritdoc />
     public int Increment()
     {
-        lock (_lock)
+        lock (this._lock)
         {
-            _count++;
-            return _count;
+            this._count++;
+            return this._count;
         }
     }
 }

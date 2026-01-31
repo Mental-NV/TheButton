@@ -73,6 +73,12 @@ jobs:
         run: |
           dotnet restore TheButton.Backend.sln
 
+      - name: Restore local tools
+        run: dotnet tool restore
+
+      - name: Verify formatting
+        run: dotnet format whitespace TheButton.Backend.sln --verify-no-changes --no-restore
+
       - name: Build Backend
         run: dotnet build TheButton.Backend.sln -c Release --no-restore
 

@@ -1,6 +1,6 @@
 using System.Net;
 using TheButton.Mobile.Core;
-using TheButton.Mobile.Infrastructure;
+using TheButton.Mobile.Infrastructure.V3;
 using Moq;
 using Moq.Protected;
 
@@ -47,7 +47,8 @@ public class CounterApiV3ClientTests
            Times.Exactly(1),
            ItExpr.Is<HttpRequestMessage>(req =>
               req.Method == HttpMethod.Post
-              && req.RequestUri.ToString().EndsWith("api/v3/counter") // Check URL
+              && req.RequestUri != null
+              && req.RequestUri.ToString().EndsWith("api/v3/counter", StringComparison.Ordinal) // Check URL
            ),
            ItExpr.IsAny<CancellationToken>()
         );
@@ -91,7 +92,8 @@ public class CounterApiV3ClientTests
            Times.Exactly(1),
            ItExpr.Is<HttpRequestMessage>(req =>
               req.Method == HttpMethod.Get
-              && req.RequestUri.ToString().EndsWith("api/v3/counter") // Check URL
+              && req.RequestUri != null
+              && req.RequestUri.ToString().EndsWith("api/v3/counter", StringComparison.Ordinal) // Check URL
            ),
            ItExpr.IsAny<CancellationToken>()
         );

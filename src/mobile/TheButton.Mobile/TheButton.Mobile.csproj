@@ -11,6 +11,8 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<NoWarn>$(NoWarn);1591;CA5392</NoWarn>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
 		<!-- Display name -->
 		<ApplicationTitle>TheButton.Mobile</ApplicationTitle>
@@ -69,6 +71,12 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\TheButton.Mobile.Infrastructure\TheButton.Mobile.Infrastructure.csproj" />
 	  <ProjectReference Include="..\TheButton.Mobile.Core\TheButton.Mobile.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="**\*.sg.cs">
+	    <NoWarn>1591</NoWarn>
+	  </Compile>
 	</ItemGroup>
 
 </Project>

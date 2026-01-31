@@ -4,25 +4,34 @@ using TheButton.Api.Features.V3.Counter;
 
 namespace TheButton.Api.Extensions;
 
-public static class EndpointExtensions
+/// <summary>
+/// Maps application endpoints onto the web application.
+/// </summary>
+internal static class EndpointExtensions
 {
+    /// <summary>
+    /// Maps all API endpoints.
+    /// </summary>
+    /// <param name="app">The web application.</param>
     public static void MapEndpoints(this WebApplication app)
     {
-        var api = app.MapGroup("/api");
+        ArgumentNullException.ThrowIfNull(app);
+
+        RouteGroupBuilder api = app.MapGroup("/api");
 
         // V2
-        api.MapGroup("/v2/counter")
-           .WithTags("Counter V2")
-           .MapV2CounterEndpoints();
+        _ = api.MapGroup("/v2/counter")
+            .WithTags("Counter V2")
+            .MapV2CounterEndpoints();
 
         // V3
-        api.MapGroup("/v3/counter")
-           .WithTags("Counter V3")
-           .MapV3CounterEndpoints();
-           
+        _ = api.MapGroup("/v3/counter")
+            .WithTags("Counter V3")
+            .MapV3CounterEndpoints();
+
         // Health
-        app.MapGroup("/health")
-           .WithTags("Health")
-           .MapHealthEndpoints();
+        _ = app.MapGroup("/health")
+            .WithTags("Health")
+            .MapHealthEndpoints();
     }
 }
