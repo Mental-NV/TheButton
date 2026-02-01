@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Scalar.AspNetCore;
 using TheButton.Api;
 using TheButton.Api.Extensions;
+using TheButton.Api.Middleware;
 using TheButton.Infrastructure.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -60,6 +61,7 @@ if (app.Environment.IsDevelopment())
 }
 
 _ = app.UseCors("AllowFrontend");
+_ = app.UseMiddleware<RequestLoggingEnrichmentMiddleware>();
 
 app.MapEndpoints();
 
