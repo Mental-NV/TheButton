@@ -45,6 +45,7 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
+      pull-requests: write
     env:
       DOTNET_ROOT: "" # Silences the linter
 
@@ -133,9 +134,11 @@ jobs:
           New-Item -ItemType Directory -Force -Path (Split-Path $badgePath) | Out-Null
           $badge | Out-File -FilePath $badgePath -Encoding utf8
 
-      - name: Commit coverage badge
+      - name: Create coverage PR
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           $status = git status --porcelain
           if (-not $status) {
@@ -144,9 +147,26 @@ jobs:
           }
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          $branch = "automation/coverage-badge"
+          git checkout -b $branch
           git add .github/badges/coverage.json
           git commit -m "docs: update coverage badge"
-          git push
+          git push -u origin $branch --force
+          $existing = gh pr list --head $branch --state open --json url | ConvertFrom-Json
+          if ($existing.Count -gt 0) {
+            $prUrl = $existing[0].url
+          } else {
+            $prUrl = gh pr create --title "docs: update coverage badge" --body "Automated coverage badge update."
+          }
+          "COVERAGE_PR_URL=$prUrl" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Auto-merge coverage PR
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && env.COVERAGE_PR_URL != ''
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr merge $env:COVERAGE_PR_URL --auto --squash --delete-branch
 
       - name: Upload test results
         if: always()
