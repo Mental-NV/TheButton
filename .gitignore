@@ -59,3 +59,4 @@ TestResults/
 coverage.json
 *.coverage
 *.cobertura.xml
+!.github/badges/coverage.json

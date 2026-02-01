@@ -5,6 +5,7 @@ TheButton is a demonstration project showcasing modern, industrial-grade softwar
 ## Deployments
 
 [![CI Backend](https://github.com/Mental-NV/TheButton/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/ci-backend.yml)
+[![Backend Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Mental-NV/TheButton/main/.github/badges/coverage.json)](https://github.com/Mental-NV/TheButton/actions/workflows/ci-backend.yml)
 [![CI Mobile](https://github.com/Mental-NV/TheButton/actions/workflows/ci-mobile.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/ci-mobile.yml)
 [![Mobile E2E](https://github.com/Mental-NV/TheButton/actions/workflows/e2e-mobile.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/e2e-mobile.yml)
 [![Azure Deploy](https://github.com/Mental-NV/TheButton/actions/workflows/deploy.yml/badge.svg)](https://github.com/Mental-NV/TheButton/actions/workflows/deploy.yml)
