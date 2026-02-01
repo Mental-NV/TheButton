@@ -1,5 +1,8 @@
-using Microsoft.Extensions.Logging;
+using System.Reflection;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using TheButton.Application.Abstractions;
 using TheButton.Infrastructure.Counter;
 using TheButton.Infrastructure.Persistence;
 
@@ -113,6 +116,16 @@ public class SqlCounterWriterTests
         Assert.AreEqual(0, context.ChangeTracker.Entries().Count());
     }
 
+    [TestMethod]
+    public async Task IncrementAsync_WhenRetryableErrorPersists_ThrowsConflictAfterRetries()
+    {
+        using var context = new RetryableFailingDbContext(_options);
+        var writer = new SqlCounterWriter(context, _logger);
+
+        await Assert.ThrowsExceptionAsync<CounterWriteConflictException>(() => writer.IncrementAsync("key-retry"));
+        Assert.AreEqual(3, context.SaveCallCount);
+    }
+
     private sealed class FailingDbContext : TheButtonDbContext
     {
         public FailingDbContext(DbContextOptions<TheButtonDbContext> options) : base(options)
@@ -123,5 +136,117 @@ public class SqlCounterWriterTests
         {
             throw new InvalidOperationException("Simulated failure.");
         }
+    }
+
+    private sealed class RetryableFailingDbContext : TheButtonDbContext
+    {
+        public RetryableFailingDbContext(DbContextOptions<TheButtonDbContext> options) : base(options)
+        {
+        }
+
+        public int SaveCallCount { get; private set; }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            SaveCallCount++;
+
+            SqlException sqlException = CreateSqlException(2627);
+            throw new DbUpdateException("Simulated retryable failure.", sqlException);
+        }
+    }
+
+    private static SqlException CreateSqlException(int number)
+    {
+        ConstructorInfo sqlErrorCtor = typeof(SqlError)
+            .GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
+            .OrderByDescending(ctor => ctor.GetParameters().Length)
+            .First();
+
+        object?[] sqlErrorArgs = BuildConstructorArgs(sqlErrorCtor.GetParameters(), number);
+        var sqlError = (SqlError)sqlErrorCtor.Invoke(sqlErrorArgs);
+
+        var errorCollection = (SqlErrorCollection)Activator.CreateInstance(typeof(SqlErrorCollection), true)!;
+        typeof(SqlErrorCollection)
+            .GetMethod("Add", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .Invoke(errorCollection, new object[] { sqlError });
+
+        ConstructorInfo sqlExceptionCtor = typeof(SqlException)
+            .GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
+            .OrderByDescending(ctor => ctor.GetParameters().Length)
+            .First();
+
+        object?[] sqlExceptionArgs = BuildConstructorArgs(sqlExceptionCtor.GetParameters(), number, errorCollection);
+        return (SqlException)sqlExceptionCtor.Invoke(sqlExceptionArgs);
+    }
+
+    private static object?[] BuildConstructorArgs(
+        ParameterInfo[] parameters,
+        int number,
+        SqlErrorCollection? errorCollection = null)
+    {
+        var args = new object?[parameters.Length];
+
+        for (int i = 0; i < parameters.Length; i++)
+        {
+            Type parameterType = parameters[i].ParameterType;
+
+            if (parameterType == typeof(int))
+            {
+                args[i] = number;
+                continue;
+            }
+
+            if (parameterType == typeof(byte))
+            {
+                args[i] = (byte)0;
+                continue;
+            }
+
+            if (parameterType == typeof(short))
+            {
+                args[i] = (short)0;
+                continue;
+            }
+
+            if (parameterType == typeof(uint))
+            {
+                args[i] = 0U;
+                continue;
+            }
+
+            if (parameterType == typeof(bool))
+            {
+                args[i] = false;
+                continue;
+            }
+
+            if (parameterType == typeof(string))
+            {
+                args[i] = "Simulated";
+                continue;
+            }
+
+            if (parameterType == typeof(Guid))
+            {
+                args[i] = Guid.NewGuid();
+                continue;
+            }
+
+            if (parameterType == typeof(SqlErrorCollection))
+            {
+                args[i] = errorCollection;
+                continue;
+            }
+
+            if (parameterType == typeof(Exception))
+            {
+                args[i] = null;
+                continue;
+            }
+
+            args[i] = null;
+        }
+
+        return args;
     }
 }

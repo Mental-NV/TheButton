@@ -30,11 +30,11 @@ public class SqlCounterWriter(TheButtonDbContext context, ILogger<SqlCounterWrit
             new EventId(3002, nameof(_logIncremented)),
             "Incremented counter for user {UserId}. Global value: {GlobalValue}, User value: {UserValue}");
 
-    private static readonly Action<ILogger, Guid?, int, int, int, Exception?> _logConcurrencyConflict =
+    private static readonly Action<ILogger, Guid?, int, int, int, Exception?> _logRetryAttempt =
         LoggerMessage.Define<Guid?, int, int, int>(
             LogLevel.Warning,
-            new EventId(3003, nameof(_logConcurrencyConflict)),
-            "Concurrency conflict detected for user {UserId}. Attempt {RetryCount}/{MaxRetries}. Jittering {DelayMs}ms...");
+            new EventId(3003, nameof(_logRetryAttempt)),
+            "Retryable failure for user {UserId}. Attempt {RetryCount}/{MaxRetries}. Jittering {DelayMs}ms...");
 
     private static readonly Action<ILogger, int, string, string, Exception?> _logFinalError =
         LoggerMessage.Define<int, string, string>(
@@ -47,6 +47,25 @@ public class SqlCounterWriter(TheButtonDbContext context, ILogger<SqlCounterWrit
             LogLevel.Error,
             new EventId(3005, nameof(_logInnerError)),
             "Inner error: {ExceptionType} - {ExceptionMessage}");
+
+    private static readonly HashSet<int> _transientErrorNumbers =
+    [
+        -2,     // Timeout
+        64,     // Network name deleted
+        233,    // Connection init error
+        10053,  // Connection aborted
+        10054,  // Connection reset
+        10060,  // Network timeout
+        40197,  // Azure SQL transient error
+        40501,  // Service busy
+        4060,   // Cannot open database
+        40613,  // Database unavailable
+        10928,  // Resource limit
+        10929,  // Resource limit
+        49918,  // Cannot process request
+        49919,  // Too many create/update requests
+        49920,  // Too many operations in progress
+    ];
 
     private readonly TheButtonDbContext _context =
         context ?? throw new ArgumentNullException(nameof(context));
@@ -69,7 +88,7 @@ public class SqlCounterWriter(TheButtonDbContext context, ILogger<SqlCounterWrit
         // one will fail. We catch that failure and retry.
         return await strategy.ExecuteAsync(async () =>
         {
-            const int maxRetries = 50;
+            const int maxRetries = 3;
             int retryCount = 0;
 
             while (true)
@@ -148,7 +167,7 @@ public class SqlCounterWriter(TheButtonDbContext context, ILogger<SqlCounterWrit
 
                     return result;
                 }
-                catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex) && retryCount < maxRetries)
+                catch (Exception ex) when (IsRetryableException(ex))
                 {
                     await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
 
@@ -158,9 +177,17 @@ public class SqlCounterWriter(TheButtonDbContext context, ILogger<SqlCounterWrit
 
                     retryCount++;
 
-                    // Dynamic jitter to break the "retry storm"
-                    int delayMs = RandomNumberGenerator.GetInt32(50, 100 + (retryCount * 10));
-                    _logConcurrencyConflict(this._logger, userId, retryCount, maxRetries, delayMs, null);
+                    if (retryCount >= maxRetries)
+                    {
+                        _logFinalError(this._logger, retryCount, ex.GetType().Name, ex.Message, ex);
+                        throw new CounterWriteConflictException(
+                            "Counter write failed after bounded retries.",
+                            ex);
+                    }
+
+                    // Dynamic jitter to break the retry storm.
+                    int delayMs = RandomNumberGenerator.GetInt32(50, 100 + (retryCount * 20));
+                    _logRetryAttempt(this._logger, userId, retryCount, maxRetries, delayMs, null);
 
                     await Task.Delay(delayMs, cancellationToken).ConfigureAwait(false);
                 }
@@ -197,6 +224,33 @@ public class SqlCounterWriter(TheButtonDbContext context, ILogger<SqlCounterWrit
             {
                 // SQL Server error codes: 2627 (Unique constraint), 2601 (Unique index)
                 return true;
+            }
+
+            current = current.InnerException;
+        }
+
+        return false;
+    }
+
+    private static bool IsRetryableException(Exception ex)
+    {
+        return IsUniqueConstraintViolation(ex) || IsTransientSqlException(ex);
+    }
+
+    private static bool IsTransientSqlException(Exception ex)
+    {
+        Exception? current = ex;
+        while (current != null)
+        {
+            if (current is SqlException sqlException)
+            {
+                foreach (SqlError error in sqlException.Errors)
+                {
+                    if (_transientErrorNumbers.Contains(error.Number))
+                    {
+                        return true;
+                    }
+                }
             }
 
             current = current.InnerException;

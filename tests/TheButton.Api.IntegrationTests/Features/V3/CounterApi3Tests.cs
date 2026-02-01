@@ -3,7 +3,9 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TheButton.Application.Abstractions;
 using TheButton.Infrastructure.Persistence;
 using TheButton.Api.Features.V3.Counter;
 
@@ -223,6 +225,49 @@ public class UnifiedCounterTests : IntegrationTestBase
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
     }
 
+    [TestMethod]
+    public async Task PostGlobal_WhenConflict_Returns409()
+    {
+        using var conflictFactory = Factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<ICounterWriter>();
+                services.AddScoped<ICounterWriter>(_ => new ConflictCounterWriter());
+            });
+        });
+
+        using var client = conflictFactory.CreateClient();
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v3/counter");
+        request.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
+
+        var response = await client.SendAsync(request);
+
+        Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    [TestMethod]
+    public async Task PostUser_WhenConflict_Returns409()
+    {
+        using var conflictFactory = Factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<ICounterWriter>();
+                services.AddScoped<ICounterWriter>(_ => new ConflictCounterWriter());
+            });
+        });
+
+        using var client = conflictFactory.CreateClient();
+        var userId = Guid.NewGuid();
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/v3/counter/{userId}");
+        request.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
+
+        var response = await client.SendAsync(request);
+
+        Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
     [TestMethod, Ignore("Temporarily disabled while fixing user incrementing")]
     public async Task GetEndpoints_ReturnConsistentValues()
     {
@@ -249,5 +294,16 @@ public class UnifiedCounterTests : IntegrationTestBase
         var userResult = await userResp.Content.ReadFromJsonAsync<CounterResponse>();
         Assert.AreEqual(postResult.Value, userResult!.Value);
         Assert.AreEqual(postResult.UserValue, userResult.UserValue);
+    }
+
+    private sealed class ConflictCounterWriter : ICounterWriter
+    {
+        public Task<TheButton.Domain.Features.V3.Counter.IncrementResult> IncrementAsync(
+            string idempotencyKey,
+            Guid? userId = null,
+            CancellationToken cancellationToken = default)
+        {
+            throw new CounterWriteConflictException("Simulated conflict.");
+        }
     }
 }
