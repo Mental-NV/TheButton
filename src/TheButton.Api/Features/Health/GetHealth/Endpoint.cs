@@ -16,6 +16,14 @@ internal static class Endpoint
 
         _ = group.MapGet("/", () => Results.Ok(new { Status = "Healthy" }))
             .WithName("GetHealth");
+        _ = group.MapGet("/live", () => Results.Ok(new { Status = "Healthy" }))
+            .WithName("GetLiveHealth");
+
+        _ = group.MapHealthChecks("/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+        {
+            Predicate = registration => registration.Tags.Contains("ready", StringComparer.OrdinalIgnoreCase),
+        }).WithName("GetReadyHealth");
+
         return group;
     }
 }

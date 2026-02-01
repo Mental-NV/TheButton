@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Scalar.AspNetCore;
+using TheButton.Api;
 using TheButton.Api.Extensions;
 using TheButton.Infrastructure.Persistence;
 
@@ -29,6 +30,8 @@ _ = builder.Services.AddDbContext<TheButtonDbContext>(
             errorNumbersToAdd: null)));
 
 _ = builder.Services.AddOpenApi();
+_ = builder.Services.AddHealthChecks()
+    .AddDbContextCheck<TheButtonDbContext>("sql", tags: HealthCheckTags.Ready);
 
 _ = builder.Services.AddCors(options =>
 {

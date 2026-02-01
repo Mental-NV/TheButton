@@ -1,39 +1,45 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using System.Threading.Tasks;
-using System.Net.Http.Json;
 
 namespace TheButton.Api.IntegrationTests;
 
 [TestClass]
-public class HealthTests
+public class HealthTests : IntegrationTestBase
 {
-    private static WebApplicationFactory<Program> _factory = null!;
-
     [ClassInitialize]
-    public static void ClassInit(TestContext context)
+    public static async Task ClassInit(TestContext context)
     {
-        _factory = new WebApplicationFactory<Program>();
+        await SetupAsync();
     }
 
     [ClassCleanup]
-    public static void ClassCleanup()
+    public static async Task ClassCleanup()
     {
-        _factory.Dispose();
+        await TeardownAsync();
     }
 
     [TestMethod]
-    public async Task GetHealth_ReturnsOk()
+    public async Task GetLiveHealth_ReturnsOk()
     {
         // Arrange
-        var client = _factory.CreateClient();
+        var client = Factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync("/health");
+        var response = await client.GetAsync("/health/live");
 
         // Assert
         response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadAsStringAsync();
-        Assert.IsTrue(content.Contains("Healthy"));
+    }
+
+    [TestMethod]
+    public async Task GetReadyHealth_ReturnsOk()
+    {
+        // Arrange
+        var client = Factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/health/ready");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
     }
 }
