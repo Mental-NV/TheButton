@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TheButton.Application.Abstractions;
 using TheButton.Application.Counter.V3.GetGlobal;
 using TheButton.Application.Counter.V3.GetUser;
 using TheButton.Application.Counter.V3.Increment;
@@ -40,16 +41,27 @@ internal static class CounterEndpoints
     /// <param name="handler">The increment handler.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The counter response.</returns>
-    internal static async Task<Microsoft.AspNetCore.Http.HttpResults.Ok<CounterResponse>> HandleGlobalIncrementAsync(
+    internal static async Task<
+        Microsoft.AspNetCore.Http.HttpResults.Results<
+            Microsoft.AspNetCore.Http.HttpResults.Ok<CounterResponse>,
+            Microsoft.AspNetCore.Http.HttpResults.Conflict>>
+        HandleGlobalIncrementAsync(
         [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,
         [FromServices] IncrementHandler handler,
         CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(handler);
 
-        IncrementCommand command = IncrementCommandFactory.Create(idempotencyKey: idempotencyKey, userId: null);
-        IncrementResult result = await handler.Handle(command, ct).ConfigureAwait(false);
-        return TypedResults.Ok(new CounterResponse(Value: result.Value, UserValue: result.UserValue));
+        try
+        {
+            IncrementCommand command = IncrementCommandFactory.Create(idempotencyKey: idempotencyKey, userId: null);
+            IncrementResult result = await handler.Handle(command, ct).ConfigureAwait(false);
+            return TypedResults.Ok(new CounterResponse(Value: result.Value, UserValue: result.UserValue));
+        }
+        catch (CounterWriteConflictException)
+        {
+            return TypedResults.Conflict();
+        }
     }
 
     /// <summary>
@@ -60,7 +72,11 @@ internal static class CounterEndpoints
     /// <param name="handler">The increment handler.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>The counter response.</returns>
-    internal static async Task<Microsoft.AspNetCore.Http.HttpResults.Ok<CounterResponse>> HandleUserIncrementAsync(
+    internal static async Task<
+        Microsoft.AspNetCore.Http.HttpResults.Results<
+            Microsoft.AspNetCore.Http.HttpResults.Ok<CounterResponse>,
+            Microsoft.AspNetCore.Http.HttpResults.Conflict>>
+        HandleUserIncrementAsync(
         [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,
         Guid userId,
         [FromServices] IncrementHandler handler,
@@ -68,9 +84,16 @@ internal static class CounterEndpoints
     {
         ArgumentNullException.ThrowIfNull(handler);
 
-        IncrementCommand command = IncrementCommandFactory.Create(idempotencyKey: idempotencyKey, userId: userId);
-        IncrementResult result = await handler.Handle(command, ct).ConfigureAwait(false);
-        return TypedResults.Ok(new CounterResponse(Value: result.Value, UserValue: result.UserValue));
+        try
+        {
+            IncrementCommand command = IncrementCommandFactory.Create(idempotencyKey: idempotencyKey, userId: userId);
+            IncrementResult result = await handler.Handle(command, ct).ConfigureAwait(false);
+            return TypedResults.Ok(new CounterResponse(Value: result.Value, UserValue: result.UserValue));
+        }
+        catch (CounterWriteConflictException)
+        {
+            return TypedResults.Conflict();
+        }
     }
 
     /// <summary>

@@ -36,7 +36,7 @@ public class CounterEndpointsTests
         var handler = new IncrementHandler(counterWriterMock.Object);
         var result = await CounterEndpoints.HandleGlobalIncrementAsync(idempotencyKey, handler, CancellationToken.None);
 
-        var okResult = result as Ok<CounterResponse>;
+        var okResult = result.Result as Ok<CounterResponse>;
         Assert.IsNotNull(okResult);
         Assert.IsNotNull(okResult.Value);
         Assert.AreEqual(10, okResult.Value.Value);
@@ -73,7 +73,7 @@ public class CounterEndpointsTests
             handler,
             CancellationToken.None);
 
-        var okResult = result as Ok<CounterResponse>;
+        var okResult = result.Result as Ok<CounterResponse>;
         Assert.IsNotNull(okResult);
         Assert.IsNotNull(okResult.Value);
         Assert.AreEqual(12, okResult.Value.Value);
@@ -85,6 +85,44 @@ public class CounterEndpointsTests
                 userId,
                 It.IsAny<CancellationToken>()),
             Times.Once);
+    }
+
+    [TestMethod]
+    public async Task HandleGlobalIncrementAsync_WhenConflict_ReturnsConflict()
+    {
+        var counterWriterMock = new Mock<ICounterWriter>();
+        counterWriterMock
+            .Setup(writer => writer.IncrementAsync(
+                It.IsAny<string>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new CounterWriteConflictException("conflict"));
+
+        var handler = new IncrementHandler(counterWriterMock.Object);
+        var result = await CounterEndpoints.HandleGlobalIncrementAsync("key", handler, CancellationToken.None);
+
+        var conflictResult = result.Result as Conflict;
+        Assert.IsNotNull(conflictResult);
+    }
+
+    [TestMethod]
+    public async Task HandleUserIncrementAsync_WhenConflict_ReturnsConflict()
+    {
+        var counterWriterMock = new Mock<ICounterWriter>();
+        var userId = Guid.NewGuid();
+
+        counterWriterMock
+            .Setup(writer => writer.IncrementAsync(
+                It.IsAny<string>(),
+                It.IsAny<Guid?>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new CounterWriteConflictException("conflict"));
+
+        var handler = new IncrementHandler(counterWriterMock.Object);
+        var result = await CounterEndpoints.HandleUserIncrementAsync("key", userId, handler, CancellationToken.None);
+
+        var conflictResult = result.Result as Conflict;
+        Assert.IsNotNull(conflictResult);
     }
 
     [TestMethod]
