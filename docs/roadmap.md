@@ -108,7 +108,7 @@ This is the authoritative entry point for AI agents and developers. It provides 
   - [Add structured logging enrichment for requests](backlog/M5/E5-1/TASK-M5-E5-1-add-structured-logging-enrichment-for-requests.md) **[Done]**
 - [EPIC: Bounded retry for concurrency/transient SQL faults](backlog/M5/E5-2/EPIC-M5-E5-2-bounded-retry-for-concurrency-transient-sql-faults.md) **[Done]**
   - [Add bounded retry in SQL counter writer](backlog/M5/E5-2/TASK-M5-E5-2-add-bounded-retry-in-sql-counter-writer.md) **[Done]**
-  - [Optional: stress integration test validating retry behavior](backlog/M5/E5-2/TASK-M5-E5-2-optional-stress-integration-test-validating-retry-behavior.md) **[New]**
+  - [Optional: stress integration test validating retry behavior](backlog/M5/E5-2/TASK-M5-E5-2-optional-stress-integration-test-validating-retry-behavior.md) **[Done]**
 
 ---
 
