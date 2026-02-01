@@ -18,6 +18,19 @@ public class HealthTests : IntegrationTestBase
     }
 
     [TestMethod]
+    public async Task GetHealth_ReturnsOk()
+    {
+        // Arrange
+        var client = Factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/health");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+    }
+
+    [TestMethod]
     public async Task GetLiveHealth_ReturnsOk()
     {
         // Arrange
