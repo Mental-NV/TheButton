@@ -8,6 +8,7 @@ on:
       - "tests/mobile/**"
       - ".github/workflows/ci-mobile.yml"
       - ".github/workflows/e2e-mobile.yml"
+      - ".github/badges/coverage.json"
       - ".maestro/**"
       - "scripts/run-*-e2e.sh"
       - "**/*.md"
@@ -18,6 +19,7 @@ on:
       - "tests/mobile/**"
       - ".github/workflows/ci-mobile.yml"
       - ".github/workflows/e2e-mobile.yml"
+      - ".github/badges/coverage.json"
       - ".maestro/**"
       - "scripts/run-*-e2e.sh"
       - "**/*.md"
@@ -41,6 +43,8 @@ jobs:
   backend:
     name: Backend build & test
     runs-on: windows-latest
+    permissions:
+      contents: write
     env:
       DOTNET_ROOT: "" # Silences the linter
 
@@ -106,6 +110,43 @@ jobs:
           if ($linePercent -lt $coverageThreshold) {
             throw "Merged line coverage $linePercent% is below the $coverageThreshold% threshold."
           }
+
+      - name: Update coverage badge
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        shell: pwsh
+        run: |
+          $coverageReport = "${{ github.workspace }}/TestResults/coverage/coverage.cobertura.xml"
+          if (-not (Test-Path $coverageReport)) {
+            throw "Coverage report not found at $coverageReport"
+          }
+          [xml]$coverageXml = Get-Content $coverageReport
+          $lineRate = [double]$coverageXml.coverage.'line-rate'
+          $linePercent = [math]::Round(($lineRate * 100), 2)
+          $color = if ($linePercent -ge 90) { "brightgreen" } elseif ($linePercent -ge 80) { "green" } elseif ($linePercent -ge 70) { "yellowgreen" } elseif ($linePercent -ge 60) { "yellow" } elseif ($linePercent -ge 50) { "orange" } else { "red" }
+          $badge = @{
+            schemaVersion = 1
+            label = "coverage"
+            message = "$linePercent`%"
+            color = $color
+          } | ConvertTo-Json -Compress
+          $badgePath = "${{ github.workspace }}/.github/badges/coverage.json"
+          New-Item -ItemType Directory -Force -Path (Split-Path $badgePath) | Out-Null
+          $badge | Out-File -FilePath $badgePath -Encoding utf8
+
+      - name: Commit coverage badge
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        shell: pwsh
+        run: |
+          $status = git status --porcelain
+          if (-not $status) {
+            Write-Host "No coverage badge changes to commit."
+            exit 0
+          }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/badges/coverage.json
+          git commit -m "docs: update coverage badge"
+          git push
 
       - name: Upload test results
         if: always()
