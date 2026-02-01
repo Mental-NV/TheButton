@@ -104,8 +104,8 @@ This is the authoritative entry point for AI agents and developers. It provides 
 ### M5 — Observability, Health, Hardening
 
 - [EPIC: Observability and health](backlog/M5/E5-1/EPIC-M5-E5-1-observability-and-health.md) **[InProgress]**
-  - [Add health check endpoints (live/ready)](backlog/M5/E5-1/TASK-M5-E5-1-add-health-check-endpoints-live-ready.md) **[InReview]**
-  - [Add structured logging enrichment for requests](backlog/M5/E5-1/TASK-M5-E5-1-add-structured-logging-enrichment-for-requests.md) **[New]**
+  - [Add health check endpoints (live/ready)](backlog/M5/E5-1/TASK-M5-E5-1-add-health-check-endpoints-live-ready.md) **[Done]**
+  - [Add structured logging enrichment for requests](backlog/M5/E5-1/TASK-M5-E5-1-add-structured-logging-enrichment-for-requests.md) **[InReview]**
 - [EPIC: Bounded retry for concurrency/transient SQL faults](backlog/M5/E5-2/EPIC-M5-E5-2-bounded-retry-for-concurrency-transient-sql-faults.md) **[New]**
   - [Add bounded retry in SQL counter writer](backlog/M5/E5-2/TASK-M5-E5-2-add-bounded-retry-in-sql-counter-writer.md) **[New]**
   - [Optional: stress integration test validating retry behavior](backlog/M5/E5-2/TASK-M5-E5-2-optional-stress-integration-test-validating-retry-behavior.md) **[New]**
