@@ -48,6 +48,7 @@ jobs:
       pull-requests: write
     env:
       DOTNET_ROOT: "" # Silences the linter
+      COVERAGE_PR_URL: "" # Silences the linter
 
     steps:
       - uses: actions/checkout@v4
