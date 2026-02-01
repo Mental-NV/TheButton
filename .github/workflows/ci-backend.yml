@@ -113,7 +113,7 @@ jobs:
           }
 
       - name: Update coverage badge
-        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         shell: pwsh
         run: |
           $coverageReport = "${{ github.workspace }}/TestResults/coverage/coverage.cobertura.xml"
@@ -135,10 +135,10 @@ jobs:
           $badge | Out-File -FilePath $badgePath -Encoding utf8
 
       - name: Create coverage PR
-        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.COVERAGE_BOT_PAT }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           $status = git status --porcelain
           if (-not $status) {
@@ -161,10 +161,10 @@ jobs:
           "COVERAGE_PR_URL=$prUrl" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Auto-merge coverage PR
-        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.COVERAGE_PR_URL != ''
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && env.COVERAGE_PR_URL != ''
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.COVERAGE_BOT_PAT }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh pr merge $env:COVERAGE_PR_URL --auto --squash --delete-branch
 
