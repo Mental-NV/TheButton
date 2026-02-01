@@ -29,6 +29,8 @@ _ = builder.Services.AddDbContext<TheButtonDbContext>(
             errorNumbersToAdd: null)));
 
 _ = builder.Services.AddOpenApi();
+_ = builder.Services.AddHealthChecks()
+    .AddDbContextCheck<TheButtonDbContext>("sql", tags: new[] { "ready" });
 
 _ = builder.Services.AddCors(options =>
 {
