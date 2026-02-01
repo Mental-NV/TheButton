@@ -2,11 +2,11 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Scalar.AspNetCore;
+using TheButton.Api;
 using TheButton.Api.Extensions;
 using TheButton.Infrastructure.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-static readonly string[] ReadyHealthTags = ["ready"];
 
 // Add services to the container.
 
@@ -31,7 +31,7 @@ _ = builder.Services.AddDbContext<TheButtonDbContext>(
 
 _ = builder.Services.AddOpenApi();
 _ = builder.Services.AddHealthChecks()
-    .AddDbContextCheck<TheButtonDbContext>("sql", tags: ReadyHealthTags);
+    .AddDbContextCheck<TheButtonDbContext>("sql", tags: HealthCheckTags.Ready);
 
 _ = builder.Services.AddCors(options =>
 {

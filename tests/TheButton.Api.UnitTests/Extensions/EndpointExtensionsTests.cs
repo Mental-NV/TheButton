@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using TheButton.Api.Extensions;
 
 namespace TheButton.Api.UnitTests.Extensions;
@@ -11,6 +12,7 @@ public class EndpointExtensionsTests
     public void MapEndpoints_RegistersExpectedRoutes()
     {
         var builder = WebApplication.CreateBuilder();
+        _ = builder.Services.AddHealthChecks();
         var app = builder.Build();
 
         app.MapEndpoints();

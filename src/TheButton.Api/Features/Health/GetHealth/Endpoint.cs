@@ -14,6 +14,8 @@ internal static class Endpoint
     {
         ArgumentNullException.ThrowIfNull(group);
 
+        _ = group.MapGet("/", () => Results.Ok(new { Status = "Healthy" }))
+            .WithName("GetHealth");
         _ = group.MapGet("/live", () => Results.Ok(new { Status = "Healthy" }))
             .WithName("GetLiveHealth");
 
