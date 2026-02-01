@@ -152,13 +152,19 @@ jobs:
           git add .github/badges/coverage.json
           git commit -m "docs: update coverage badge"
           git push -u origin $branch --force
-          $existing = gh pr list --head $branch --state open --json url | ConvertFrom-Json
-          if ($existing.Count -gt 0) {
-            $prUrl = $existing[0].url
-          } else {
-            $prUrl = gh pr create --title "docs: update coverage badge" --body "Automated coverage badge update."
+          try {
+            $existing = gh pr list --head $branch --state open --json url | ConvertFrom-Json
+            if ($existing.Count -gt 0) {
+              $prUrl = $existing[0].url
+            } else {
+              $prUrl = gh pr create --title "docs: update coverage badge" --body "Automated coverage badge update."
+            }
+            if ($prUrl) {
+              "COVERAGE_PR_URL=$prUrl" | Out-File -FilePath $env:GITHUB_ENV -Append
+            }
+          } catch {
+            Write-Host "Coverage PR creation failed; continuing without auto-merge."
           }
-          "COVERAGE_PR_URL=$prUrl" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Auto-merge coverage PR
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.COVERAGE_PR_URL != ''
@@ -166,7 +172,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.COVERAGE_BOT_PAT }}
         run: |
-          gh pr merge $env:COVERAGE_PR_URL --auto --squash --delete-branch
+          try {
+            gh pr merge $env:COVERAGE_PR_URL --auto --squash --delete-branch
+          } catch {
+            Write-Host "Coverage PR auto-merge failed; continuing."
+          }
 
       - name: Upload test results
         if: always()
