@@ -14,10 +14,10 @@ Idempotency must be safe across retries and must not collide across different op
 ## Decision
 Use **Variant A: Transactional projections** in a single database:
 
-- Append the event to `write.Events` and (when applicable) update the projection `read.UserCounters` **in the same SQL transaction**.
+- Append the event to `write.Events` and persist idempotency outcome in the **same SQL transaction**.
 - Persist idempotency outcomes in `write.Commands` scoped by:
-  - `Operation` (`GlobalIncrement` or `UserIncrement`)
-  - optional `UserId`
+  - `Operation` (`Increment`)
+  - optional `UserId` (NULL for global increment)
   - `IdempotencyKey` (header value)
 
 There is **one** increment event type (`CounterIncremented`) with **optional `UserId`**.

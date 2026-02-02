@@ -45,6 +45,97 @@ dotnet run --project src/TheButton.Api/TheButton.Api.csproj
 -   **API URL**: `http://localhost:5285` (Configured in `launchSettings.json`)
 -   **Scalar/OpenAPI UI**: `http://localhost:5285/scalar/v1`
 
+### LocalDB, Migrations, and Scripts
+
+The API uses SQL Server LocalDB by default.
+
+```text
+Server=(localdb)\MSSQLLocalDB;Database=TheButton;Trusted_Connection=True;MultipleActiveResultSets=True
+```
+
+Restore tools and apply migrations:
+
+```bash
+dotnet tool restore
+dotnet ef database update -p src/TheButton.Infrastructure -s src/TheButton.Api
+```
+
+Or use the bootstrap scripts:
+
+```powershell
+.\scripts\db\bootstrap-db.ps1
+```
+
+```bash
+./scripts/db/bootstrap-db.sh
+```
+
+To target a custom connection string, set `THEBUTTON_CONNECTIONSTRING` before running the script.
+
+### API Examples (v3)
+
+Global increment:
+
+```bash
+curl -X POST "http://localhost:5285/api/v3/counter" \
+  -H "Idempotency-Key: 11111111-1111-1111-1111-111111111111"
+```
+
+Response:
+
+```json
+{
+  "value": 1,
+  "userValue": null
+}
+```
+
+User increment:
+
+```bash
+curl -X POST "http://localhost:5285/api/v3/counter/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" \
+  -H "Idempotency-Key: 22222222-2222-2222-2222-222222222222"
+```
+
+Response:
+
+```json
+{
+  "value": 2,
+  "userValue": 1
+}
+```
+
+Global read:
+
+```bash
+curl "http://localhost:5285/api/v3/counter"
+```
+
+Response:
+
+```json
+{
+  "value": 2,
+  "userValue": null
+}
+```
+
+User read:
+
+```bash
+curl "http://localhost:5285/api/v3/counter/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+```
+
+Response:
+
+```json
+{
+  "value": 2,
+  "userValue": 1
+}
+```
+
 ### Test
 
 Run all unit and integration tests:
