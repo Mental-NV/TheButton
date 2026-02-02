@@ -114,7 +114,7 @@ This is the authoritative entry point for AI agents and developers. It provides 
 
 ### M6 — Documentation & Polish
 
-- [EPIC: Documentation updates (README + examples)](backlog/M6/E6-1/EPIC-M6-E6-1-documentation-updates-readme-examples.md) **[InProgress]**
-  - [README: API examples (curl) for v3 endpoints](backlog/M6/E6-1/TASK-M6-E6-1-readme-api-examples-curl-for-v3-endpoints.md) **[InProgress]**
-  - [README: LocalDB + migrations + scripts section](backlog/M6/E6-1/TASK-M6-E6-1-readme-localdb-migrations-scripts-section.md) **[InProgress]**
-  - [Update roadmap and ADR references after v3 contract change](backlog/M6/E6-1/TASK-M6-E6-1-update-roadmap-and-adr-references-after-v3-contract-change.md) **[InProgress]**
+- [EPIC: Documentation updates (README + examples)](backlog/M6/E6-1/EPIC-M6-E6-1-documentation-updates-readme-examples.md) **[InReview]**
+  - [README: API examples (curl) for v3 endpoints](backlog/M6/E6-1/TASK-M6-E6-1-readme-api-examples-curl-for-v3-endpoints.md) **[InReview]**
+  - [README: LocalDB + migrations + scripts section](backlog/M6/E6-1/TASK-M6-E6-1-readme-localdb-migrations-scripts-section.md) **[InReview]**
+  - [Update roadmap and ADR references after v3 contract change](backlog/M6/E6-1/TASK-M6-E6-1-update-roadmap-and-adr-references-after-v3-contract-change.md) **[InReview]**
