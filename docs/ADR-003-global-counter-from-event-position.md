@@ -8,15 +8,15 @@ Maintaining a single-row global counter (`UPDATE counter SET value=value+1`) bec
 
 The API requires a global counter value for both:
 
-- global increment (`POST /counter`)
-- user increment (`POST /counter/{userId}`)
+- global increment (`POST /api/v3/counter`)
+- user increment (`POST /api/v3/counter/{userId}`)
 
 ## Decision
 Use the event store’s identity position (`write.Events.Position`) as the global counter value:
 
 - Each increment appends a `CounterIncremented` event (optional `UserId`).
 - `globalValue` is the inserted row’s `Position` for the request.
-- `GET /counter` reads `MAX(Position)` (via `read.GlobalCounter` view filtered by `EventType='CounterIncremented'`).
+- `GET /api/v3/counter` reads `MAX(Position)` from `write.Events` filtered by `EventType='CounterIncremented'`.
 
 ## Consequences
 - **Pros**

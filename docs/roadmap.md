@@ -95,8 +95,8 @@ This is the authoritative entry point for AI agents and developers. It provides 
   - [Integration test: concurrency (N parallel global increments)](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-concurrency-n-parallel-global-increments.md) **[Done]**
   - [Integration test: concurrency (N parallel user increments)](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-concurrency-n-parallel-user-increments.md) **[Done]**
   - [Integration test: idempotency scoped by operation and user](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-idempotency-scoped-by-operation-and-user.md) **[Done]**
-  - [Integration test: POST /counter (global) increments and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-global-increments-and-persists-event.md) **[Done]**
-  - [Integration test: POST /counter?userId={guid} increments user and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-userid-increments-user-and-persists-event.md) **[Done]**
+  - [Integration test: POST /api/v3/counter (global) increments and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-global-increments-and-persists-event.md) **[Done]**
+  - [Integration test: POST /api/v3/counter/{userId} increments user and persists event](backlog/M4/E4-1/TASK-M4-E4-1-integration-test-post-counter-userid-increments-user-and-persists-event.md) **[Done]**
   - [Provision per-run unique LocalDB database and apply migrations](backlog/M4/E4-1/TASK-M4-E4-1-provision-per-run-unique-localdb-database-and-apply-migrations.md) **[Done]**
 
 ---
@@ -114,7 +114,7 @@ This is the authoritative entry point for AI agents and developers. It provides 
 
 ### M6 — Documentation & Polish
 
-- [EPIC: Documentation updates (README + examples)](backlog/M6/E6-1/EPIC-M6-E6-1-documentation-updates-readme-examples.md) **[New]**
-  - [README: API examples (curl) for v3 endpoints](backlog/M6/E6-1/TASK-M6-E6-1-readme-api-examples-curl-for-v3-endpoints.md) **[New]**
-  - [README: LocalDB + migrations + scripts section](backlog/M6/E6-1/TASK-M6-E6-1-readme-localdb-migrations-scripts-section.md) **[New]**
-  - [Update roadmap and ADR references after v3 contract change](backlog/M6/E6-1/TASK-M6-E6-1-update-roadmap-and-adr-references-after-v3-contract-change.md) **[New]**
+- [EPIC: Documentation updates (README + examples)](backlog/M6/E6-1/EPIC-M6-E6-1-documentation-updates-readme-examples.md) **[InProgress]**
+  - [README: API examples (curl) for v3 endpoints](backlog/M6/E6-1/TASK-M6-E6-1-readme-api-examples-curl-for-v3-endpoints.md) **[InProgress]**
+  - [README: LocalDB + migrations + scripts section](backlog/M6/E6-1/TASK-M6-E6-1-readme-localdb-migrations-scripts-section.md) **[InProgress]**
+  - [Update roadmap and ADR references after v3 contract change](backlog/M6/E6-1/TASK-M6-E6-1-update-roadmap-and-adr-references-after-v3-contract-change.md) **[InProgress]**
